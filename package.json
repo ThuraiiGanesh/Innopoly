@@ -1,21 +1,35 @@
 {
-  "name": "innopoly",
+  "name": "innopoly-mobile-app",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "description": "StyleSync AI Fashion-Tech Mobile Application for iOS App Store & Google Play Store",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cap:init": "cap init",
+    "cap:sync": "npm run build && cap sync",
+    "cap:android": "npm run build && cap sync android",
+    "cap:ios": "npm run build && cap sync ios",
+    "cap:open:android": "cap open android",
+    "cap:open:ios": "cap open ios"
   },
   "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/camera": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/haptics": "^7.0.0",
+    "@capacitor/ios": "^7.0.0",
+    "@capacitor/status-bar": "^7.0.0",
     "canvas-confetti": "^1.9.4",
     "lucide-react": "^1.25.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.0.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",

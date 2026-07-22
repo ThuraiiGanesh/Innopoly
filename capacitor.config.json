@@ -1,0 +1,19 @@
+{
+  "appId": "com.stylesync.innopoly",
+  "appName": "StyleSync AI",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  },
+  "plugins": {
+    "Camera": {
+      "permissions": ["camera", "photos"]
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#0f172a"
+    }
+  }
+}
