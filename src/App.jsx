@@ -22,6 +22,7 @@ import {
 } from './utils/database';
 
 export default function App() {
+  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'closet' | 'styling' | 'creators' | 'templates' | 'compliance'
   const [user, setUser] = useState(null);
   const [wardrobe, setWardrobe] = useState(INITIAL_WARDROBE);
   const [currentBudget, setCurrentBudget] = useState(50);
@@ -32,7 +33,6 @@ export default function App() {
   const [complianceOpen, setComplianceOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
 
-  // Initialize DB and load user on mount
   useEffect(() => {
     initDatabase();
     const currentUser = getCurrentUser();
@@ -43,29 +43,9 @@ export default function App() {
     setWardrobe(savedWardrobe);
   }, []);
 
-  // Sync wardrobe changes to persistent DB
   useEffect(() => {
     saveUserWardrobeInDB(wardrobe);
   }, [wardrobe]);
-
-  // Intersection observer for scroll animations
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    const revealElements = document.querySelectorAll('.reveal-on-scroll');
-    revealElements.forEach((el) => observer.observe(el));
-
-    return () => observer.disconnect();
-  }, []);
 
   const handleAddItem = (newItem) => {
     setWardrobe((prev) => [newItem, ...prev]);
@@ -78,19 +58,15 @@ export default function App() {
   const handleSelectTemplate = (template) => {
     setSelectedTemplate(template);
     setSelectedCreator(null);
-    const mixerElement = document.getElementById('mixer');
-    if (mixerElement) {
-      mixerElement.scrollIntoView({ behavior: 'smooth' });
-    }
+    setActiveTab('styling');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSelectCreatorOutfit = (creator) => {
     setSelectedCreator(creator);
     setSelectedTemplate(null);
-    const mixerElement = document.getElementById('mixer');
-    if (mixerElement) {
-      mixerElement.scrollIntoView({ behavior: 'smooth' });
-    }
+    setActiveTab('styling');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleLoginSuccess = (loggedInUser) => {
@@ -104,62 +80,87 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col justify-between selection:bg-black selection:text-white">
-      {/* Header Navigation */}
+      {/* Header Navigation Bar with Active Section Tabs */}
       <Header
         user={user}
+        activeTab={activeTab}
+        onTabChange={(tab) => {
+          setActiveTab(tab);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
         onOpenLogin={() => setLoginModalOpen(true)}
         onLogout={handleLogout}
         onOpenPitch={() => setPitchDeckOpen(true)}
       />
 
-      <main className="flex-1">
-        {/* Hero Section */}
-        <Hero onOpenCompliance={() => setComplianceOpen(true)} />
+      <main className="flex-1 pb-12">
+        {/* Section View 1: Home Overview */}
+        {activeTab === 'home' && (
+          <div className="animate-fade-in-up">
+            <Hero 
+              onNavigate={(tab) => {
+                setActiveTab(tab);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              onOpenCompliance={() => setComplianceOpen(true)} 
+            />
+          </div>
+        )}
 
-        {/* Section 1: Closet Digitizer */}
-        <div className="reveal-on-scroll">
-          <WardrobeDigitizer
-            wardrobe={wardrobe}
-            onAddItem={handleAddItem}
-            onDeleteItem={handleDeleteItem}
-          />
-        </div>
+        {/* Section View 2: Closet Digitizer */}
+        {activeTab === 'closet' && (
+          <div className="animate-fade-in-up">
+            <WardrobeDigitizer
+              wardrobe={wardrobe}
+              onAddItem={handleAddItem}
+              onDeleteItem={handleDeleteItem}
+            />
+          </div>
+        )}
 
-        {/* Section 2: Height, Waist & Creator Matcher */}
-        <div className="reveal-on-scroll">
-          <BodyCreatorMatcher
-            onSelectCreatorOutfit={handleSelectCreatorOutfit}
-          />
-        </div>
+        {/* Section View 3: Height, Waist & Creator Matcher */}
+        {activeTab === 'creators' && (
+          <div className="animate-fade-in-up">
+            <BodyCreatorMatcher
+              onSelectCreatorOutfit={handleSelectCreatorOutfit}
+            />
+          </div>
+        )}
 
-        {/* Section 3: Occasion Style Templates */}
-        <div className="reveal-on-scroll">
-          <CategoryTemplates
-            onSelectTemplate={handleSelectTemplate}
-          />
-        </div>
+        {/* Section View 4: Occasion Templates */}
+        {activeTab === 'templates' && (
+          <div className="animate-fade-in-up">
+            <CategoryTemplates
+              onSelectTemplate={handleSelectTemplate}
+            />
+          </div>
+        )}
 
-        {/* Section 4: Mix & Match Canvas + Color Swapper + Affiliate Links */}
-        <div className="reveal-on-scroll">
-          <OutfitMixer
-            wardrobe={wardrobe}
-            currentBudget={currentBudget}
-            selectedTemplate={selectedTemplate}
-            selectedCreator={selectedCreator}
-          />
-        </div>
+        {/* Section View 5: Interactive Outfit Mixer & "Choose Color" Canvas */}
+        {activeTab === 'styling' && (
+          <div className="animate-fade-in-up">
+            <OutfitMixer
+              wardrobe={wardrobe}
+              currentBudget={currentBudget}
+              selectedTemplate={selectedTemplate}
+              selectedCreator={selectedCreator}
+            />
+          </div>
+        )}
 
-        {/* Section 5: Budget Filter & Compliance Rules */}
-        <div className="reveal-on-scroll">
-          <BudgetCompliance
-            currentBudget={currentBudget}
-            onBudgetChange={setCurrentBudget}
-            onOpenCompliance={() => setComplianceOpen(true)}
-          />
-        </div>
+        {/* Section View 6: Budget Controls & Regulatory Rules */}
+        {activeTab === 'compliance' && (
+          <div className="animate-fade-in-up">
+            <BudgetCompliance
+              currentBudget={currentBudget}
+              onBudgetChange={setCurrentBudget}
+              onOpenCompliance={() => setComplianceOpen(true)}
+            />
+          </div>
+        )}
       </main>
 
-      {/* Floating AI Fashion Stylist Chatbot */}
+      {/* Floating AI Fashion Stylist Chatbot (Accessible across all views) */}
       <Chatbot
         userProfile={user}
         wardrobe={wardrobe}
@@ -172,7 +173,7 @@ export default function App() {
         onOpenCompliance={() => setComplianceOpen(true)}
       />
 
-      {/* User Login & Signup Modal */}
+      {/* Login & Registration Modal */}
       <LoginModal
         isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
@@ -185,7 +186,7 @@ export default function App() {
         onClose={() => setPitchDeckOpen(false)}
       />
 
-      {/* Compliance Modal */}
+      {/* Compliance Rules Modal */}
       <ComplianceModal
         isOpen={complianceOpen}
         onClose={() => setComplianceOpen(false)}
