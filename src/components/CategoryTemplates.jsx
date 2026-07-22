@@ -10,6 +10,7 @@ export default function CategoryTemplates({ onSelectTemplate }) {
     'Smart Casual',
     'Streetwear',
     'Formal',
+    'Sportswear',
     'Vacation'
   ];
 
@@ -27,7 +28,7 @@ export default function CategoryTemplates({ onSelectTemplate }) {
           Curated Occasion Style Templates
         </h2>
         <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-          Select ready-to-wear styling templates categorized by occasion. StyleSync instantly scans your digitized wardrobe and isolates missing pieces within budget.
+          Select ready-to-wear styling templates categorized by occasion (Smart Casual, Streetwear, Formal, Sportswear, Vacation).
         </p>
 
         {/* Category Filter Pills */}

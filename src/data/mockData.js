@@ -143,20 +143,48 @@ export const TEMPLATES = [
   },
   {
     id: 't2',
-    title: 'Tokyo Streetwear Chill',
+    title: 'Tokyo Streetwear Black Tee',
     category: 'Streetwear',
-    image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&auto=format&fit=crop&q=80',
-    description: 'Relaxed proportions with contrast stitching and boxy silhouetting.',
+    image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=600&auto=format&fit=crop&q=80',
+    description: 'Black photo tee paired with olive cargo pants and beanie.',
     ownedCount: 2,
     missingCount: 1,
-    missingItemName: 'Wide-Leg Indigo Baggy Jeans',
-    missingItemPrice: 18.90,
-    affiliateLink: 'https://shopee.sg/product/baggy-jeans',
+    missingItemName: 'Wide-Leg Olive Cargo Pants',
+    missingItemPrice: 28.90,
+    affiliateLink: 'https://shopee.sg/product/cargo-pants',
     merchant: 'Shopee Preferred / Uniqlo',
-    colorsAvailable: ['#1e1b4b', '#0f172a', '#334155', '#64748b']
+    colorsAvailable: ['#18181b', '#3f6212', '#27272a']
   },
   {
     id: 't3',
+    title: 'Monochrome Formal Pinstripe Suit',
+    category: 'Formal',
+    image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80',
+    description: 'Tailored blue pinstripe suit with white dress shirt and monk straps.',
+    ownedCount: 2,
+    missingCount: 1,
+    missingItemName: 'Double-Monk Strap Leather Shoes',
+    missingItemPrice: 68.00,
+    affiliateLink: 'https://amazon.sg/product/oxford-shoes',
+    merchant: 'Amazon Fashion',
+    colorsAvailable: ['#1e1b4b', '#09090b', '#3f3f46']
+  },
+  {
+    id: 't4',
+    title: 'Nike Performance Athletic Sportswear',
+    category: 'Sportswear',
+    image: 'https://images.unsplash.com/photo-1483721074892-4a8580712694?w=600&auto=format&fit=crop&q=80',
+    description: 'Black Dri-FIT performance athletic tee, black joggers & Nike running shoes.',
+    ownedCount: 2,
+    missingCount: 1,
+    missingItemName: 'Nike Dri-FIT Performance Joggers',
+    missingItemPrice: 39.90,
+    affiliateLink: 'https://nike.com/product/joggers',
+    merchant: 'Nike Official Store',
+    colorsAvailable: ['#18181b', '#27272a', '#ffffff']
+  },
+  {
+    id: 't5',
     title: 'Resort Vacation Linen',
     category: 'Vacation',
     image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&auto=format&fit=crop&q=80',
@@ -168,20 +196,6 @@ export const TEMPLATES = [
     affiliateLink: 'https://lazada.sg/product/camp-shirt',
     merchant: 'ASOS / Lazada',
     colorsAvailable: ['#15803d', '#f59e0b', '#0284c7', '#ffffff']
-  },
-  {
-    id: 't4',
-    title: 'Monochrome Gala Elegance',
-    category: 'Formal',
-    image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80',
-    description: 'Refined silhouette featuring tailored lines and sharp structure.',
-    ownedCount: 2,
-    missingCount: 1,
-    missingItemName: 'Double-Monk Strap Oxford Shoes',
-    missingItemPrice: 68.00,
-    affiliateLink: 'https://amazon.sg/product/oxford-shoes',
-    merchant: 'Amazon Fashion',
-    colorsAvailable: ['#09090b', '#3f3f46', '#78350f']
   }
 ];
 

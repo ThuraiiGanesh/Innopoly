@@ -18,7 +18,7 @@ export default function Chatbot({ userProfile, wardrobe, currentBudget }) {
     {
       id: 'm1',
       sender: 'bot',
-      text: `Welcome! I am your StyleSync AI Assistant. I analyze your ${wardrobe.length} closet items, height/waist profile, and $${currentBudget} SGD budget to recommend outfits and generate visual outfit pictures. How can I style you today?`,
+      text: `Welcome! I am your StyleSync AI Assistant. I analyze your ${wardrobe.length} closet items, height/waist profile, and $${currentBudget} SGD budget to recommend outfits and generate visual outfit pictures (Black Tee, Smart Casual, Formal Wear & Sportswear). How can I style you today?`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       picture: 'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=600&auto=format&fit=crop&q=80',
       pictureCaption: '✨ AI Generated Outfit Look: Contemporary Smart Casual'
@@ -41,13 +41,13 @@ export default function Chatbot({ userProfile, wardrobe, currentBudget }) {
   };
 
   const quickPrompts = [
-    "📸 Provide outfit picture for Black Tee",
-    "💼 Picture for Smart Casual look under $50",
-    "🏖️ Tropical vacation outfit image",
-    "🎨 Show color match picture"
+    "📸 Picture for Black Tee",
+    "💼 Picture for Smart Casual",
+    "👔 Picture for Formal Wear",
+    "🏃 Picture for Sportswear"
   ];
 
-  // Call Gemini REST API with fallback and AI picture generation
+  // Call Gemini REST API with fallback and category-specific AI picture generation
   const callGeminiAPI = async (userQuery) => {
     const apiKey = getStylistApiKey();
     const wardrobeList = wardrobe.map(i => `${i.name} (${i.category})`).join(', ');
@@ -77,31 +77,34 @@ Provide a helpful 2-3 sentence style recommendation. Focus on their owned items 
       console.warn("Gemini API fallback:", e);
     }
 
-    if (!aiText) {
-      const q = userQuery.toLowerCase();
-      if (q.includes('picture') || q.includes('image') || q.includes('photo') || q.includes('show') || q.includes('tee')) {
-        aiText = `Here is your generated outfit picture! Pair your owned Black Tee with charcoal tailored trousers and white sneakers. Add an unlined beige trench coat to elevate the look!`;
-      } else if (q.includes('smart') || q.includes('office') || q.includes('casual')) {
-        aiText = `Here is a crisp Smart Casual outfit recommendation picture for you. Clean lines, tailored waist fit, and subtle contrast!`;
-      } else {
-        aiText = `Here is a custom AI-generated outfit look based on your digitized wardrobe items and $${currentBudget} SGD budget cap!`;
-      }
+    const q = userQuery.toLowerCase();
+    let pic = 'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=600&auto=format&fit=crop&q=80';
+    let cap = '📸 AI Generated Style Picture';
+
+    if (q.includes('sport') || q.includes('nike') || q.includes('gym') || q.includes('athletic')) {
+      if (!aiText) aiText = `Here is your Sportswear outfit recommendation picture! Featuring a black performance athletic tee, black Dri-FIT jogger pants, and responsive running sneakers for maximum mobility.`;
+      pic = 'https://images.unsplash.com/photo-1483721074892-4a8580712694?w=600&auto=format&fit=crop&q=80';
+      cap = '🏃 AI Generated Picture: Nike Athletic Sportswear';
+    } else if (q.includes('formal') || q.includes('suit') || q.includes('gala')) {
+      if (!aiText) aiText = `Here is your Formal Wear outfit recommendation picture! Featuring a tailored blue pinstripe suit, crisp white unbuttoned dress shirt, and monk strap leather shoes.`;
+      pic = 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80';
+      cap = '👔 AI Generated Picture: Formal Pinstripe Suit';
+    } else if (q.includes('tee') || q.includes('black') || q.includes('streetwear')) {
+      if (!aiText) aiText = `Here is your Black Photo Tee outfit recommendation picture! Pair your owned Black Tee with olive cargo trousers and a black knit beanie.`;
+      pic = 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=600&auto=format&fit=crop&q=80';
+      cap = '📸 AI Generated Picture: Black Photo Tee';
+    } else if (q.includes('smart') || q.includes('office') || q.includes('casual')) {
+      if (!aiText) aiText = `Here is your Smart Casual outfit recommendation picture! Featuring a tweed blazer, light dress shirt, dark denim, and brown leather shoes.`;
+      pic = 'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=600&auto=format&fit=crop&q=80';
+      cap = '💼 AI Generated Picture: Smart Casual Blazer';
+    } else {
+      if (!aiText) aiText = `Here is a custom AI-generated outfit look based on your digitized wardrobe items and $${currentBudget} SGD budget cap!`;
     }
-
-    // Generate matching AI picture for the chatbot response
-    const fashionPics = [
-      'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80'
-    ];
-
-    const randomPic = fashionPics[Math.floor(Math.random() * fashionPics.length)];
 
     return {
       text: aiText,
-      picture: randomPic,
-      caption: `📸 AI Generated Style Picture: ${userQuery.slice(0, 30)}...`
+      picture: pic,
+      caption: cap
     };
   };
 
