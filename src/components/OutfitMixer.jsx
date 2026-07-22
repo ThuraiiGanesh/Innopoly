@@ -1,15 +1,24 @@
 import React, { useState } from 'react';
-import { Palette, ShoppingBag, ExternalLink, Sparkles, Check, Sliders, ShieldCheck } from 'lucide-react';
+import { Palette, ShoppingBag, ExternalLink, Sparkles, Check, Sliders, ShieldCheck, ArrowRight, Layers, User, Camera } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { AFFILIATE_PRODUCTS } from '../data/mockData';
 
-export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate, selectedCreator }) {
+export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate, selectedCreator, onNavigate }) {
+  const ownedTops = wardrobe.filter(i => i.category === 'Tops');
+  const ownedBottoms = wardrobe.filter(i => i.category === 'Bottoms');
+  const ownedOuterwear = wardrobe.filter(i => i.category === 'Outerwear');
+  const ownedShoes = wardrobe.filter(i => i.category === 'Shoes');
+
+  const [selectedTop, setSelectedTop] = useState(ownedTops[0] || wardrobe[0] || null);
+  const [selectedBottom, setSelectedBottom] = useState(ownedBottoms[0] || null); // null means using affiliate missing piece
+  const [selectedOuter, setSelectedOuter] = useState(ownedOuterwear[0] || null);
+  const [selectedShoes, setSelectedShoes] = useState(ownedShoes[0] || null);
+
   const [topColor, setTopColor] = useState('#18181b'); // Black
   const [topColorName, setTopColorName] = useState('Midnight Black');
   const [bottomColor, setBottomColor] = useState('#1e1b4b'); // Indigo
   const [bottomColorName, setBottomColorName] = useState('Indigo Blue');
-  const [outerColor, setOuterColor] = useState('#d4b996'); // Beige
-  
+
   const [purchasedItems, setPurchasedItems] = useState({});
 
   const colorPalette = [
@@ -36,15 +45,39 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
 
   return (
     <section id="mixer" className="py-16 px-6 max-w-7xl mx-auto scroll-mt-20">
+      {/* Section Stepper / Navigation Banner */}
+      <div className="flex items-center justify-between glass-panel p-3.5 px-6 rounded-2xl mb-8 border border-black/5 text-xs">
+        <div className="flex items-center gap-2 font-mono text-slate-500">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span>Section 3 of 6: <strong>Interactive Outfit Canvas</strong></span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => onNavigate && onNavigate('closet')}
+            className="text-slate-600 hover:text-black font-semibold flex items-center gap-1 hover:underline"
+          >
+            ← My Closet
+          </button>
+          <span className="text-slate-300">•</span>
+          <button
+            onClick={() => onNavigate && onNavigate('creators')}
+            className="text-slate-900 font-bold flex items-center gap-1 hover:underline"
+          >
+            Match Body & Creators →
+          </button>
+        </div>
+      </div>
+
       <div className="text-center max-w-2xl mx-auto mb-12">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-pill text-xs tracking-wider uppercase text-slate-700 font-semibold mb-3">
           <Palette className="w-3.5 h-3.5" /> Mix & Match AI Engine & Color Swapper
         </div>
         <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 mb-3">
-          Interactive Outfit Canvas & "Choose Color"
+          Interactive Outfit Canvas & Item Photos
         </h2>
         <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-          Mix owned clothing items with live color customization. Missing pieces update in real-time with direct, transparent affiliate links filtered strictly under your budget.
+          Select items directly from your digitized closet, test live color swatches, and fill missing pieces with budget-filtered affiliate buy links.
         </p>
 
         {selectedTemplate && (
@@ -68,44 +101,72 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
               <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-slate-800" /> Outfit Preview Canvas
               </h3>
-              <span className="text-xs font-mono text-slate-400">Real-Time Simulation</span>
+              <span className="text-xs font-mono text-slate-400">Photos Included</span>
             </div>
 
-            {/* Interactive Layered Outfit Display */}
-            <div className="space-y-3">
+            {/* Interactive Layered Outfit Display with Real Photos */}
+            <div className="space-y-4">
               {/* Outerwear Layer */}
-              <div className="glass-card p-4 rounded-2xl flex items-center justify-between">
+              <div className="glass-card p-4 rounded-2xl flex items-center justify-between gap-3 border border-slate-200 bg-white">
                 <div className="flex items-center gap-3">
-                  <div 
-                    className="w-7 h-7 rounded-full border border-slate-300 shadow-sm"
-                    style={{ backgroundColor: outerColor }}
+                  <img
+                    src={selectedOuter ? selectedOuter.image : 'https://images.unsplash.com/photo-1544441893-675973e31985?w=600&auto=format&fit=crop&q=80'}
+                    alt="Outerwear"
+                    className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm"
                   />
                   <div>
                     <span className="text-[10px] text-slate-400 font-mono uppercase block">Outerwear Layer</span>
-                    <h4 className="text-slate-900 font-semibold text-sm">Beige Linen Blend Trench Blazer</h4>
+                    <h4 className="text-slate-900 font-bold text-sm">
+                      {selectedOuter ? selectedOuter.name : 'Beige Linen Blend Trench Blazer'}
+                    </h4>
+                    <p className="text-xs text-slate-500 font-mono mt-0.5">
+                      {selectedOuter ? `${selectedOuter.colorName} • Owned` : 'Sand Beige • Owned'}
+                    </p>
                   </div>
                 </div>
-                <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-mono font-bold">
-                  Owned Garment
-                </span>
+
+                {ownedOuterwear.length > 0 && (
+                  <select
+                    value={selectedOuter?.id || ''}
+                    onChange={(e) => setSelectedOuter(ownedOuterwear.find(i => i.id === e.target.value) || null)}
+                    className="bg-slate-100 border border-slate-200 rounded-xl px-2 py-1 text-xs text-slate-900 focus:outline-none"
+                  >
+                    {ownedOuterwear.map(item => (
+                      <option key={item.id} value={item.id}>{item.name}</option>
+                    ))}
+                  </select>
+                )}
               </div>
 
               {/* Top Garment Layer with Color Selector */}
               <div className="glass-card p-4 rounded-2xl border border-slate-300 bg-slate-50 flex flex-col gap-3">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div 
-                      className="w-7 h-7 rounded-full border border-slate-400 shadow-sm"
-                      style={{ backgroundColor: topColor }}
+                    <img
+                      src={selectedTop ? selectedTop.image : 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&auto=format&fit=crop&q=80'}
+                      alt="Top"
+                      className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm"
                     />
                     <div>
                       <span className="text-[10px] text-slate-600 font-mono uppercase block font-bold">Top Layer ("Choose Color")</span>
-                      <h4 className="text-slate-900 font-bold text-sm">Oversized Heavyweight Tee ({topColorName})</h4>
+                      <h4 className="text-slate-900 font-bold text-sm">
+                        {selectedTop ? selectedTop.name : 'Oversized Heavyweight Tee'} ({topColorName})
+                      </h4>
+                      <p className="text-xs text-emerald-700 font-mono font-bold mt-0.5">Owned Closet Item</p>
                     </div>
                   </div>
-                  <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-mono font-bold">
-                    Owned Garment
-                  </span>
+
+                  {ownedTops.length > 0 && (
+                    <select
+                      value={selectedTop?.id || ''}
+                      onChange={(e) => setSelectedTop(ownedTops.find(i => i.id === e.target.value) || null)}
+                      className="bg-white border border-slate-200 rounded-xl px-2 py-1 text-xs text-slate-900 focus:outline-none"
+                    >
+                      {ownedTops.map(item => (
+                        <option key={item.id} value={item.id}>{item.name}</option>
+                      ))}
+                    </select>
+                  )}
                 </div>
 
                 {/* Color Swatch Picker */}
@@ -130,49 +191,72 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
                 </div>
               </div>
 
-              {/* Bottom Garment Layer (Affiliate Missing Piece) */}
+              {/* Bottom Garment Layer (Affiliate Missing Piece or Closet Bottom) */}
               <div className="glass-card p-4 rounded-2xl border border-amber-300 bg-amber-50/50 flex flex-col gap-3">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div 
-                      className="w-7 h-7 rounded-full border border-slate-400 shadow-sm"
-                      style={{ backgroundColor: bottomColor }}
+                    <img
+                      src={selectedBottom ? selectedBottom.image : 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&auto=format&fit=crop&q=80'}
+                      alt="Bottom"
+                      className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm"
                     />
                     <div>
-                      <span className="text-[10px] text-amber-800 font-mono uppercase block font-bold">Bottom Layer (Missing Piece)</span>
-                      <h4 className="text-slate-900 font-bold text-sm">Wide-Leg Indigo Trousers ({bottomColorName})</h4>
+                      <span className="text-[10px] text-amber-800 font-mono uppercase block font-bold">Bottom Layer (Missing Piece Gap)</span>
+                      <h4 className="text-slate-900 font-bold text-sm">
+                        {selectedBottom ? selectedBottom.name : 'Wide-Leg Indigo Trousers'} ({bottomColorName})
+                      </h4>
+                      <p className="text-xs text-amber-900 font-mono font-bold mt-0.5">Targeted Affiliate Buy Link</p>
                     </div>
                   </div>
+
                   <span className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-mono font-bold">
-                    Affiliate Missing Piece
+                    Under ${currentBudget} Cap
                   </span>
                 </div>
 
                 <div className="pt-2 border-t border-amber-200/60 flex items-center justify-between text-xs text-slate-700">
                   <span>Max Budget Cap: <strong className="text-emerald-700 font-mono">${currentBudget} SGD</strong></span>
-                  <span className="text-slate-600 font-mono">Buy-Link Verified</span>
+                  <span className="text-slate-600 font-mono">Direct Merchant Price</span>
                 </div>
               </div>
 
               {/* Footwear Layer */}
-              <div className="glass-card p-4 rounded-2xl flex items-center justify-between">
+              <div className="glass-card p-4 rounded-2xl flex items-center justify-between gap-3 border border-slate-200 bg-white">
                 <div className="flex items-center gap-3">
-                  <div className="w-7 h-7 rounded-full border border-slate-300 bg-white shadow-sm" />
+                  <img
+                    src={selectedShoes ? selectedShoes.image : 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&auto=format&fit=crop&q=80'}
+                    alt="Shoes"
+                    className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm"
+                  />
                   <div>
                     <span className="text-[10px] text-slate-400 font-mono uppercase block">Footwear</span>
-                    <h4 className="text-slate-900 font-semibold text-sm">Minimalist White Leather Sneakers</h4>
+                    <h4 className="text-slate-900 font-bold text-sm">
+                      {selectedShoes ? selectedShoes.name : 'Minimalist White Leather Sneakers'}
+                    </h4>
+                    <p className="text-xs text-slate-500 font-mono mt-0.5">
+                      {selectedShoes ? `${selectedShoes.colorName} • Owned` : 'Pure White • Owned'}
+                    </p>
                   </div>
                 </div>
-                <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-mono font-bold">
-                  Owned Garment
-                </span>
+
+                {ownedShoes.length > 0 && (
+                  <select
+                    value={selectedShoes?.id || ''}
+                    onChange={(e) => setSelectedShoes(ownedShoes.find(i => i.id === e.target.value) || null)}
+                    className="bg-slate-100 border border-slate-200 rounded-xl px-2 py-1 text-xs text-slate-900 focus:outline-none"
+                  >
+                    {ownedShoes.map(item => (
+                      <option key={item.id} value={item.id}>{item.name}</option>
+                    ))}
+                  </select>
+                )}
               </div>
             </div>
           </div>
 
           <div className="mt-6 pt-4 border-t border-black/5 flex items-center justify-between text-xs text-slate-500">
-            <span>Look Match Score: <strong className="text-emerald-700 font-bold">98% Synergy</strong></span>
-            <span className="text-slate-700">75% Owned • 25% Affiliate Gap</span>
+            <span>Look Synergy: <strong className="text-emerald-700 font-bold">98% Synergy</strong></span>
+            <span className="text-slate-700">75% Owned Closet • 25% Affiliate Gap</span>
           </div>
         </div>
 
@@ -194,12 +278,12 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
             </div>
 
             {/* Product Cards */}
-            <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+            <div className="space-y-3 max-h-[440px] overflow-y-auto pr-1">
               {budgetFilteredProducts.length === 0 ? (
                 <div className="text-center py-12 glass-card rounded-2xl p-6">
                   <Sliders className="w-8 h-8 text-slate-400 mx-auto mb-2" />
                   <p className="text-slate-900 font-bold text-sm mb-1">No missing pieces under ${currentBudget} SGD</p>
-                  <p className="text-xs text-slate-500">Increase your budget slider below to view affiliate recommendations.</p>
+                  <p className="text-xs text-slate-500">Increase your budget slider to view affiliate recommendations.</p>
                 </div>
               ) : (
                 budgetFilteredProducts.map((product) => (
@@ -210,7 +294,7 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-14 h-14 rounded-xl object-cover border border-slate-200 shadow-sm group-hover:scale-105 transition-transform"
+                      className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm group-hover:scale-105 transition-transform"
                     />
                     
                     <div className="flex-1 min-w-0">
@@ -228,7 +312,7 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
                       </h4>
 
                       <p className="text-xs text-emerald-700 font-mono font-bold mt-0.5">
-                        ${product.price.toFixed(2)} SGD <span className="text-[10px] text-slate-400 font-normal">(Direct Merchant Price)</span>
+                        ${product.price.toFixed(2)} SGD <span className="text-[10px] text-slate-400 font-normal">(Cost to user: $0 extra)</span>
                       </p>
                     </div>
 
@@ -256,11 +340,18 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
             </div>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-black/5 flex items-center justify-between text-xs text-slate-500">
-            <span className="flex items-center gap-1 font-medium">
-              <ShieldCheck className="w-3.5 h-3.5 text-slate-800" /> FTC/CCCS Fair Ranking Compliant
+          {/* Proceed Next Step Button */}
+          <div className="mt-6 pt-4 border-t border-black/5 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <span className="flex items-center gap-1 font-medium text-slate-500">
+              <ShieldCheck className="w-3.5 h-3.5 text-slate-800" /> FTC/CCCS Compliant ($0 Extra Cost)
             </span>
-            <span>StyleSync Earns 5%–20% Affiliate Cut</span>
+
+            <button
+              onClick={() => onNavigate && onNavigate('creators')}
+              className="primary-button px-4 py-2 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5"
+            >
+              Next: Body & Creator Matcher <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
       </div>

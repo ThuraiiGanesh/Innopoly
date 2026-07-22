@@ -4,7 +4,11 @@ import { CREATORS } from '../data/mockData';
 
 export default function BodyCreatorMatcher({ onSelectCreatorOutfit }) {
   const [height, setHeight] = useState(178); // cm
+  const [chest, setChest] = useState(38); // inches (Bust/Chest)
   const [waist, setWaist] = useState(30); // inches
+  const [hips, setHips] = useState(38); // inches
+  const [shoulders, setShoulders] = useState(44); // cm
+  const [inseam, setInseam] = useState(30); // inches
   const [build, setBuild] = useState('Athletic');
   const [copiedId, setCopiedId] = useState(null);
 
@@ -16,13 +20,13 @@ export default function BodyCreatorMatcher({ onSelectCreatorOutfit }) {
     if (height >= 180 && waist <= 32) {
       return {
         ratio: "Tall & Tapered Frame",
-        cuts: "Boxy cropped tops, high-waist straight leg denim, structured double-breasted blazers.",
+        cuts: "Boxy cropped tops, high-waist straight leg denim, 30\" inseam trousers, structured 44cm shoulders.",
         avoid: "Overly tight skinny jeans or extra-long tunic tees that obscure waist proportions."
       };
     } else if (height < 172 && waist <= 32) {
       return {
         ratio: "Compact Proportion",
-        cuts: "Monochrome vertical tonal outfits, high-waisted ankle trousers, tucked-in fitted tees.",
+        cuts: "Monochrome vertical tonal outfits, high-waisted ankle trousers (28\" inseam), tucked-in fitted tees.",
         avoid: "Overly dropped shoulders or heavy ankle break trousers that shorten leg lines."
       };
     } else if (waist > 34) {
@@ -34,7 +38,7 @@ export default function BodyCreatorMatcher({ onSelectCreatorOutfit }) {
     }
     return {
       ratio: "Balanced Proportional Ratio",
-      cuts: "Relaxed crew tees, mid-rise chinos, minimal leather sneakers, light outer layers.",
+      cuts: "Relaxed crew tees, mid-rise chinos (30\" inseam), minimal leather sneakers, light outer layers.",
       avoid: "Excessively mismatched oversized layers."
     };
   };
@@ -58,13 +62,13 @@ export default function BodyCreatorMatcher({ onSelectCreatorOutfit }) {
     <section id="creator-matcher" className="py-16 px-6 max-w-7xl mx-auto scroll-mt-20">
       <div className="text-center max-w-2xl mx-auto mb-12">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-pill text-xs tracking-wider uppercase text-slate-700 font-semibold mb-3">
-          <User className="w-3.5 h-3.5" /> Height, Waist & Creator Alignment
+          <User className="w-3.5 h-3.5" /> Body Metrics & Creator Alignment
         </div>
         <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 mb-3">
-          Personalized Body Proportion & Creator Match
+          Personalized Body Metrics & Silhouette Advice
         </h2>
         <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-          Input your body dimensions to receive custom AI silhouette advice and instantly discover fashion content creators who share your exact build and height.
+          Input your exact measurements (Bust/Chest, Waist, Hips, Shoulders & Inseam) to get AI garment cut recommendations and discover creator outfits with matching proportions.
         </p>
       </div>
 
@@ -74,92 +78,158 @@ export default function BodyCreatorMatcher({ onSelectCreatorOutfit }) {
           <div>
             <div className="flex items-center justify-between mb-6 border-b border-black/5 pb-4">
               <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <Ruler className="w-4 h-4 text-slate-800" /> Body Metrics Profile
+                <Ruler className="w-4 h-4 text-slate-800" /> Full Body Metrics Profile
               </h3>
-              <span className="text-xs font-mono text-slate-400">Interactive</span>
+              <span className="text-xs font-mono text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full">
+                6 Dimensions
+              </span>
             </div>
 
-            {/* Height Slider */}
-            <div className="mb-5">
-              <div className="flex justify-between items-center mb-1.5">
-                <label className="text-xs uppercase font-semibold text-slate-600 tracking-wider">Height</label>
-                <span className="text-slate-900 font-bold text-sm px-2.5 py-0.5 rounded-lg bg-slate-100 border border-slate-200">
-                  {heightFormatted}
-                </span>
+            <div className="space-y-4 max-h-[460px] overflow-y-auto pr-1">
+              {/* Height Slider */}
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs uppercase font-semibold text-slate-600 tracking-wider">Height</label>
+                  <span className="text-slate-900 font-bold text-xs px-2.5 py-0.5 rounded-lg bg-slate-100 border border-slate-200">
+                    {heightFormatted}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="150"
+                  max="195"
+                  value={height}
+                  onChange={(e) => setHeight(Number(e.target.value))}
+                  className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-black"
+                />
               </div>
-              <input
-                type="range"
-                min="150"
-                max="195"
-                value={height}
-                onChange={(e) => setHeight(Number(e.target.value))}
-                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-black"
-              />
-              <div className="flex justify-between text-[10px] font-mono text-slate-400 mt-1">
-                <span>150 cm (4'11")</span>
-                <span>175 cm (5'9")</span>
-                <span>195 cm (6'5")</span>
-              </div>
-            </div>
 
-            {/* Waist Slider */}
-            <div className="mb-5">
-              <div className="flex justify-between items-center mb-1.5">
-                <label className="text-xs uppercase font-semibold text-slate-600 tracking-wider">Waist Size</label>
-                <span className="text-slate-900 font-bold text-sm px-2.5 py-0.5 rounded-lg bg-slate-100 border border-slate-200">
-                  {waist} inches
-                </span>
+              {/* Bust / Chest Slider */}
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs uppercase font-semibold text-slate-600 tracking-wider">Bust / Chest</label>
+                  <span className="text-slate-900 font-bold text-xs px-2.5 py-0.5 rounded-lg bg-slate-100 border border-slate-200">
+                    {chest} inches
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="30"
+                  max="52"
+                  value={chest}
+                  onChange={(e) => setChest(Number(e.target.value))}
+                  className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-black"
+                />
               </div>
-              <input
-                type="range"
-                min="24"
-                max="42"
-                value={waist}
-                onChange={(e) => setWaist(Number(e.target.value))}
-                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-black"
-              />
-              <div className="flex justify-between text-[10px] font-mono text-slate-400 mt-1">
-                <span>24" (XS)</span>
-                <span>32" (M)</span>
-                <span>42" (XXL)</span>
-              </div>
-            </div>
 
-            {/* Build Type Selector */}
-            <div className="mb-6">
-              <label className="block text-xs uppercase tracking-wider text-slate-500 mb-2 font-mono">
-                Body Build
-              </label>
-              <div className="grid grid-cols-4 gap-2">
-                {['Slim', 'Athletic', 'Regular', 'Muscular'].map((b) => (
-                  <button
-                    key={b}
-                    onClick={() => setBuild(b)}
-                    className={`py-2 rounded-xl text-xs font-semibold transition-all border ${
-                      build === b
-                        ? 'bg-black text-white border-black shadow-sm'
-                        : 'bg-white text-slate-600 border-slate-200 hover:border-black'
-                    }`}
-                  >
-                    {b}
-                  </button>
-                ))}
+              {/* Waist Slider */}
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs uppercase font-semibold text-slate-600 tracking-wider">Waist Size</label>
+                  <span className="text-slate-900 font-bold text-xs px-2.5 py-0.5 rounded-lg bg-slate-100 border border-slate-200">
+                    {waist} inches
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="24"
+                  max="44"
+                  value={waist}
+                  onChange={(e) => setWaist(Number(e.target.value))}
+                  className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-black"
+                />
+              </div>
+
+              {/* Hips Slider */}
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs uppercase font-semibold text-slate-600 tracking-wider">Hips</label>
+                  <span className="text-slate-900 font-bold text-xs px-2.5 py-0.5 rounded-lg bg-slate-100 border border-slate-200">
+                    {hips} inches
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="30"
+                  max="54"
+                  value={hips}
+                  onChange={(e) => setHips(Number(e.target.value))}
+                  className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-black"
+                />
+              </div>
+
+              {/* Shoulders Slider */}
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs uppercase font-semibold text-slate-600 tracking-wider">Shoulders</label>
+                  <span className="text-slate-900 font-bold text-xs px-2.5 py-0.5 rounded-lg bg-slate-100 border border-slate-200">
+                    {shoulders} cm
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="35"
+                  max="58"
+                  value={shoulders}
+                  onChange={(e) => setShoulders(Number(e.target.value))}
+                  className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-black"
+                />
+              </div>
+
+              {/* Inseam Slider */}
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs uppercase font-semibold text-slate-600 tracking-wider">Inseam Length</label>
+                  <span className="text-slate-900 font-bold text-xs px-2.5 py-0.5 rounded-lg bg-slate-100 border border-slate-200">
+                    {inseam} inches
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="26"
+                  max="36"
+                  value={inseam}
+                  onChange={(e) => setInseam(Number(e.target.value))}
+                  className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-black"
+                />
+              </div>
+
+              {/* Build Type Selector */}
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-slate-500 mb-1.5 font-mono">
+                  Body Build
+                </label>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {['Slim', 'Athletic', 'Regular', 'Muscular'].map((b) => (
+                    <button
+                      key={b}
+                      onClick={() => setBuild(b)}
+                      className={`py-1.5 rounded-xl text-xs font-semibold transition-all border ${
+                        build === b
+                          ? 'bg-black text-white border-black shadow-sm'
+                          : 'bg-white text-slate-600 border-slate-200 hover:border-black'
+                      }`}
+                    >
+                      {b}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
             {/* AI Silhouette Recommendation Box */}
-            <div className="glass-card p-4 rounded-2xl border border-slate-200 bg-slate-50">
+            <div className="glass-card p-4 rounded-2xl border border-slate-200 bg-slate-50 mt-4">
               <div className="flex items-center gap-2 mb-1.5">
                 <Sparkles className="w-4 h-4 text-slate-900" />
                 <h4 className="text-slate-900 text-xs font-bold uppercase tracking-wider">
                   AI Proportion Rule: {aiAdvice.ratio}
                 </h4>
               </div>
-              <p className="text-xs text-slate-700 leading-relaxed mb-1.5">
+              <p className="text-xs text-slate-700 leading-relaxed mb-1">
                 <strong>Recommended Cuts:</strong> {aiAdvice.cuts}
               </p>
               <p className="text-xs text-slate-500 leading-relaxed italic">
-                <strong>Styling Pitfall to Avoid:</strong> {aiAdvice.avoid}
+                <strong>Avoid:</strong> {aiAdvice.avoid}
               </p>
             </div>
           </div>
@@ -174,7 +244,7 @@ export default function BodyCreatorMatcher({ onSelectCreatorOutfit }) {
                   <Users className="w-4 h-4 text-slate-800" /> Creator Alignment Feed
                 </h3>
                 <p className="text-xs text-slate-500">
-                  Creators near {heightFormatted} height & {waist}" waist
+                  Creators matching {heightFormatted}, {chest}" Chest, {waist}" Waist, {inseam}" Inseam
                 </p>
               </div>
               <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-mono font-bold">
@@ -183,7 +253,7 @@ export default function BodyCreatorMatcher({ onSelectCreatorOutfit }) {
             </div>
 
             {/* Creators List */}
-            <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+            <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
               {matchedCreators.map((creator) => (
                 <div
                   key={creator.id}

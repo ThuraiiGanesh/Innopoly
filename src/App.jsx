@@ -78,16 +78,18 @@ export default function App() {
     setUser(null);
   };
 
+  const handleNavigate = (tab) => {
+    setActiveTab(tab);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col justify-between selection:bg-black selection:text-white">
       {/* Header Navigation Bar with Active Section Tabs */}
       <Header
         user={user}
         activeTab={activeTab}
-        onTabChange={(tab) => {
-          setActiveTab(tab);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
+        onTabChange={handleNavigate}
         onOpenLogin={() => setLoginModalOpen(true)}
         onLogout={handleLogout}
         onOpenPitch={() => setPitchDeckOpen(true)}
@@ -98,10 +100,7 @@ export default function App() {
         {activeTab === 'home' && (
           <div className="animate-fade-in-up">
             <Hero 
-              onNavigate={(tab) => {
-                setActiveTab(tab);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
+              onNavigate={handleNavigate}
               onOpenCompliance={() => setComplianceOpen(true)} 
             />
           </div>
@@ -144,6 +143,7 @@ export default function App() {
               currentBudget={currentBudget}
               selectedTemplate={selectedTemplate}
               selectedCreator={selectedCreator}
+              onNavigate={handleNavigate}
             />
           </div>
         )}
