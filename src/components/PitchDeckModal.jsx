@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ChevronLeft, ChevronRight, Presentation, Clock } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Presentation, Clock, Award, Cpu } from 'lucide-react';
 
 export default function PitchDeckModal({ isOpen, onClose }) {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -8,9 +8,9 @@ export default function PitchDeckModal({ isOpen, onClose }) {
 
   const slides = [
     {
-      title: "Slide 1: Hook & Cover",
-      headline: "StyleSync: Reclaiming 52 Minutes of Outfit Friction",
-      speakerNotes: "Judges, have you ever stared at an overflowing closet and thought 'I have nothing to wear'? Studies prove we spend 20 mins for casual Friday, 36 mins for formal parties, and up to 52 mins for vacations getting dressed. We built StyleSync to solve this forever.",
+      title: "Slide 1: Hook & Evidence-Backed Friction",
+      headline: "StyleSync: Reclaiming 52 Minutes of Daily Outfit Friction",
+      speakerNotes: "Judges, studies show Singaporeans spend 20 minutes getting ready for casual Friday, 36 minutes for a formal event, and up to 52 minutes when dressing for vacation. We built StyleSync to solve decision fatigue and turn 52 minutes of frustration into 2 minutes of instant confidence.",
       keyPoints: [
         "20 to 52 minutes lost per dressing session",
         "Digitizes existing wardrobe from photos",
@@ -19,53 +19,53 @@ export default function PitchDeckModal({ isOpen, onClose }) {
       timing: "0:00 - 0:20"
     },
     {
-      title: "Slide 2: The Problem",
-      headline: "The $200B Fashion Friction: Closet Blindness & Fragmentation",
-      speakerNotes: "The issue isn't a lack of clothes—it's that our closets are disconnected from modern e-commerce. Users waste hours opening 5 shopping apps to find one missing piece within budget.",
+      title: "Slide 2: Hackathon Judging Alignment (50/50 Split)",
+      headline: "Technical Execution & Business Readiness Blueprint",
+      speakerNotes: "Our project addresses both judging criteria equally: 50% Technical Execution powered by Google AI Tools (Gemini 2.5 Flash API, AI Auto-Tagging, Vercel SPA) and 50% Business Readiness with zero-inventory affiliate monetization.",
       keyPoints: [
-        "Decision fatigue & information fragmentation",
-        "80% of owned clothes worn repeatedly, 20% gather dust",
-        "Shopping friction across multiple e-commerce platforms"
+        "Technical (50%): Functional live MVP + Gemini 2.5 Flash AI Assistant + Google AI Auto-Tagging",
+        "Business Readiness (50%): Clear pain points, 5%-20% affiliate monetization, GTM strategy",
+        "Google AI Stack: Gemini Deep Research (Phase 1) ➔ AI Studio / Vercel (Phase 2-4)"
       ],
       timing: "0:20 - 0:45"
     },
     {
-      title: "Slide 3: The Solution",
+      title: "Slide 3: The Core Solution",
       headline: "StyleSync Engine: Your Closet, Supercharged",
       speakerNotes: "StyleSync digitizes your closet with quick photos, prioritizes what you ALREADY own, and only suggests buying the exact missing piece—like a brown blazer under $50—to complete the look.",
       keyPoints: [
-        "Instant wardrobe digitization from photos",
+        "Instant wardrobe digitization from photos with AI Auto-Tagging",
         "AI Mix & Match prioritizing owned garments",
-        "Targeted missing piece buy-link recommendations"
+        "Targeted missing piece buy-link recommendations ($0 extra cost to user)"
       ],
       timing: "0:45 - 1:10"
     },
     {
-      title: "Slide 4: Core UX Demo",
-      headline: "4 Steps: Photo ➔ Occasion ➔ Color Swap ➔ Smart Budget Filter",
-      speakerNotes: "In 4 easy steps: Snap your clothes, pick an occasion like Smart Casual, swap colors dynamically, and cap your budget slider. You get ready in under 2 minutes with budget-friendly affiliate links.",
+      title: "Slide 4: Core UX & Proportion Matcher",
+      headline: "4 Steps: Auto-Tag ➔ Occasion ➔ Color Swap ➔ Height/Waist Creator Match",
+      speakerNotes: "In 4 easy steps: Snap your clothes, pick an occasion like Smart Casual, swap colors dynamically, and set your height/waist profile to match styled looks from content creators your exact build.",
       keyPoints: [
         "Trend Templates (Smart Casual, Streetwear, Formal, Vacation)",
-        "Height & Waist body proportion matching with content creators",
+        "Height (cm) & Waist (in) body proportion matching with content creators",
         "Real-time 'Choose Color' swatches and price-capped links"
       ],
       timing: "1:10 - 1:45"
     },
     {
-      title: "Slide 5: Business Model & Compliance",
-      headline: "High-Margin Affiliate Engine + 100% Ethical Price Transparency",
-      speakerNotes: "We earn 5% to 20% affiliate commissions with ZERO inventory risk. Crucially, our price comparisons are strictly objective and 100% compliant with FTC & CCCS regulations. We NEVER falsely label items as 'cheapest' because a brand paid more.",
+      title: "Slide 5: Business Model & Ethical Compliance",
+      headline: "5%–20% Affiliate Commissions + 100% Price Transparency",
+      speakerNotes: "We earn 5% to 20% affiliate commissions with ZERO inventory risk. Crucially, our price comparisons are strictly objective and 100% compliant with FTC & CCCS regulations. Consumers pay $0 extra, as commissions come out of retailer marketing budgets.",
       keyPoints: [
-        "Primary: 5%–20% Affiliate Commissions (Zero inventory)",
+        "Primary: 5%–20% Affiliate Commissions (Zero inventory, $0 extra cost to user)",
         "Regulatory Compliance: CCCS / FTC transparent pricing",
-        "Secondary: Brand Partnerships, Creator Cut, Freemium AI, B2B Insights"
+        "Secondary: Brand Partnerships, Creator 70% Cut, Freemium AI, B2B Insights"
       ],
       timing: "1:45 - 2:20"
     },
     {
       title: "Slide 6: Competitive Advantage",
       headline: "The Hybrid Sweet Spot: Bridging Wardrobes & E-Commerce",
-      speakerNotes: "Where do we sit? Standard shopping apps only care about selling more clothes. Standard closet organizers don't integrate shopping. StyleSync bridges both worlds seamlessly.",
+      speakerNotes: "Where do we sit? Standard shopping apps only care about selling more clothes. Standard closet apps don't integrate shopping. StyleSync bridges both worlds seamlessly by maximizing owned clothes first.",
       keyPoints: [
         "E-Commerce Apps (LTK/ShopLook): No visibility into owned wardrobe",
         "Closet Apps (Cladwell): Poor shopping gap-filling",
@@ -74,9 +74,9 @@ export default function PitchDeckModal({ isOpen, onClose }) {
       timing: "2:20 - 2:45"
     },
     {
-      title: "Slide 7: Market Opportunity",
-      headline: "$350B E-Commerce Market & Creator Flywheel",
-      speakerNotes: "We tap into a $350B online fashion market driven by Gen-Z and Millennials. By sharing affiliate commissions with content creators, we drive viral, low-cost user acquisition.",
+      title: "Slide 7: Market Opportunity & Creator Flywheel",
+      headline: "$350B E-Commerce Market & 70/30 Creator Revenue Split",
+      speakerNotes: "We tap into a $350B online fashion market driven by Gen-Z and Millennials. By sharing a 70% affiliate commission split with content creators, we create a viral, low-cost user acquisition flywheel.",
       keyPoints: [
         "TAM: $1.5T Apparel Market | SAM: $350B Online Fashion",
         "Creator Flywheel: Creators post looks, earn 70% commission split",
@@ -85,7 +85,7 @@ export default function PitchDeckModal({ isOpen, onClose }) {
       timing: "2:45 - 3:05"
     },
     {
-      title: "Slide 8: Closing Call",
+      title: "Slide 8: Closing Call to Action",
       headline: "Reclaiming 52 Minutes, One Outfit at a Time",
       speakerNotes: "StyleSync turns 52 minutes of daily outfit frustration into 2 minutes of effortless confidence—all while building a trusted, zero-inventory, high-commission business. Thank you!",
       keyPoints: [
@@ -109,8 +109,8 @@ export default function PitchDeckModal({ isOpen, onClose }) {
               <Presentation className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-slate-900">
-                1st-Place Hackathon Pitch Deck & Script
+              <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                1st-Place Hackathon Pitch Deck & Script <Award className="w-4 h-4 text-amber-500" />
               </h3>
               <span className="text-xs text-slate-500 font-mono">
                 Slide {currentSlide + 1} of {slides.length} • Timing: {slide.timing}

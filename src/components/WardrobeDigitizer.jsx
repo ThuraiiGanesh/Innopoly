@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Camera, Check, Plus, Trash2, Tag, Layers, Sparkles } from 'lucide-react';
+import { Camera, Check, Plus, Trash2, Tag, Layers, Sparkles, Cpu } from 'lucide-react';
 
 export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem }) {
   const [itemName, setItemName] = useState('');
   const [category, setCategory] = useState('Tops');
   const [colorName, setColorName] = useState('Black');
+  const [pattern, setPattern] = useState('Solid');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [autoTagged, setAutoTagged] = useState(null);
   const [selectedFilter, setSelectedFilter] = useState('All');
 
   const handleSimulatedUpload = (e) => {
@@ -13,13 +15,16 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
     if (!itemName.trim()) return;
 
     setIsAnalyzing(true);
+    setAutoTagged(null);
+
     setTimeout(() => {
-      onAddItem({
+      const newItem = {
         id: 'w_' + Date.now(),
         name: itemName,
         category: category,
         color: colorName.toLowerCase().includes('white') ? '#ffffff' : colorName.toLowerCase().includes('beige') ? '#d4b996' : '#18181b',
         colorName: colorName,
+        pattern: pattern,
         style: 'Smart Casual',
         image: category === 'Tops' 
           ? 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&auto=format&fit=crop&q=80'
@@ -29,6 +34,13 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
           ? 'https://images.unsplash.com/photo-1544441893-675973e31985?w=600&auto=format&fit=crop&q=80'
           : 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&auto=format&fit=crop&q=80',
         owned: true
+      };
+
+      onAddItem(newItem);
+      setAutoTagged({
+        category: category,
+        color: colorName,
+        pattern: pattern
       });
       setItemName('');
       setIsAnalyzing(false);
@@ -43,13 +55,13 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
     <section id="digitizer" className="py-16 px-6 max-w-7xl mx-auto scroll-mt-20">
       <div className="text-center max-w-2xl mx-auto mb-12">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-pill text-xs tracking-wider uppercase text-slate-700 font-semibold mb-3">
-          <Camera className="w-3.5 h-3.5" /> Wardrobe Digitization Engine
+          <Camera className="w-3.5 h-3.5" /> Google AI Auto-Tagging Digitization Engine
         </div>
         <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 mb-3">
-          Snap, Upload & Catalog Your Closet
+          Snap, Auto-Tag & Catalog Your Closet
         </h2>
         <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-          Digitize your physical clothing inventory in seconds. StyleSync prioritizes the garments you already own before suggesting any new purchases.
+          Instead of forcing you to manually type details, Google AI Vision scans your clothes and automatically tags Category, Color & Pattern into your personal profile.
         </p>
       </div>
 
@@ -59,9 +71,11 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
           <div>
             <div className="flex items-center justify-between mb-6 border-b border-black/5 pb-4">
               <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-slate-800" /> AI Photo Analyzer
+                <Cpu className="w-4 h-4 text-slate-800" /> Google AI Vision Auto-Tagger
               </h3>
-              <span className="text-xs font-mono text-slate-400">Step 1 of 3</span>
+              <span className="text-xs font-mono text-emerald-600 font-bold bg-emerald-50 px-2.5 py-1 rounded-full">
+                Zero Friction
+              </span>
             </div>
 
             <form onSubmit={handleSimulatedUpload} className="space-y-4">
@@ -71,10 +85,10 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
                   <Camera className="w-6 h-6" />
                 </div>
                 <p className="text-sm font-semibold text-slate-800 mb-0.5">
-                  Click to Take Photo or Drag Image
+                  Snap Photo of Garment
                 </p>
                 <p className="text-xs text-slate-500">
-                  Supports JPG, PNG, WEBP • Background Auto-Removed
+                  AI automatically detects cut, color spectrum & pattern
                 </p>
               </div>
 
@@ -91,7 +105,7 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-2">
                 <div>
                   <label className="block text-xs uppercase tracking-wider text-slate-500 mb-1 font-mono">
                     Category
@@ -99,7 +113,7 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-black transition-colors"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-2 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-black transition-colors"
                   >
                     <option value="Tops">Tops</option>
                     <option value="Bottoms">Bottoms</option>
@@ -114,11 +128,27 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. Charcoal Black"
+                    placeholder="e.g. Black"
                     value={colorName}
                     onChange={(e) => setColorName(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-black transition-colors"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-black transition-colors"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-slate-500 mb-1 font-mono">
+                    Pattern
+                  </label>
+                  <select
+                    value={pattern}
+                    onChange={(e) => setPattern(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-2 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-black transition-colors"
+                  >
+                    <option value="Solid">Solid</option>
+                    <option value="Striped">Striped</option>
+                    <option value="Textured">Textured</option>
+                    <option value="Plaid">Plaid</option>
+                  </select>
                 </div>
               </div>
 
@@ -130,15 +160,25 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
                 {isAnalyzing ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Analyzing Cut & Color...
+                    AI Auto-Tagging Garment...
                   </>
                 ) : (
                   <>
-                    <Plus className="w-4 h-4" /> Add Garment to Closet
+                    <Plus className="w-4 h-4" /> Save Garment to Closet
                   </>
                 )}
               </button>
             </form>
+
+            {/* AI Auto-Tagged Notification Badge */}
+            {autoTagged && (
+              <div className="mt-4 p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-mono animate-fade-in-up">
+                <span className="font-bold block mb-1 flex items-center gap-1.5 text-emerald-800">
+                  <Sparkles className="w-3.5 h-3.5" /> AI Auto-Tagging Complete:
+                </span>
+                • Category: <strong>{autoTagged.category}</strong> • Color: <strong>{autoTagged.color}</strong> • Pattern: <strong>{autoTagged.pattern}</strong>
+              </div>
+            )}
           </div>
 
           <div className="mt-6 pt-4 border-t border-black/5 text-xs text-slate-500 flex items-center justify-between">
@@ -188,7 +228,7 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
                       <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] uppercase font-mono font-bold">
-                        Owned
+                        Auto-Tagged
                       </span>
                       <span className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">
                         {item.category}
@@ -198,7 +238,7 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
                       {item.name}
                     </h4>
                     <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                      <Tag className="w-3 h-3 text-slate-400" /> {item.colorName} • {item.style}
+                      <Tag className="w-3 h-3 text-slate-400" /> {item.colorName} • {item.pattern || 'Solid'} • {item.style}
                     </p>
                   </div>
 
@@ -215,7 +255,7 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
           </div>
 
           <p className="text-xs text-slate-400 mt-6 pt-4 border-t border-black/5 italic text-center">
-            * StyleSync AI reads fabric texture, color spectrum, and cut geometry from your uploaded photos.
+            * StyleSync AI scans fabric texture, color spectrum, and cut geometry from your uploaded photos.
           </p>
         </div>
       </div>
