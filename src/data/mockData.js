@@ -55,11 +55,13 @@ export const CREATORS = [
     featuredLook: 'Minimalist Smart Casual',
     followers: '142K',
     matchingCategory: 'Smart Casual',
+    outfitImage: 'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=600&auto=format&fit=crop&q=80',
+    totalCost: '$104.90 SGD',
     outfit: {
-      top: 'Black Oversized Crew Tee',
+      top: 'Black Oversized Crew Tee ($0 - Owned)',
       bottom: 'Uniqlo Smart Ankle Trousers ($39.90)',
       outer: 'Structured Linen Blazer ($65.00)',
-      shoes: 'White Leather Sneakers'
+      shoes: 'White Leather Sneakers ($0 - Owned)'
     }
   },
   {
@@ -73,11 +75,13 @@ export const CREATORS = [
     featuredLook: 'Urban Streetwear Layer',
     followers: '98K',
     matchingCategory: 'Streetwear',
+    outfitImage: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&auto=format&fit=crop&q=80',
+    totalCost: '$56.00 SGD',
     outfit: {
       top: 'Boxy Graphic Heavyweight Tee ($24.00)',
       bottom: 'Wide-Leg Baggy Indigo Denim ($32.00)',
-      outer: 'Cropped Denim Jacket',
-      shoes: 'Retro Canvas Kicks'
+      outer: 'Cropped Denim Jacket ($0 - Owned)',
+      shoes: 'Retro Canvas Kicks ($0 - Owned)'
     }
   },
   {
@@ -91,11 +95,13 @@ export const CREATORS = [
     featuredLook: 'Vacation Linen Elegance',
     followers: '210K',
     matchingCategory: 'Vacation',
+    outfitImage: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&auto=format&fit=crop&q=80',
+    totalCost: '$57.90 SGD',
     outfit: {
       top: 'Open Collar Linen Shirt ($29.90)',
       bottom: 'Tailored Cream Shorts ($28.00)',
       outer: 'None',
-      shoes: 'Leather Penny Loafers'
+      shoes: 'Leather Penny Loafers ($0 - Owned)'
     }
   },
   {
@@ -109,11 +115,13 @@ export const CREATORS = [
     featuredLook: 'Formal Evening Gala',
     followers: '315K',
     matchingCategory: 'Formal',
+    outfitImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80',
+    totalCost: '$127.00 SGD',
     outfit: {
-      top: 'Silk Draped Satin Top',
+      top: 'Silk Draped Satin Top ($0 - Owned)',
       bottom: 'High-Waisted Wide Trousers ($48.00)',
       outer: 'Tailored Single Blazer ($79.00)',
-      shoes: 'Pointed Slingback Heels'
+      shoes: 'Pointed Slingback Heels ($0 - Owned)'
     }
   }
 ];

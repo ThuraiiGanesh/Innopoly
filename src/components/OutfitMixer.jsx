@@ -1,24 +1,26 @@
 import React, { useState } from 'react';
-import { Palette, ShoppingBag, ExternalLink, Sparkles, Check, Sliders, ShieldCheck, ArrowRight, Layers, User, Camera } from 'lucide-react';
+import { Palette, ShoppingBag, ExternalLink, Sparkles, Check, Sliders, ShieldCheck, ArrowRight, Layers, Camera, Image, Download } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { AFFILIATE_PRODUCTS } from '../data/mockData';
 
 export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate, selectedCreator, onNavigate }) {
+  // Strictly filter owned wardrobe items
   const ownedTops = wardrobe.filter(i => i.category === 'Tops');
   const ownedBottoms = wardrobe.filter(i => i.category === 'Bottoms');
   const ownedOuterwear = wardrobe.filter(i => i.category === 'Outerwear');
   const ownedShoes = wardrobe.filter(i => i.category === 'Shoes');
 
   const [selectedTop, setSelectedTop] = useState(ownedTops[0] || wardrobe[0] || null);
-  const [selectedBottom, setSelectedBottom] = useState(ownedBottoms[0] || null); // null means using affiliate missing piece
-  const [selectedOuter, setSelectedOuter] = useState(ownedOuterwear[0] || null);
-  const [selectedShoes, setSelectedShoes] = useState(ownedShoes[0] || null);
+  const [selectedBottom, setSelectedBottom] = useState(ownedBottoms[0] || wardrobe[1] || null);
+  const [selectedOuter, setSelectedOuter] = useState(ownedOuterwear[0] || wardrobe[3] || null);
+  const [selectedShoes, setSelectedShoes] = useState(ownedShoes[0] || wardrobe[2] || null);
 
   const [topColor, setTopColor] = useState('#18181b'); // Black
   const [topColorName, setTopColorName] = useState('Midnight Black');
-  const [bottomColor, setBottomColor] = useState('#1e1b4b'); // Indigo
-  const [bottomColorName, setBottomColorName] = useState('Indigo Blue');
+  const [bottomColor, setBottomColor] = useState('#27272a'); // Charcoal
+  const [bottomColorName, setBottomColorName] = useState('Charcoal Trousers');
 
+  const [showFinalPhotoModal, setShowFinalPhotoModal] = useState(false);
   const [purchasedItems, setPurchasedItems] = useState({});
 
   const colorPalette = [
@@ -43,13 +45,22 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
     });
   };
 
+  const handleGenerateFinalLook = () => {
+    setShowFinalPhotoModal(true);
+    confetti({
+      particleCount: 90,
+      spread: 70,
+      origin: { y: 0.5 }
+    });
+  };
+
   return (
     <section id="mixer" className="py-16 px-6 max-w-7xl mx-auto scroll-mt-20">
       {/* Section Stepper / Navigation Banner */}
       <div className="flex items-center justify-between glass-panel p-3.5 px-6 rounded-2xl mb-8 border border-black/5 text-xs">
         <div className="flex items-center gap-2 font-mono text-slate-500">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Section 3 of 6: <strong>Interactive Outfit Canvas</strong></span>
+          <span>Section 3 of 6: <strong>Owned Outfit Canvas & Recommendations</strong></span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -71,13 +82,13 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
 
       <div className="text-center max-w-2xl mx-auto mb-12">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-pill text-xs tracking-wider uppercase text-slate-700 font-semibold mb-3">
-          <Palette className="w-3.5 h-3.5" /> Mix & Match AI Engine & Color Swapper
+          <Palette className="w-3.5 h-3.5" /> Owned Closet Canvas & Recommendation Engine
         </div>
         <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 mb-3">
-          Interactive Outfit Canvas & Item Photos
+          Interactive Outfit Canvas & Final Look Generator
         </h2>
         <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-          Select items directly from your digitized closet, test live color swatches, and fill missing pieces with budget-filtered affiliate buy links.
+          Assemble looks exclusively from your owned physical closet, customize colors, and generate a final styled outfit photo collage.
         </p>
 
         {selectedTemplate && (
@@ -94,17 +105,20 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Outfit Visualizer Canvas */}
+        {/* Left Column: Owned Clothes Outfit Canvas */}
         <div className="lg:col-span-6 glass-panel p-6 sm:p-8 rounded-3xl flex flex-col justify-between relative overflow-hidden">
           <div>
             <div className="flex items-center justify-between mb-6 border-b border-black/5 pb-4">
-              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-slate-800" /> Outfit Preview Canvas
-              </h3>
-              <span className="text-xs font-mono text-slate-400">Photos Included</span>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-slate-800" /> Owned Wardrobe Canvas
+                </h3>
+                <span className="text-xs text-emerald-700 font-mono font-semibold">100% Owned Physical Closet Items</span>
+              </div>
+              <span className="text-xs font-mono text-slate-400">4 Layers</span>
             </div>
 
-            {/* Interactive Layered Outfit Display with Real Photos */}
+            {/* Interactive Layered Display - strictly owned items */}
             <div className="space-y-4">
               {/* Outerwear Layer */}
               <div className="glass-card p-4 rounded-2xl flex items-center justify-between gap-3 border border-slate-200 bg-white">
@@ -115,12 +129,15 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
                     className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm"
                   />
                   <div>
-                    <span className="text-[10px] text-slate-400 font-mono uppercase block">Outerwear Layer</span>
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] uppercase font-mono font-bold">Owned</span>
+                      <span className="text-[10px] text-slate-400 font-mono uppercase">Outerwear</span>
+                    </div>
                     <h4 className="text-slate-900 font-bold text-sm">
-                      {selectedOuter ? selectedOuter.name : 'Beige Linen Blend Trench Blazer'}
+                      {selectedOuter ? selectedOuter.name : 'Beige Double-Breasted Trench Coat'}
                     </h4>
-                    <p className="text-xs text-slate-500 font-mono mt-0.5">
-                      {selectedOuter ? `${selectedOuter.colorName} • Owned` : 'Sand Beige • Owned'}
+                    <p className="text-xs text-slate-500 font-mono">
+                      {selectedOuter ? selectedOuter.colorName : 'Sand Beige'}
                     </p>
                   </div>
                 </div>
@@ -138,7 +155,7 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
                 )}
               </div>
 
-              {/* Top Garment Layer with Color Selector */}
+              {/* Top Garment Layer */}
               <div className="glass-card p-4 rounded-2xl border border-slate-300 bg-slate-50 flex flex-col gap-3">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
@@ -148,11 +165,13 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
                       className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm"
                     />
                     <div>
-                      <span className="text-[10px] text-slate-600 font-mono uppercase block font-bold">Top Layer ("Choose Color")</span>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] uppercase font-mono font-bold">Owned</span>
+                        <span className="text-[10px] text-slate-600 font-mono uppercase font-bold">Top ("Choose Color")</span>
+                      </div>
                       <h4 className="text-slate-900 font-bold text-sm">
-                        {selectedTop ? selectedTop.name : 'Oversized Heavyweight Tee'} ({topColorName})
+                        {selectedTop ? selectedTop.name : 'Black Oversized Crew Tee'} ({topColorName})
                       </h4>
-                      <p className="text-xs text-emerald-700 font-mono font-bold mt-0.5">Owned Closet Item</p>
                     </div>
                   </div>
 
@@ -171,7 +190,7 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
 
                 {/* Color Swatch Picker */}
                 <div className="pt-2 border-t border-slate-200 flex items-center gap-2 overflow-x-auto pb-1">
-                  <span className="text-xs font-semibold text-slate-700 mr-1 whitespace-nowrap">Choose Color:</span>
+                  <span className="text-xs font-semibold text-slate-700 mr-1 whitespace-nowrap">Choose Top Color:</span>
                   {colorPalette.map((c) => (
                     <button
                       key={c.name}
@@ -191,8 +210,8 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
                 </div>
               </div>
 
-              {/* Bottom Garment Layer (Affiliate Missing Piece or Closet Bottom) */}
-              <div className="glass-card p-4 rounded-2xl border border-amber-300 bg-amber-50/50 flex flex-col gap-3">
+              {/* Bottom Garment Layer */}
+              <div className="glass-card p-4 rounded-2xl border border-slate-200 bg-white flex flex-col gap-3">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <img
@@ -201,22 +220,30 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
                       className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm"
                     />
                     <div>
-                      <span className="text-[10px] text-amber-800 font-mono uppercase block font-bold">Bottom Layer (Missing Piece Gap)</span>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] uppercase font-mono font-bold">Owned</span>
+                        <span className="text-[10px] text-slate-400 font-mono uppercase">Bottom</span>
+                      </div>
                       <h4 className="text-slate-900 font-bold text-sm">
-                        {selectedBottom ? selectedBottom.name : 'Wide-Leg Indigo Trousers'} ({bottomColorName})
+                        {selectedBottom ? selectedBottom.name : 'Tailored Straight Chinos'}
                       </h4>
-                      <p className="text-xs text-amber-900 font-mono font-bold mt-0.5">Targeted Affiliate Buy Link</p>
+                      <p className="text-xs text-slate-500 font-mono">
+                        {selectedBottom ? selectedBottom.colorName : 'Charcoal'}
+                      </p>
                     </div>
                   </div>
 
-                  <span className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-mono font-bold">
-                    Under ${currentBudget} Cap
-                  </span>
-                </div>
-
-                <div className="pt-2 border-t border-amber-200/60 flex items-center justify-between text-xs text-slate-700">
-                  <span>Max Budget Cap: <strong className="text-emerald-700 font-mono">${currentBudget} SGD</strong></span>
-                  <span className="text-slate-600 font-mono">Direct Merchant Price</span>
+                  {ownedBottoms.length > 0 && (
+                    <select
+                      value={selectedBottom?.id || ''}
+                      onChange={(e) => setSelectedBottom(ownedBottoms.find(i => i.id === e.target.value) || null)}
+                      className="bg-slate-100 border border-slate-200 rounded-xl px-2 py-1 text-xs text-slate-900 focus:outline-none"
+                    >
+                      {ownedBottoms.map(item => (
+                        <option key={item.id} value={item.id}>{item.name}</option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               </div>
 
@@ -229,12 +256,15 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
                     className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm"
                   />
                   <div>
-                    <span className="text-[10px] text-slate-400 font-mono uppercase block">Footwear</span>
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] uppercase font-mono font-bold">Owned</span>
+                      <span className="text-[10px] text-slate-400 font-mono uppercase">Footwear</span>
+                    </div>
                     <h4 className="text-slate-900 font-bold text-sm">
-                      {selectedShoes ? selectedShoes.name : 'Minimalist White Leather Sneakers'}
+                      {selectedShoes ? selectedShoes.name : 'Classic White Leather Sneakers'}
                     </h4>
-                    <p className="text-xs text-slate-500 font-mono mt-0.5">
-                      {selectedShoes ? `${selectedShoes.colorName} • Owned` : 'Pure White • Owned'}
+                    <p className="text-xs text-slate-500 font-mono">
+                      {selectedShoes ? selectedShoes.colorName : 'Pure White'}
                     </p>
                   </div>
                 </div>
@@ -252,38 +282,43 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
                 )}
               </div>
             </div>
-          </div>
 
-          <div className="mt-6 pt-4 border-t border-black/5 flex items-center justify-between text-xs text-slate-500">
-            <span>Look Synergy: <strong className="text-emerald-700 font-bold">98% Synergy</strong></span>
-            <span className="text-slate-700">75% Owned Closet • 25% Affiliate Gap</span>
+            {/* Generate Final Photo CTA Button */}
+            <div className="mt-6 pt-4 border-t border-black/5">
+              <button
+                onClick={handleGenerateFinalLook}
+                className="w-full primary-button py-3 text-xs uppercase tracking-wider flex items-center justify-center gap-2 font-bold shadow-md"
+              >
+                <Camera className="w-4 h-4 text-white" /> View Assembled Final Look Photo
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Affiliate Buy Links Panel */}
+        {/* Right Column: Recommendations For You To Wear */}
         <div className="lg:col-span-6 glass-panel p-6 sm:p-8 rounded-3xl flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-6 border-b border-black/5 pb-4">
               <div>
                 <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                  <ShoppingBag className="w-4 h-4 text-slate-800" /> Targeted Affiliate Buy Links
+                  <ShoppingBag className="w-4 h-4 text-slate-800" /> Our Recommendations for You to Wear
                 </h3>
                 <p className="text-xs text-slate-500">
-                  Filtered under your ${currentBudget} SGD Budget Cap
+                  Targeted gap-filling pieces under your ${currentBudget} SGD Budget Cap
                 </p>
               </div>
               <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-mono font-bold">
-                100% Fair Price Ranked
+                Recommended
               </span>
             </div>
 
-            {/* Product Cards */}
+            {/* Recommended Products Cards */}
             <div className="space-y-3 max-h-[440px] overflow-y-auto pr-1">
               {budgetFilteredProducts.length === 0 ? (
                 <div className="text-center py-12 glass-card rounded-2xl p-6">
                   <Sliders className="w-8 h-8 text-slate-400 mx-auto mb-2" />
                   <p className="text-slate-900 font-bold text-sm mb-1">No missing pieces under ${currentBudget} SGD</p>
-                  <p className="text-xs text-slate-500">Increase your budget slider to view affiliate recommendations.</p>
+                  <p className="text-xs text-slate-500">Increase your budget slider to view recommendations.</p>
                 </div>
               ) : (
                 budgetFilteredProducts.map((product) => (
@@ -355,6 +390,107 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
           </div>
         </div>
       </div>
+
+      {/* FINAL LOOK PHOTO COMPOSITE MODAL */}
+      {showFinalPhotoModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-fade-in-up">
+          <div className="glass-panel w-full max-w-2xl rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden flex flex-col justify-between max-h-[90vh]">
+            <div className="flex items-center justify-between border-b border-black/5 pb-4 mb-4">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-xl bg-black text-white">
+                  <Image className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900">
+                    Assembled Final Outfit Look Photo
+                  </h3>
+                  <span className="text-xs text-slate-500 font-mono">
+                    Flat-Lay Magazine Composite
+                  </span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowFinalPhotoModal(false)}
+                className="p-1.5 text-slate-400 hover:text-black rounded-full bg-slate-100 hover:bg-slate-200 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Assembled Flat-Lay Composite Visualizer (matches user uploaded sample!) */}
+            <div className="bg-slate-100/80 p-6 rounded-2xl border border-slate-200 flex flex-col items-center justify-center relative my-2 overflow-hidden shadow-inner">
+              <div className="text-center mb-4">
+                <span className="text-xs font-mono uppercase font-bold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
+                  ✨ Final Outfit Synergy: 100% Match
+                </span>
+              </div>
+
+              {/* Flat-Lay Layered Grid Composite */}
+              <div className="relative w-full max-w-md h-72 flex items-center justify-center">
+                {/* Trench Coat (Background Outer Layer) */}
+                <img
+                  src={selectedOuter ? selectedOuter.image : 'https://images.unsplash.com/photo-1544441893-675973e31985?w=600&auto=format&fit=crop&q=80'}
+                  alt="Outerwear"
+                  className="absolute w-44 h-60 object-cover rounded-2xl shadow-xl -left-2 top-2 rotate-[-4deg] border-2 border-white"
+                />
+
+                {/* Top Shirt (Middle Layer) */}
+                <img
+                  src={selectedTop ? selectedTop.image : 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&auto=format&fit=crop&q=80'}
+                  alt="Top"
+                  className="absolute w-36 h-40 object-cover rounded-2xl shadow-2xl left-24 top-4 rotate-[2deg] border-2 border-white"
+                />
+
+                {/* Denim Trousers (Front Bottom Layer) */}
+                <img
+                  src={selectedBottom ? selectedBottom.image : 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&auto=format&fit=crop&q=80'}
+                  alt="Bottom"
+                  className="absolute w-36 h-44 object-cover rounded-2xl shadow-2xl right-6 bottom-2 rotate-[6deg] border-2 border-white"
+                />
+
+                {/* Shoes (Bottom Footwear) */}
+                <img
+                  src={selectedShoes ? selectedShoes.image : 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&auto=format&fit=crop&q=80'}
+                  alt="Shoes"
+                  className="absolute w-24 h-24 object-cover rounded-2xl shadow-xl left-6 bottom-2 rotate-[-8deg] border-2 border-white"
+                />
+              </div>
+
+              {/* Assembled Details List */}
+              <div className="w-full mt-4 bg-white/90 backdrop-blur-md p-3.5 rounded-xl border border-slate-200 text-xs text-slate-800 space-y-1">
+                <p>🧥 <strong>Outer:</strong> {selectedOuter?.name || 'Beige Trench Coat'}</p>
+                <p>👕 <strong>Top:</strong> {selectedTop?.name || 'Black Crew Tee'} ({topColorName})</p>
+                <p>👖 <strong>Bottom:</strong> {selectedBottom?.name || 'Tailored Straight Chinos'}</p>
+                <p>👟 <strong>Footwear:</strong> {selectedShoes?.name || 'White Leather Sneakers'}</p>
+              </div>
+            </div>
+
+            {/* Modal Controls */}
+            <div className="flex items-center justify-between border-t border-black/5 pt-4 mt-2">
+              <span className="text-xs text-slate-500 font-mono">Ready to Wear • Reclaimed 52 Mins</span>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowFinalPhotoModal(false)}
+                  className="secondary-button px-4 py-2 text-xs uppercase font-bold"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={() => {
+                    confetti({ particleCount: 100, spread: 80 });
+                    alert('Final outfit look photo saved to your gallery!');
+                  }}
+                  className="primary-button px-4 py-2 text-xs uppercase font-bold flex items-center gap-1.5"
+                >
+                  <Download className="w-3.5 h-3.5" /> Save Final Photo
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
