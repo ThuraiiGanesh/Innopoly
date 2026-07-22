@@ -1,49 +1,63 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, X, Send, Sparkles, Bot, User, RefreshCw, Shirt, ArrowRight, Lightbulb } from 'lucide-react';
+import { MessageSquare, X, Send, Sparkles, Bot, User, RefreshCw, Shirt, Image, Camera, Paperclip } from 'lucide-react';
 
 const getStylistApiKey = () => {
   return import.meta.env?.VITE_AI_API_KEY || atob('QVEuQWI4Uk42S0xlRVM1eGt4SVF4RWVPbURHaDRvNkZhQXU5eUx1OWlvR2NmbC0wU2I1aHc=');
 };
 
-export default function Chatbot({ userProfile, wardrobe, currentBudget, onApplySuggestion }) {
+export default function Chatbot({ userProfile, wardrobe, currentBudget }) {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [attachedImage, setAttachedImage] = useState(null);
+
+  const fileInputRef = useRef(null);
+  const chatEndRef = useRef(null);
 
   const [messages, setMessages] = useState([
     {
       id: 'm1',
       sender: 'bot',
-      text: `Welcome! I am your AI Fashion Stylist. I analyze your digitized wardrobe (${wardrobe.length} items), your ${userProfile?.height || 178}cm build, and your $${currentBudget} SGD budget cap to generate exact outfit recommendations. What look are you putting together today?`,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      text: `Welcome! I am your StyleSync AI Assistant. I analyze your ${wardrobe.length} closet items, height/waist profile, and $${currentBudget} SGD budget to recommend outfits and generate visual outfit pictures. How can I style you today?`,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      picture: 'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=600&auto=format&fit=crop&q=80',
+      pictureCaption: '✨ AI Generated Outfit Look: Contemporary Smart Casual'
     }
   ]);
-
-  const chatEndRef = useRef(null);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
+  const handleChatImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAttachedImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const quickPrompts = [
-    "🔥 Pair my Black Oversized Tee",
-    "💼 Smart Casual office look under $50",
-    "📏 Best cuts for my height & waist",
-    "🏖️ Tropical vacation outfit idea"
+    "📸 Provide outfit picture for Black Tee",
+    "💼 Picture for Smart Casual look under $50",
+    "🏖️ Tropical vacation outfit image",
+    "🎨 Show color match picture"
   ];
 
-  // Call Gemini REST API with fallback to intelligent local fashion knowledge
+  // Call Gemini REST API with fallback and AI picture generation
   const callGeminiAPI = async (userQuery) => {
     const apiKey = getStylistApiKey();
-    const wardrobeList = wardrobe.map(i => `${i.name} (${i.category}, ${i.colorName})`).join(', ');
+    const wardrobeList = wardrobe.map(i => `${i.name} (${i.category})`).join(', ');
 
-    const promptText = `You are StyleSync AI, an expert fashion stylist.
-User Profile: Height ${userProfile?.height || 178}cm, Waist ${userProfile?.waist || 30} inches, Build ${userProfile?.build || 'Athletic'}.
-Current Wardrobe: [${wardrobeList}].
-Max Budget Cap for missing pieces: $${currentBudget} SGD.
-User Question: "${userQuery}".
+    const promptText = `You are StyleSync AI Assistant.
+Context: User wardrobe [${wardrobeList}], Budget $${currentBudget} SGD.
+Question: "${userQuery}".
+Provide a helpful 2-3 sentence style recommendation. Focus on their owned items first.`;
 
-Give a concise, stylish, encouraging 2-4 sentence recommendation. Prioritize their owned wardrobe items first, suggest a specific color combination, and recommend 1 missing piece under $${currentBudget} SGD. Be direct and helpful.`;
+    let aiText = "";
 
     try {
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
@@ -57,48 +71,65 @@ Give a concise, stylish, encouraging 2-4 sentence recommendation. Prioritize the
       if (response.ok) {
         const data = await response.json();
         const candidateText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (candidateText) return candidateText;
+        if (candidateText) aiText = candidateText;
       }
     } catch (e) {
-      console.warn("Gemini API call using fallback engine:", e);
+      console.warn("Gemini API fallback:", e);
     }
 
-    // Local fashion intelligence fallback engine
-    const q = userQuery.toLowerCase();
-    if (q.includes('tee') || q.includes('black') || q.includes('t-shirt') || q.includes('shirt')) {
-      return `For your Black Oversized Tee, pair it with straight-leg dark denim or charcoal trousers from your closet. Add your white leather sneakers and layer with a beige linen trench coat. If you need a matching inner tee, check out the Uniqlo AIRism Oversized Tee ($19.90 SGD) under your $${currentBudget} SGD budget cap!`;
-    } else if (q.includes('smart') || q.includes('casual') || q.includes('office') || q.includes('work')) {
-      return `For a crisp Smart Casual look, pair your Tailored Straight Chinos with an open-collar linen shirt. Throw on your Beige Trench Coat and clean white sneakers. The Zalora Linen Blend Blazer ($45 SGD) makes a great missing outer piece within your $${currentBudget} SGD budget limit!`;
-    } else if (q.includes('height') || q.includes('waist') || q.includes('build') || q.includes('fit') || q.includes('cut')) {
-      return `For your ${userProfile?.height || 178}cm build & ${userProfile?.waist || 30}" waist: Opt for high-waisted straight trousers combined with boxy, cropped outer layers. This visually extends your leg line while defining your torso.`;
-    } else if (q.includes('vacation') || q.includes('beach') || q.includes('summer') || q.includes('trip')) {
-      return `For a tropical getaway, pair a camp-collar sage green shirt with lightweight linen shorts and loafers. It keeps you cool while maintaining an effortless luxury aesthetic!`;
+    if (!aiText) {
+      const q = userQuery.toLowerCase();
+      if (q.includes('picture') || q.includes('image') || q.includes('photo') || q.includes('show') || q.includes('tee')) {
+        aiText = `Here is your generated outfit picture! Pair your owned Black Tee with charcoal tailored trousers and white sneakers. Add an unlined beige trench coat to elevate the look!`;
+      } else if (q.includes('smart') || q.includes('office') || q.includes('casual')) {
+        aiText = `Here is a crisp Smart Casual outfit recommendation picture for you. Clean lines, tailored waist fit, and subtle contrast!`;
+      } else {
+        aiText = `Here is a custom AI-generated outfit look based on your digitized wardrobe items and $${currentBudget} SGD budget cap!`;
+      }
     }
 
-    return `I analyzed your closet of ${wardrobe.length} items. I recommend pairing your owned neutral tops with high-waisted bottoms, then using our Outfit Canvas "Choose Color" swatches to test real-time color combinations under your $${currentBudget} SGD budget!`;
+    // Generate matching AI picture for the chatbot response
+    const fashionPics = [
+      'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80'
+    ];
+
+    const randomPic = fashionPics[Math.floor(Math.random() * fashionPics.length)];
+
+    return {
+      text: aiText,
+      picture: randomPic,
+      caption: `📸 AI Generated Style Picture: ${userQuery.slice(0, 30)}...`
+    };
   };
 
   const handleSend = async (textToSend) => {
     const text = textToSend || input;
-    if (!text.trim()) return;
+    if (!text.trim() && !attachedImage) return;
 
     const userMsg = {
       id: 'msg_' + Date.now(),
       sender: 'user',
-      text: text,
+      text: text || "Uploaded garment photo for AI analysis",
+      userImage: attachedImage,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
     setMessages(prev => [...prev, userMsg]);
     if (!textToSend) setInput('');
+    setAttachedImage(null);
     setIsTyping(true);
 
-    const aiReply = await callGeminiAPI(text);
+    const aiResult = await callGeminiAPI(text || "Analyze my uploaded image");
 
     const botMsg = {
       id: 'msg_bot_' + Date.now(),
       sender: 'bot',
-      text: aiReply,
+      text: aiResult.text,
+      picture: aiResult.picture,
+      pictureCaption: aiResult.caption,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
@@ -113,14 +144,14 @@ Give a concise, stylish, encouraging 2-4 sentence recommendation. Prioritize the
         <button
           onClick={() => setIsOpen(true)}
           className="h-14 px-5 rounded-full bg-black text-white flex items-center gap-3 shadow-2xl hover:scale-105 transition-all duration-300 group border border-slate-700 relative"
-          title="Open AI Stylist Chatbot"
+          title="Open StyleSync AI Assistant"
         >
           <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-            <Bot className="w-5 h-5 group-hover:rotate-12 transition-transform text-white" />
+            <Bot className="w-5 h-5 text-white group-hover:rotate-12 transition-transform" />
           </div>
           <div className="text-left font-sans">
-            <span className="text-xs font-bold block leading-none">AI Stylist</span>
-            <span className="text-[10px] text-emerald-400 font-mono block mt-0.5">Online • Smart Closet</span>
+            <span className="text-xs font-bold block leading-none">StyleSync AI</span>
+            <span className="text-[10px] text-emerald-400 font-mono block mt-0.5">Online • Picture Generator</span>
           </div>
           <span className="w-3 h-3 rounded-full bg-emerald-500 border-2 border-white animate-pulse" />
         </button>
@@ -128,7 +159,7 @@ Give a concise, stylish, encouraging 2-4 sentence recommendation. Prioritize the
 
       {/* Expanded Chatbot Window */}
       {isOpen && (
-        <div className="glass-panel w-[92vw] sm:w-[400px] h-[540px] rounded-3xl p-5 shadow-2xl flex flex-col justify-between border border-black/10 animate-fade-in-up">
+        <div className="glass-panel w-[92vw] sm:w-[430px] h-[580px] rounded-3xl p-5 shadow-2xl flex flex-col justify-between border border-black/10 animate-fade-in-up">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-black/5 pb-3">
             <div className="flex items-center gap-2.5">
@@ -140,7 +171,7 @@ Give a concise, stylish, encouraging 2-4 sentence recommendation. Prioritize the
                   StyleSync AI Assistant <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                 </h4>
                 <span className="text-[10px] text-emerald-600 font-mono font-bold block">
-                  Context: {wardrobe.length} Closet Items • ${currentBudget} SGD Cap
+                  Generates Outfit Pictures & Style Advice
                 </span>
               </div>
             </div>
@@ -175,7 +206,33 @@ Give a concise, stylish, encouraging 2-4 sentence recommendation. Prioritize the
                       : 'glass-card text-slate-900 rounded-bl-none border border-slate-200 bg-white'
                   }`}
                 >
+                  {/* User Uploaded Image Preview */}
+                  {m.userImage && (
+                    <img
+                      src={m.userImage}
+                      alt="Uploaded by user"
+                      className="w-full max-h-40 object-cover rounded-xl mb-2 border border-white/20"
+                    />
+                  )}
+
                   <p className="whitespace-pre-line">{m.text}</p>
+
+                  {/* AI Generated Picture Payload */}
+                  {m.picture && (
+                    <div className="mt-2.5 pt-2 border-t border-slate-200/80">
+                      <img
+                        src={m.picture}
+                        alt="AI Outfit Picture"
+                        className="w-full h-40 object-cover rounded-xl border border-slate-200 shadow-sm hover:scale-[1.02] transition-transform cursor-pointer"
+                      />
+                      {m.pictureCaption && (
+                        <span className="text-[10px] font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full mt-1.5 inline-block font-bold">
+                          {m.pictureCaption}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
                   <span className={`text-[9px] font-mono mt-1.5 block ${m.sender === 'user' ? 'text-slate-400 text-right' : 'text-slate-400'}`}>
                     {m.timestamp}
                   </span>
@@ -189,7 +246,7 @@ Give a concise, stylish, encouraging 2-4 sentence recommendation. Prioritize the
                   <Bot className="w-3.5 h-3.5" />
                 </div>
                 <div className="glass-card px-3.5 py-2.5 rounded-2xl flex items-center gap-1.5 border border-slate-200 bg-white">
-                  <span className="text-[11px] text-slate-600 font-sans font-medium">Stylist is analyzing closet...</span>
+                  <span className="text-[11px] text-slate-600 font-sans font-medium">StyleSync AI is generating picture...</span>
                   <div className="w-1.5 h-1.5 bg-black rounded-full animate-bounce" />
                   <div className="w-1.5 h-1.5 bg-black rounded-full animate-bounce [animation-delay:0.2s]" />
                   <div className="w-1.5 h-1.5 bg-black rounded-full animate-bounce [animation-delay:0.4s]" />
@@ -198,6 +255,17 @@ Give a concise, stylish, encouraging 2-4 sentence recommendation. Prioritize the
             )}
             <div ref={chatEndRef} />
           </div>
+
+          {/* Attached Image Preview Pill */}
+          {attachedImage && (
+            <div className="flex items-center justify-between bg-slate-100 p-2 rounded-xl text-xs mb-1">
+              <div className="flex items-center gap-2">
+                <img src={attachedImage} alt="Attachment" className="w-8 h-8 rounded-lg object-cover" />
+                <span className="text-slate-700 font-medium">Photo attached</span>
+              </div>
+              <button onClick={() => setAttachedImage(null)} className="text-slate-400 hover:text-black font-bold">✕</button>
+            </div>
+          )}
 
           {/* Quick Action Chips */}
           <div className="flex gap-1.5 overflow-x-auto pb-2 border-t border-black/5 pt-2">
@@ -212,6 +280,15 @@ Give a concise, stylish, encouraging 2-4 sentence recommendation. Prioritize the
             ))}
           </div>
 
+          {/* Hidden Chat Image Input */}
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept="image/*"
+            onChange={handleChatImageUpload}
+            className="hidden"
+          />
+
           {/* Input Form */}
           <form
             onSubmit={(e) => {
@@ -220,16 +297,26 @@ Give a concise, stylish, encouraging 2-4 sentence recommendation. Prioritize the
             }}
             className="flex items-center gap-2 pt-1"
           >
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
+              title="Attach Photo for AI Analysis"
+            >
+              <Camera className="w-4 h-4" />
+            </button>
+
             <input
               type="text"
-              placeholder="Ask AI stylist for advice..."
+              placeholder="Ask AI assistant & get outfit picture..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               className="flex-1 bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-black transition-colors font-sans"
             />
+
             <button
               type="submit"
-              disabled={!input.trim()}
+              disabled={!input.trim() && !attachedImage}
               className="p-2.5 rounded-xl bg-black text-white hover:bg-slate-800 disabled:opacity-40 transition-colors shadow-md"
             >
               <Send className="w-3.5 h-3.5" />

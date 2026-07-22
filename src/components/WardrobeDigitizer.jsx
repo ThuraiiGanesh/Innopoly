@@ -1,14 +1,33 @@
-import React, { useState } from 'react';
-import { Camera, Check, Plus, Trash2, Tag, Layers, Sparkles, Cpu } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Camera, Check, Plus, Trash2, Tag, Layers, Sparkles, Cpu, Upload } from 'lucide-react';
 
 export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem }) {
   const [itemName, setItemName] = useState('');
   const [category, setCategory] = useState('Tops');
   const [colorName, setColorName] = useState('Black');
   const [pattern, setPattern] = useState('Solid');
+  const [customImage, setCustomImage] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [autoTagged, setAutoTagged] = useState(null);
   const [selectedFilter, setSelectedFilter] = useState('All');
+
+  const fileInputRef = useRef(null);
+
+  const handleImageFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCustomImage(reader.result);
+        if (!itemName) {
+          // Auto-suggest name based on filename
+          const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
+          setItemName(nameWithoutExt.charAt(0).toUpperCase() + nameWithoutExt.slice(1));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSimulatedUpload = (e) => {
     e.preventDefault();
@@ -16,6 +35,14 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
 
     setIsAnalyzing(true);
     setAutoTagged(null);
+
+    const defaultImg = category === 'Tops' 
+      ? 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&auto=format&fit=crop&q=80'
+      : category === 'Bottoms'
+      ? 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&auto=format&fit=crop&q=80'
+      : category === 'Outerwear'
+      ? 'https://images.unsplash.com/photo-1544441893-675973e31985?w=600&auto=format&fit=crop&q=80'
+      : 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&auto=format&fit=crop&q=80';
 
     setTimeout(() => {
       const newItem = {
@@ -26,13 +53,7 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
         colorName: colorName,
         pattern: pattern,
         style: 'Smart Casual',
-        image: category === 'Tops' 
-          ? 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&auto=format&fit=crop&q=80'
-          : category === 'Bottoms'
-          ? 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&auto=format&fit=crop&q=80'
-          : category === 'Outerwear'
-          ? 'https://images.unsplash.com/photo-1544441893-675973e31985?w=600&auto=format&fit=crop&q=80'
-          : 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&auto=format&fit=crop&q=80',
+        image: customImage || defaultImg,
         owned: true
       };
 
@@ -43,8 +64,9 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
         pattern: pattern
       });
       setItemName('');
+      setCustomImage(null);
       setIsAnalyzing(false);
-    }, 1000);
+    }, 900);
   };
 
   const filteredWardrobe = selectedFilter === 'All' 
@@ -58,10 +80,10 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
           <Camera className="w-3.5 h-3.5" /> Google AI Auto-Tagging Digitization Engine
         </div>
         <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 mb-3">
-          Snap, Auto-Tag & Catalog Your Closet
+          Snap, Upload & Catalog Your Closet
         </h2>
         <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-          Instead of forcing you to manually type details, Google AI Vision scans your clothes and automatically tags Category, Color & Pattern into your personal profile.
+          Upload any clothing photo from your device. Google AI Vision scans your garment and automatically tags Category, Color & Pattern into your closet!
         </p>
       </div>
 
@@ -79,17 +101,44 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
             </div>
 
             <form onSubmit={handleSimulatedUpload} className="space-y-4">
-              {/* Photo Upload Dropzone Simulation */}
-              <div className="border-2 border-dashed border-slate-300 hover:border-slate-800 rounded-2xl p-6 text-center bg-white/60 cursor-pointer transition-all group">
-                <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-800 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                  <Camera className="w-6 h-6" />
-                </div>
-                <p className="text-sm font-semibold text-slate-800 mb-0.5">
-                  Snap Photo of Garment
-                </p>
-                <p className="text-xs text-slate-500">
-                  AI automatically detects cut, color spectrum & pattern
-                </p>
+              {/* Hidden File Input */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept="image/*"
+                onChange={handleImageFileChange}
+                className="hidden"
+              />
+
+              {/* Photo Upload Dropzone Box */}
+              <div 
+                onClick={() => fileInputRef.current?.click()}
+                className="border-2 border-dashed border-slate-300 hover:border-slate-800 rounded-2xl p-6 text-center bg-white/60 cursor-pointer transition-all group relative overflow-hidden"
+              >
+                {customImage ? (
+                  <div className="relative">
+                    <img
+                      src={customImage}
+                      alt="Uploaded garment preview"
+                      className="w-28 h-28 object-cover rounded-xl mx-auto shadow-md border border-slate-200"
+                    />
+                    <span className="text-[10px] font-mono bg-emerald-600 text-white px-2 py-0.5 rounded-full mt-2 inline-block font-bold">
+                      ✓ Image Ready for AI Scan
+                    </span>
+                  </div>
+                ) : (
+                  <>
+                    <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-800 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                      <Upload className="w-6 h-6" />
+                    </div>
+                    <p className="text-sm font-semibold text-slate-800 mb-0.5">
+                      Click to Upload Garment Photo
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      Select photo from camera or files • Auto Background Crop
+                    </p>
+                  </>
+                )}
               </div>
 
               <div>
@@ -238,7 +287,7 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
                       {item.name}
                     </h4>
                     <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                      <Tag className="w-3 h-3 text-slate-400" /> {item.colorName} • {item.pattern || 'Solid'} • {item.style}
+                      <Tag className="w-3 h-3 text-slate-400" /> {item.colorName} • {item.pattern || 'Solid'}
                     </p>
                   </div>
 
