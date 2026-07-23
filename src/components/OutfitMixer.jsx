@@ -70,36 +70,13 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
   };
 
   return (
-    <section id="mixer" className="py-16 px-6 max-w-7xl mx-auto scroll-mt-20">
-      {/* Section Stepper / Navigation Banner */}
-      <div className="flex items-center justify-between glass-panel p-3.5 px-6 rounded-2xl mb-6 border border-black/5 text-xs">
-        <div className="flex items-center gap-2 font-mono text-slate-500">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Section 3 of 6: <strong>Owned Outfit Canvas & Recommendations</strong></span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => onNavigate && onNavigate('closet')}
-            className="text-slate-600 hover:text-black font-semibold flex items-center gap-1 hover:underline"
-          >
-            ← My Closet
-          </button>
-          <span className="text-slate-300">•</span>
-          <button
-            onClick={() => onNavigate && onNavigate('creators')}
-            className="text-slate-900 font-bold flex items-center gap-1 hover:underline"
-          >
-            Match Body & Creators →
-          </button>
-        </div>
-      </div>
-
+    <section id="mixer" className="py-12 sm:py-16 px-4 sm:px-6 max-w-7xl mx-auto scroll-mt-20">
+      
       {/* 🎉 GOOGLE CALENDAR BIRTHDAY EVENT AUTO-SUGGESTION BANNER */}
       {calendarSyncInfo.enabled && (
         <div className="p-5 rounded-3xl bg-gradient-to-r from-rose-600 via-pink-600 to-amber-500 text-white shadow-xl mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-rose-300/40 animate-fade-in">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 border border-white/30">
+            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 border border-white/30 shadow-md">
               <Gift className="w-6 h-6 text-white animate-bounce" />
             </div>
             <div>
@@ -108,7 +85,7 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
                   Google Calendar Synced
                 </span>
                 <span className="text-[10px] font-mono bg-amber-300 text-slate-950 font-extrabold px-2.5 py-0.5 rounded-full">
-                  EVENT FOUND TODAY
+                  EVENT TODAY
                 </span>
               </div>
               <h3 className="text-lg sm:text-xl font-extrabold text-white mt-1">
@@ -122,45 +99,48 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
         </div>
       )}
 
-      <div className="text-center max-w-2xl mx-auto mb-12">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-pill text-xs tracking-wider uppercase text-slate-700 font-semibold mb-3">
-          <Palette className="w-3.5 h-3.5" /> Owned Closet Canvas & Recommendation Engine
+      {/* Streamlined Clean Header */}
+      <div className="text-center max-w-2xl mx-auto mb-10">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full glass-pill text-xs tracking-wider uppercase text-slate-800 font-semibold mb-3">
+          <Sparkles className="w-3.5 h-3.5 text-emerald-600" /> Outfit Canvas & Recommendation Engine
         </div>
-        <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 mb-3">
-          Interactive Owned Canvas & Assembled Final Look
+        <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 mb-3">
+          Interactive Outfit Canvas
         </h2>
         <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-          Assemble looks exclusively from your owned physical closet items (clothing & shoes only, no faces). Click to generate a clear top-to-bottom assembled outfit photo!
+          Assemble looks from your physical closet layers and discover gap-filling store recommendations tailored to your style.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
         {/* Left Column: Interactive Owned Closet Layer Mixer Canvas */}
-        <div className="lg:col-span-6 glass-panel p-6 sm:p-8 rounded-3xl flex flex-col justify-between">
+        <div className="lg:col-span-6 glass-panel p-6 sm:p-8 rounded-3xl flex flex-col justify-between shadow-lg bg-white border border-slate-200">
           <div>
             <div className="flex items-center justify-between mb-6 border-b border-black/5 pb-4">
-              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <Layers className="w-4 h-4 text-slate-800" /> Owned Closet Layers
+              <h3 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                <Layers className="w-4 h-4 text-emerald-600" /> Owned Closet Layers
               </h3>
-              <span className="text-xs font-mono text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full">
+              <span className="text-xs font-mono text-emerald-700 font-bold bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
                 100% Physical Closet
               </span>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-5">
+              
               {/* Outerwear Layer */}
-              <div className="glass-card p-4 rounded-2xl border border-slate-200 bg-white flex flex-col gap-3">
+              <div className="glass-card p-4 rounded-2xl border border-slate-200 bg-slate-50/60 flex flex-col gap-3">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <img
-                      src={selectedOuter ? selectedOuter.image : 'https://images.unsplash.com/photo-1544441893-675973e31985?w=600&auto=format&fit=crop&q=80'}
+                      src={selectedOuter ? selectedOuter.image : 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&auto=format&fit=crop&q=80'}
                       alt="Outerwear Item"
-                      className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm"
+                      className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm bg-white"
                     />
                     <div>
                       <div className="flex items-center gap-2 mb-0.5">
                         <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] uppercase font-mono font-bold">Owned Item</span>
-                        <span className="text-[10px] text-slate-400 font-mono uppercase">Outerwear</span>
+                        <span className="text-[10px] text-slate-500 font-mono uppercase font-bold">Outerwear</span>
                       </div>
                       <h4 className="text-slate-900 font-bold text-sm">
                         {selectedOuter ? selectedOuter.name : 'Beige Double-Breasted Trench'}
@@ -175,7 +155,7 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
                     <select
                       value={selectedOuter?.id || ''}
                       onChange={(e) => setSelectedOuter(ownedOuterwear.find(i => i.id === e.target.value) || null)}
-                      className="bg-slate-100 border border-slate-200 rounded-xl px-2 py-1 text-xs text-slate-900 focus:outline-none"
+                      className="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none font-medium shadow-sm"
                     >
                       {ownedOuterwear.map(item => (
                         <option key={item.id} value={item.id}>{item.name}</option>
@@ -186,13 +166,13 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
               </div>
 
               {/* Top Garment Layer */}
-              <div className="glass-card p-4 rounded-2xl border border-slate-300 bg-slate-50 flex flex-col gap-3">
+              <div className="glass-card p-4 rounded-2xl border border-slate-300 bg-white flex flex-col gap-3.5 shadow-sm">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <img
                       src={selectedTop ? selectedTop.image : 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&auto=format&fit=crop&q=80'}
                       alt="Top Item"
-                      className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm"
+                      className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm bg-white"
                     />
                     <div>
                       <div className="flex items-center gap-2 mb-0.5">
@@ -200,8 +180,11 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
                         <span className="text-[10px] text-slate-600 font-mono uppercase font-bold">Top ("Choose Color")</span>
                       </div>
                       <h4 className="text-slate-900 font-bold text-sm">
-                        {selectedTop ? selectedTop.name : 'Black Oversized Crew Tee'} ({topColorName})
+                        {selectedTop ? selectedTop.name : 'Black Oversized Crew Tee'}
                       </h4>
+                      <p className="text-xs text-slate-500 font-mono">
+                        Active Color: <strong className="text-slate-900">{topColorName}</strong>
+                      </p>
                     </div>
                   </div>
 
@@ -209,7 +192,7 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
                     <select
                       value={selectedTop?.id || ''}
                       onChange={(e) => setSelectedTop(ownedTops.find(i => i.id === e.target.value) || null)}
-                      className="bg-white border border-slate-200 rounded-xl px-2 py-1 text-xs text-slate-900 focus:outline-none"
+                      className="bg-slate-100 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none font-medium"
                     >
                       {ownedTops.map(item => (
                         <option key={item.id} value={item.id}>{item.name}</option>
@@ -218,41 +201,44 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
                   )}
                 </div>
 
-                {/* Color Swatch Picker */}
-                <div className="pt-2 border-t border-slate-200 flex items-center gap-2 overflow-x-auto pb-1">
-                  <span className="text-xs font-semibold text-slate-700 mr-1 whitespace-nowrap">Choose Top Color:</span>
-                  {colorPalette.map((c) => (
-                    <button
-                      key={c.name}
-                      onClick={() => {
-                        setTopColor(c.hex);
-                        setTopColorName(c.name);
-                      }}
-                      className={`w-6 h-6 rounded-full border transition-all ${
-                        topColor === c.hex
-                          ? 'border-black scale-125 shadow-md ring-2 ring-slate-400'
-                          : 'border-slate-300 hover:scale-110'
-                      }`}
-                      style={{ backgroundColor: c.hex }}
-                      title={c.name}
-                    />
-                  ))}
+                {/* Color Swatch Picker with Selected Ring Outline */}
+                <div className="pt-2 border-t border-slate-100 flex items-center gap-2 overflow-x-auto pb-1">
+                  <span className="text-xs font-bold text-slate-700 mr-1 shrink-0 font-mono">Top Color:</span>
+                  {colorPalette.map((c) => {
+                    const isSelected = topColor === c.hex;
+                    return (
+                      <button
+                        key={c.name}
+                        onClick={() => {
+                          setTopColor(c.hex);
+                          setTopColorName(c.name);
+                        }}
+                        className={`w-6 h-6 rounded-full border transition-all ${
+                          isSelected
+                            ? 'border-black scale-125 shadow-md ring-2 ring-emerald-500 ring-offset-2'
+                            : 'border-slate-300 hover:scale-110 opacity-80 hover:opacity-100'
+                        }`}
+                        style={{ backgroundColor: c.hex }}
+                        title={c.name}
+                      />
+                    );
+                  })}
                 </div>
               </div>
 
               {/* Bottom Garment Layer */}
-              <div className="glass-card p-4 rounded-2xl border border-slate-200 bg-white flex flex-col gap-3">
+              <div className="glass-card p-4 rounded-2xl border border-slate-200 bg-slate-50/60 flex flex-col gap-3">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <img
                       src={selectedBottom ? selectedBottom.image : 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&auto=format&fit=crop&q=80'}
                       alt="Bottom Item"
-                      className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm"
+                      className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm bg-white"
                     />
                     <div>
                       <div className="flex items-center gap-2 mb-0.5">
                         <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] uppercase font-mono font-bold">Owned Item</span>
-                        <span className="text-[10px] text-slate-400 font-mono uppercase">Bottom</span>
+                        <span className="text-[10px] text-slate-500 font-mono uppercase font-bold">Bottom</span>
                       </div>
                       <h4 className="text-slate-900 font-bold text-sm">
                         {selectedBottom ? selectedBottom.name : 'Tailored Straight Chinos'}
@@ -267,7 +253,7 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
                     <select
                       value={selectedBottom?.id || ''}
                       onChange={(e) => setSelectedBottom(ownedBottoms.find(i => i.id === e.target.value) || null)}
-                      className="bg-slate-100 border border-slate-200 rounded-xl px-2 py-1 text-xs text-slate-900 focus:outline-none"
+                      className="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none font-medium shadow-sm"
                     >
                       {ownedBottoms.map(item => (
                         <option key={item.id} value={item.id}>{item.name}</option>
@@ -278,17 +264,17 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
               </div>
 
               {/* Footwear Layer */}
-              <div className="glass-card p-4 rounded-2xl flex items-center justify-between gap-3 border border-slate-200 bg-white">
+              <div className="glass-card p-4 rounded-2xl border border-slate-200 bg-slate-50/60 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <img
                     src={selectedShoes ? selectedShoes.image : 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&auto=format&fit=crop&q=80'}
                     alt="Shoe Item"
-                    className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm"
+                    className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm bg-white"
                   />
                   <div>
                     <div className="flex items-center gap-2 mb-0.5">
                       <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] uppercase font-mono font-bold">Owned Item</span>
-                      <span className="text-[10px] text-slate-400 font-mono uppercase">Footwear</span>
+                      <span className="text-[10px] text-slate-500 font-mono uppercase font-bold">Footwear</span>
                     </div>
                     <h4 className="text-slate-900 font-bold text-sm">
                       {selectedShoes ? selectedShoes.name : 'Classic White Leather Sneakers'}
@@ -303,7 +289,7 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
                   <select
                     value={selectedShoes?.id || ''}
                     onChange={(e) => setSelectedShoes(ownedShoes.find(i => i.id === e.target.value) || null)}
-                    className="bg-slate-100 border border-slate-200 rounded-xl px-2 py-1 text-xs text-slate-900 focus:outline-none"
+                    className="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none font-medium shadow-sm"
                   >
                     {ownedShoes.map(item => (
                       <option key={item.id} value={item.id}>{item.name}</option>
@@ -313,37 +299,39 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
               </div>
             </div>
 
-            {/* Generate Final Photo CTA Button */}
-            <div className="mt-6 pt-4 border-t border-black/5">
+            {/* Clear Interactive Trigger Action Button */}
+            <div className="mt-8 pt-4 border-t border-black/5">
               <button
                 onClick={handleGenerateFinalLook}
-                className="w-full primary-button py-3 text-xs uppercase tracking-wider flex items-center justify-center gap-2 font-bold shadow-md"
+                className="w-full bg-slate-950 hover:bg-slate-900 text-white py-3.5 rounded-2xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 font-extrabold shadow-lg transition-all transform hover:scale-[1.01]"
               >
-                <Camera className="w-4 h-4 text-white" /> Assembled Final Look Photo
+                <Sparkles className="w-4 h-4 text-emerald-400" />
+                <span>✨ Generate Assembled Look</span>
+                <ArrowRight className="w-4 h-4 text-slate-300 ml-1" />
               </button>
             </div>
           </div>
         </div>
 
-        {/* Right Column: Our Recommendations for You to Wear */}
-        <div className="lg:col-span-6 glass-panel p-6 sm:p-8 rounded-3xl flex flex-col justify-between">
+        {/* Right Column: Gap-Filling Store Additions to Complete Look */}
+        <div className="lg:col-span-6 glass-panel p-6 sm:p-8 rounded-3xl flex flex-col justify-between shadow-lg bg-white border border-slate-200">
           <div>
             <div className="flex items-center justify-between mb-6 border-b border-black/5 pb-4">
               <div>
-                <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                  <ShoppingBag className="w-4 h-4 text-slate-800" /> Our Recommendations for You to Wear
+                <h3 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                  <ShoppingBag className="w-4 h-4 text-indigo-600" /> Gap-Filling Store Additions to Complete Look
                 </h3>
-                <p className="text-xs text-slate-500">
-                  Targeted gap-filling pieces under your ${currentBudget} SGD Budget Cap
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Recommended partner store additions under your ${currentBudget} SGD Budget Cap
                 </p>
               </div>
-              <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-mono font-bold">
-                Recommended
+              <span className="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-mono font-bold border border-indigo-200">
+                Partner Store
               </span>
             </div>
 
             {/* Recommended Products Cards */}
-            <div className="space-y-3 max-h-[440px] overflow-y-auto pr-1">
+            <div className="space-y-4 max-h-[460px] overflow-y-auto pr-1">
               {budgetFilteredProducts.length === 0 ? (
                 <div className="text-center py-12 glass-card rounded-2xl p-6">
                   <Sliders className="w-8 h-8 text-slate-400 mx-auto mb-2" />
@@ -354,12 +342,12 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
                 budgetFilteredProducts.map((product) => (
                   <div
                     key={product.id}
-                    className="glass-card p-3.5 rounded-2xl flex items-center justify-between gap-3 group hover:border-black/20 transition-all"
+                    className="glass-card p-4 rounded-2xl flex items-center justify-between gap-3 group hover:border-black/20 transition-all border border-slate-200 bg-white"
                   >
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm group-hover:scale-105 transition-transform"
+                      className="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm group-hover:scale-105 transition-transform bg-slate-50"
                     />
                     
                     <div className="flex-1 min-w-0">
@@ -372,22 +360,23 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
                         </span>
                       </div>
 
-                      <h4 className="text-slate-900 text-sm truncate font-bold mt-0.5">
+                      <h4 className="text-slate-900 text-sm truncate font-extrabold mt-0.5">
                         {product.name}
                       </h4>
 
-                      <p className="text-xs text-emerald-700 font-mono font-bold mt-0.5">
-                        ${product.price.toFixed(2)} SGD <span className="text-[10px] text-slate-400 font-normal">(Cost to user: $0 extra)</span>
-                      </p>
+                      <div className="text-xs text-indigo-900 font-mono font-extrabold mt-0.5 flex items-center gap-1.5">
+                        <span>${product.price.toFixed(2)} SGD</span>
+                        <span className="text-[10px] text-slate-500 font-normal">• Direct Partner Store Link</span>
+                      </div>
                     </div>
 
                     <button
                       onClick={() => handleBuyClick(product)}
-                      title={`Go to ${product.merchant} webpage to purchase`}
-                      className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-sm ${
+                      title={`Go directly to ${product.merchant} item webpage`}
+                      className={`px-3.5 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-sm ${
                         purchasedItems[product.id]
-                          ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-                          : 'bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold'
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-emerald-600 hover:bg-emerald-700 text-white'
                       }`}
                     >
                       {purchasedItems[product.id] ? (
@@ -396,7 +385,7 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
                         </>
                       ) : (
                         <>
-                          <Check className="w-3.5 h-3.5 text-white" /> Shop Now <ExternalLink className="w-3 h-3 ml-0.5" />
+                          <span>Shop Item</span> <ExternalLink className="w-3 h-3 ml-0.5" />
                         </>
                       )}
                     </button>
@@ -406,16 +395,16 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
             </div>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-black/5 flex flex-wrap items-center justify-between gap-3 text-xs">
-            <span className="flex items-center gap-1 font-medium text-slate-500">
-              <ShieldCheck className="w-3.5 h-3.5 text-slate-800" /> FTC/CCCS Compliant ($0 Extra Cost)
+          <div className="mt-8 pt-4 border-t border-black/5 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <span className="flex items-center gap-1 font-medium text-slate-500 font-mono text-[11px]">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Direct Merchant URLs • FTC/CCCS Compliant
             </span>
 
             <button
               onClick={() => onNavigate && onNavigate('compliance')}
               className="text-slate-900 font-bold flex items-center gap-1 hover:underline"
             >
-              Store Budget Filter <ArrowRight className="w-3.5 h-3.5" />
+              Adjust Store Budget Filter <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
@@ -423,7 +412,7 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
 
       {/* Assembled Final Look Photo Overlay Modal */}
       {showFinalPhotoModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in">
           <div className="relative w-full max-w-lg bg-white rounded-3xl border border-black/10 shadow-2xl p-6 sm:p-8 overflow-hidden">
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">

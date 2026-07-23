@@ -12,8 +12,9 @@ import ProfileDashboardModal from './components/ProfileDashboardModal';
 import Footer from './components/Footer';
 import Toast from './components/Toast';
 
-// Smart AI Component
+// Smart AI Components
 import ColorSeasonAnalyzer from './components/ColorSeasonAnalyzer';
+import Chatbot from './components/Chatbot';
 
 import { INITIAL_WARDROBE } from './data/mockData';
 import { 
@@ -26,9 +27,9 @@ import {
 import { syncWardrobeToCloud } from './utils/supabase';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'color' | 'closet' | 'styling' | 'creators' | 'templates' | 'compliance'
+  const [activeTab, setActiveTab] = useState('home');
   const [user, setUser] = useState(null);
-  const [wardrobe, setWardrobe] = useState([]);
+  const [wardrobe, setWardrobe] = useState(INITIAL_WARDROBE);
   const [currentBudget, setCurrentBudget] = useState(50);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [selectedCreator, setSelectedCreator] = useState(null);
@@ -43,15 +44,23 @@ export default function App() {
 
   useEffect(() => {
     initDatabase();
-    // Guarantee 100% brand new logged-out launch state on site open
-    logoutUserInDB();
-    setUser(null);
-    setWardrobe([]);
+    // Persistent Login Session: Restore user from localStorage on refresh
+    const existingUser = getCurrentUser();
+    if (existingUser) {
+      setUser(existingUser);
+      const userWardrobe = getUserWardrobeFromDB(existingUser.id, INITIAL_WARDROBE);
+      setWardrobe(userWardrobe);
+    } else {
+      // First visit / Logged out user: Open Login/Register Modal automatically
+      setLoginRegisterMode(false);
+      setLoginModalOpen(true);
+      setWardrobe(INITIAL_WARDROBE);
+    }
   }, []);
 
   useEffect(() => {
-    saveUserWardrobeInDB(user?.id, wardrobe);
     if (user?.id) {
+      saveUserWardrobeInDB(user.id, wardrobe);
       syncWardrobeToCloud(user.id, wardrobe);
     }
   }, [wardrobe, user]);
@@ -61,6 +70,11 @@ export default function App() {
   };
 
   const handleAddItem = (newItem) => {
+    if (!user) {
+      handleOpenLoginModal(true);
+      showToast('Please sign in or register to add garments to your closet', 'info');
+      return;
+    }
     setWardrobe((prev) => [newItem, ...prev]);
     showToast(`✨ Added "${newItem.name}" to closet!`);
   };
@@ -101,8 +115,7 @@ export default function App() {
     setUser(loggedInUser);
     const userWardrobe = getUserWardrobeFromDB(loggedInUser.id, INITIAL_WARDROBE);
     setWardrobe(userWardrobe);
-    showToast(`Welcome, ${loggedInUser.name}!`);
-    setProfileModalOpen(true);
+    showToast(`Welcome back, ${loggedInUser.name}!`);
   };
 
   const handleLogout = () => {
@@ -110,9 +123,16 @@ export default function App() {
     setUser(null);
     setWardrobe(INITIAL_WARDROBE);
     showToast("Signed out successfully", "info");
+    setLoginModalOpen(true);
   };
 
   const handleNavigate = (tab) => {
+    // Require login for interactive features
+    if (!user && tab !== 'home') {
+      handleOpenLoginModal(false);
+      showToast('Please sign in or register to access this section', 'info');
+      return;
+    }
     setActiveTab(tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -164,11 +184,12 @@ export default function App() {
               wardrobe={wardrobe}
               onAddItem={handleAddItem}
               onDeleteItem={handleDeleteItem}
+              onNavigateToCanvas={() => handleNavigate('styling')}
             />
           </div>
         )}
 
-        {/* Section View 4: Height, Waist & Creator Matcher */}
+        {/* Section View 4: Creators Page (Two Horizontal Columns) */}
         {activeTab === 'creators' && (
           <div className="animate-fade-in-up">
             <BodyCreatorMatcher
@@ -188,7 +209,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Section View 6: Interactive Outfit Mixer */}
+        {/* Section View 6: Interactive Outfit Mixer (Outfit Canvas) */}
         {activeTab === 'styling' && (
           <div className="animate-fade-in-up">
             <OutfitMixer
@@ -212,6 +233,9 @@ export default function App() {
           </div>
         )}
       </main>
+
+      {/* Floating StyleSync AI Widget (Docked Bottom Right) */}
+      <Chatbot user={user} onNavigate={handleNavigate} />
 
       {/* Footer */}
       <Footer

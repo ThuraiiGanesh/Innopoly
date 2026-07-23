@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, Check, Plus, Trash2, Tag, Layers, Sparkles, Cpu, Upload, Grid, Video, RefreshCw, X, Play } from 'lucide-react';
+import { Camera, Check, Plus, Trash2, Tag, Layers, Sparkles, Cpu, Upload, Grid, Video, RefreshCw, X, Play, ArrowRight } from 'lucide-react';
 
-export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem }) {
+export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem, onNavigateToCanvas }) {
   const [itemName, setItemName] = useState('');
   const [category, setCategory] = useState('Tops');
   const [colorName, setColorName] = useState('Black');
@@ -76,7 +76,6 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
         if (!itemName) setItemName('Live Camera Snap Item');
         closeCameraModal();
       } else {
-        // Batch camera mode: accumulate photos
         setCapturedBatchPhotos(prev => [dataUrl, ...prev]);
       }
     }
@@ -99,54 +98,43 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
         id: 'w_camera_batch_' + Date.now() + '_' + index,
         name: `Camera Shot Garment ${index + 1}`,
         category: autoCat,
-        color: autoColor.toLowerCase().includes('white') ? '#ffffff' : '#18181b',
+        color: autoColor.toLowerCase(),
         colorName: autoColor,
         pattern: 'Solid',
-        style: 'Smart Casual',
+        fabric: 'Scanned Texture',
         image: imgData,
-        owned: true
+        dateAdded: new Date().toISOString().split('T')[0]
       };
       onAddItem(newItem);
     });
 
-    setBatchCount(capturedBatchPhotos.length);
     setIsAnalyzing(false);
-    setAutoTagged({
-      category: `${capturedBatchPhotos.length} Camera Shots Auto-Tagged`,
-      color: 'Batch Processed',
-      pattern: 'Multi-Scan Ready'
-    });
     setCapturedBatchPhotos([]);
     closeCameraModal();
   };
 
-  const handleImageFileChange = (e) => {
-    const file = e.target.files?.[0];
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setCustomImage(reader.result);
-        if (!itemName) {
-          const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
-          setItemName(nameWithoutExt.charAt(0).toUpperCase() + nameWithoutExt.slice(1));
-        }
+        if (!itemName) setItemName(file.name.replace(/\.[^/.]+$/, ""));
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleBatchUpload = (e) => {
-    const files = Array.from(e.target.files || []);
+  const handleMultiShotBatch = (e) => {
+    const files = Array.from(e.target.files);
     if (files.length === 0) return;
 
     setIsAnalyzing(true);
-    let count = 0;
+    setBatchCount(files.length);
 
-    files.slice(0, 10).forEach((file, index) => {
+    files.forEach((file, index) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
-        const autoName = nameWithoutExt.charAt(0).toUpperCase() + nameWithoutExt.slice(1);
         const categories = ['Tops', 'Bottoms', 'Outerwear', 'Shoes'];
         const colors = ['Black', 'White', 'Navy', 'Olive', 'Beige'];
         const autoCat = categories[index % categories.length];
@@ -154,103 +142,120 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
 
         const newItem = {
           id: 'w_batch_' + Date.now() + '_' + index,
-          name: autoName,
+          name: file.name.replace(/\.[^/.]+$/, "") || `Scanned Item ${index + 1}`,
           category: autoCat,
-          color: autoColor.toLowerCase().includes('white') ? '#ffffff' : '#18181b',
+          color: autoColor.toLowerCase(),
           colorName: autoColor,
           pattern: 'Solid',
-          style: 'Smart Casual',
+          fabric: 'Cotton Blend',
           image: reader.result,
-          owned: true
+          dateAdded: new Date().toISOString().split('T')[0]
         };
-
         onAddItem(newItem);
-        count++;
-        if (count === Math.min(files.length, 10)) {
-          setBatchCount(count);
-          setIsAnalyzing(false);
-          setAutoTagged({
-            category: `${count} Items Auto-Tagged`,
-            color: 'Batch Processed',
-            pattern: 'Multi-Scan Ready'
-          });
-        }
       };
       reader.readAsDataURL(file);
     });
+
+    setTimeout(() => {
+      setIsAnalyzing(false);
+      setBatchCount(0);
+    }, 1200);
   };
 
-  const handleSimulatedUpload = (e) => {
+  const handleSubmitSingle = (e) => {
     e.preventDefault();
     if (!itemName.trim()) return;
 
     setIsAnalyzing(true);
-    setAutoTagged(null);
-
-    const defaultImg = category === 'Tops' 
-      ? 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&auto=format&fit=crop&q=80'
-      : category === 'Bottoms'
-      ? 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&auto=format&fit=crop&q=80'
-      : category === 'Outerwear'
-      ? 'https://images.unsplash.com/photo-1544441893-675973e31985?w=600&auto=format&fit=crop&q=80'
-      : 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&auto=format&fit=crop&q=80';
 
     setTimeout(() => {
       const newItem = {
         id: 'w_' + Date.now(),
-        name: itemName,
-        category: category,
-        color: colorName.toLowerCase().includes('white') ? '#ffffff' : colorName.toLowerCase().includes('beige') ? '#d4b996' : '#18181b',
-        colorName: colorName,
-        pattern: pattern,
-        style: 'Smart Casual',
-        image: customImage || defaultImg,
-        owned: true
+        name: itemName.trim(),
+        category,
+        color: colorName.toLowerCase(),
+        colorName,
+        pattern,
+        fabric: 'Scanned Textile',
+        image: customImage || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&auto=format&fit=crop&q=80',
+        dateAdded: new Date().toISOString().split('T')[0]
       };
 
       onAddItem(newItem);
-      setAutoTagged({
-        category: category,
-        color: colorName,
-        pattern: pattern
-      });
-      setItemName('');
-      setCustomImage(null);
+      setAutoTagged({ category, color: colorName, pattern });
       setIsAnalyzing(false);
-    }, 900);
+      resetForm();
+    }, 600);
   };
 
-  const filteredWardrobe = selectedFilter === 'All' 
-    ? wardrobe 
-    : wardrobe.filter(item => item.category === selectedFilter);
+  const resetForm = () => {
+    setItemName('');
+    setCustomImage(null);
+  };
+
+  const filteredWardrobe = selectedFilter === 'All'
+    ? wardrobe
+    : wardrobe.filter(i => i.category === selectedFilter);
 
   return (
-    <section id="digitizer" className="py-12 sm:py-16 px-4 sm:px-6 max-w-7xl mx-auto scroll-mt-20">
-      <div className="text-center max-w-2xl mx-auto mb-10">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass-pill text-xs tracking-wider uppercase text-slate-700 font-semibold mb-3">
-          <Camera className="w-3.5 h-3.5" /> AI Auto-Tagging Digitization Engine
+    <section id="closet-digitizer" className="py-16 px-6 max-w-7xl mx-auto scroll-mt-20">
+      
+      {/* Clear Instruction Banner -> Proceed to Outfit Canvas */}
+      <div className="p-4 sm:p-5 mb-8 rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-600 to-slate-950 text-white shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-emerald-400/30">
+        <div className="flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 border border-white/30">
+            <Sparkles className="w-5 h-5 text-emerald-200 animate-spin-slow" />
+          </div>
+          <div>
+            <h4 className="text-sm sm:text-base font-extrabold text-white leading-tight">
+              ✨ Next Step: Proceed to Outfit Canvas
+            </h4>
+            <p className="text-xs text-emerald-100 font-mono mt-0.5">
+              Once you've snapped or uploaded your clothes, proceed to the Outfit Canvas to assemble looks!
+            </p>
+          </div>
         </div>
-        <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 mb-3">
+
+        <button
+          onClick={onNavigateToCanvas}
+          className="bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-xs uppercase tracking-wider px-5 py-2.5 rounded-xl transition-all shadow-md shrink-0 flex items-center gap-1.5 transform hover:scale-[1.02]"
+        >
+          Proceed to Outfit Canvas <ArrowRight className="w-4 h-4 text-emerald-600" />
+        </button>
+      </div>
+
+      <div className="text-center max-w-2xl mx-auto mb-10">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-pill text-xs tracking-wider uppercase text-slate-700 font-semibold mb-3">
+          <Camera className="w-3.5 h-3.5" /> AI Garment Scanner & Multi-Shot Digitizer
+        </div>
+        <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 mb-3">
           Snap, Upload & Catalog Your Closet
         </h2>
-        <p className="text-slate-600 text-sm leading-relaxed">
+        <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
           Single item scanner or multi-shot batch camera scanner up to 10 garments simultaneously.
         </p>
 
-        {/* Mode Selector Chips */}
-        <div className="inline-flex items-center gap-2 bg-slate-200/80 p-1 rounded-2xl mt-4 border border-slate-300">
+        {/* Scan Mode Toggle Pill */}
+        <div className="inline-flex items-center gap-1 bg-slate-200/70 p-1.5 rounded-2xl border border-slate-300 mt-6 text-xs font-bold font-mono">
           <button
+            type="button"
             onClick={() => setScanMode('single')}
-            className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
-              scanMode === 'single' ? 'bg-black text-white shadow-sm' : 'text-slate-700 hover:text-black'
+            className={`px-4 py-2 rounded-xl transition-all flex items-center gap-1.5 ${
+              scanMode === 'single'
+                ? 'bg-black text-white shadow-md'
+                : 'text-slate-600 hover:text-black'
             }`}
           >
             Single Garment Scan
           </button>
+
           <button
+            type="button"
             onClick={() => setScanMode('batch')}
-            className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-              scanMode === 'batch' ? 'bg-black text-white shadow-sm' : 'text-slate-700 hover:text-black'
+            className={`px-4 py-2 rounded-xl transition-all flex items-center gap-1.5 ${
+              scanMode === 'batch'
+                ? 'bg-black text-white shadow-md'
+                : 'text-slate-600 hover:text-black'
             }`}
           >
             <Grid className="w-3.5 h-3.5 text-amber-400" /> Multi-Shot Batch Scanner
@@ -259,119 +264,106 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Photo Upload & AI Scanner Form */}
+        {/* Scanner Form Panel */}
         <div className="lg:col-span-5 glass-panel p-6 sm:p-8 rounded-3xl flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-6 border-b border-black/5 pb-4">
               <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                 <Cpu className="w-4 h-4 text-slate-800" /> Google AI Vision Auto-Tagger
               </h3>
-              <span className="text-xs font-mono text-emerald-600 font-bold bg-emerald-50 px-2.5 py-1 rounded-full">
-                {scanMode === 'batch' ? 'Batch Mode' : 'Single Mode'}
+              <span className="text-xs font-mono text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full">
+                {scanMode === 'single' ? 'Single Mode' : 'Multi-Shot Batch Mode'}
               </span>
             </div>
 
-            {/* Hidden native input for direct mobile camera capture fallback */}
-            <input
-              type="file"
-              ref={cameraInputRef}
-              accept="image/*"
-              capture="environment"
-              onChange={handleImageFileChange}
-              className="hidden"
-            />
-
             {scanMode === 'batch' ? (
               <div className="space-y-4">
-                <input
-                  type="file"
-                  ref={batchFileInputRef}
-                  multiple
-                  accept="image/*"
-                  onChange={handleBatchUpload}
-                  className="hidden"
-                />
+                <div className="p-6 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 text-center flex flex-col items-center justify-center">
+                  <Grid className="w-8 h-8 text-slate-400 mb-2" />
+                  <h4 className="text-sm font-bold text-slate-900 mb-1">Multi-Shot Batch Mode</h4>
+                  <p className="text-xs text-slate-500 mb-4 font-mono">
+                    Select up to 10 garment photos at once or snap with live camera.
+                  </p>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={startCameraStream}
-                    className="p-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white flex flex-col items-center justify-center gap-2 transition-all shadow-md group"
-                  >
-                    <div className="p-3 rounded-full bg-white/20 group-hover:scale-110 transition-transform">
-                      <Camera className="w-6 h-6" />
-                    </div>
-                    <span className="text-xs font-extrabold uppercase tracking-wider">Open Live Camera</span>
-                    <span className="text-[10px] text-indigo-100 font-mono">Snap Batch Shots</span>
-                  </button>
+                  <div className="flex flex-wrap items-center justify-center gap-2">
+                    <button
+                      type="button"
+                      onClick={startCameraStream}
+                      className="bg-black hover:bg-slate-800 text-white font-extrabold text-xs uppercase px-4 py-2.5 rounded-xl shadow-sm flex items-center gap-1.5 transition-all"
+                    >
+                      <Camera className="w-3.5 h-3.5 text-emerald-400" /> Open Live Camera
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={() => batchFileInputRef.current?.click()}
-                    className="p-4 rounded-2xl bg-white border border-slate-300 hover:border-black text-slate-900 flex flex-col items-center justify-center gap-2 transition-all shadow-sm group"
-                  >
-                    <div className="p-3 rounded-full bg-slate-100 group-hover:scale-110 transition-transform">
-                      <Upload className="w-6 h-6 text-slate-700" />
-                    </div>
-                    <span className="text-xs font-extrabold uppercase tracking-wider">Select Files</span>
-                    <span className="text-[10px] text-slate-500 font-mono">Up to 10 Photos</span>
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => batchFileInputRef.current?.click()}
+                      className="secondary-button text-xs uppercase px-4 py-2.5 font-bold flex items-center gap-1.5"
+                    >
+                      <Upload className="w-3.5 h-3.5" /> Upload Photos
+                    </button>
+
+                    <input
+                      ref={batchFileInputRef}
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleMultiShotBatch}
+                      className="hidden"
+                    />
+                  </div>
                 </div>
               </div>
             ) : (
-              <form onSubmit={handleSimulatedUpload} className="space-y-4">
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  accept="image/*"
-                  onChange={handleImageFileChange}
-                  className="hidden"
-                />
-
-                {/* Direct Camera Button & Upload Area Split */}
-                <div className="grid grid-cols-2 gap-3 mb-2">
+              <form onSubmit={handleSubmitSingle} className="space-y-4">
+                <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={startCameraStream}
-                    className="p-3 rounded-2xl bg-slate-950 hover:bg-slate-800 text-white flex items-center justify-center gap-2 transition-all shadow-md"
+                    className="flex-1 bg-black hover:bg-slate-800 text-white font-extrabold text-xs uppercase py-2.5 px-3 rounded-xl shadow-sm flex items-center justify-center gap-1.5 transition-all"
                   >
-                    <Camera className="w-4 h-4 text-emerald-400" />
-                    <span className="text-xs font-extrabold uppercase tracking-wider">Take Photo (Camera)</span>
+                    <Camera className="w-3.5 h-3.5 text-emerald-400" /> Take Photo (Camera)
                   </button>
 
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="p-3 rounded-2xl bg-white border border-slate-300 hover:border-slate-800 text-slate-900 flex items-center justify-center gap-2 transition-all shadow-sm"
+                    className="flex-1 secondary-button text-xs uppercase py-2.5 px-3 font-bold flex items-center justify-center gap-1.5"
                   >
-                    <Upload className="w-4 h-4 text-slate-700" />
-                    <span className="text-xs font-extrabold uppercase tracking-wider">Upload File</span>
+                    <Upload className="w-3.5 h-3.5" /> Upload File
                   </button>
+
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                  <input
+                    ref={cameraInputRef}
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
                 </div>
 
                 <div 
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-slate-300 hover:border-slate-800 rounded-2xl p-4 text-center bg-white/60 cursor-pointer transition-all group relative overflow-hidden"
+                  className="relative rounded-2xl border-2 border-dashed border-slate-300 hover:border-slate-400 transition-colors p-4 text-center cursor-pointer bg-slate-50 h-36 flex flex-col items-center justify-center overflow-hidden"
                 >
                   {customImage ? (
-                    <div className="relative">
-                      <img
-                        src={customImage}
-                        alt="Uploaded garment preview"
-                        className="w-28 h-28 object-cover rounded-xl mx-auto shadow-md border border-slate-200"
-                      />
-                      <span className="text-[10px] font-mono bg-emerald-600 text-white px-2 py-0.5 rounded-full mt-2 inline-block font-bold">
-                        ✓ Image Ready for AI Scan
-                      </span>
-                    </div>
+                    <img src={customImage} alt="Garment Preview" className="w-full h-full object-contain" />
                   ) : (
                     <>
-                      <p className="text-xs font-semibold text-slate-700">
+                      <Camera className="w-6 h-6 text-slate-400 mb-1" />
+                      <span className="text-xs text-slate-600 font-medium">
                         Click or drag garment photo here to upload
-                      </p>
-                      <p className="text-[10px] text-slate-500 font-mono mt-0.5">
-                        Auto background removal & auto-tagging
-                      </p>
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-mono mt-0.5">
+                        auto background removal & auto tagging
+                      </span>
                     </>
                   )}
                 </div>
@@ -385,7 +377,7 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
                     placeholder="e.g. Vintage Black Oversized Tee"
                     value={itemName}
                     onChange={(e) => setItemName(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-black transition-colors"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-black transition-colors"
                   />
                 </div>
 
@@ -500,7 +492,7 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
               {filteredWardrobe.map((item) => (
                 <div
                   key={item.id}
-                  className="glass-card p-3.5 rounded-2xl flex items-center gap-3 group relative"
+                  className="glass-card p-3.5 rounded-2xl flex items-center gap-3 group relative bg-white border border-slate-200"
                 >
                   <img
                     src={item.image}

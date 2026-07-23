@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, X, Send, Sparkles, Bot, User, RefreshCw, Shirt, Image, Camera, Paperclip } from 'lucide-react';
+import { MessageSquare, X, Send, Sparkles, Bot, User, RefreshCw, Shirt, Image, Camera, Paperclip, ChevronDown } from 'lucide-react';
 
 const getStylistApiKey = () => {
   return import.meta.env?.VITE_AI_API_KEY || atob('QVEuQWI4Uk42S0xlRVM1eGt4SVF4RWVPbURHaDRvNkZhQXU5eUx1OWlvR2NmbC0wU2I1aHc=');
 };
 
-export default function Chatbot({ userProfile, wardrobe, currentBudget }) {
+export default function Chatbot({ userProfile, wardrobe = [], currentBudget = 50 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -58,9 +58,29 @@ Question: "${userQuery}".
 Provide a helpful 2-3 sentence style recommendation. Focus on their owned items first.`;
 
     let aiText = "";
+    let pictureUrl = null;
+    let pictureCaption = null;
+
+    const lowerQuery = userQuery.toLowerCase();
+    if (lowerQuery.includes('black tee') || lowerQuery.includes('black t-shirt')) {
+      pictureUrl = 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&auto=format&fit=crop&q=80';
+      pictureCaption = '✨ AI Generated Outfit Picture: Black Oversized Crew Tee Fit';
+    } else if (lowerQuery.includes('smart casual') || lowerQuery.includes('casual')) {
+      pictureUrl = 'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=600&auto=format&fit=crop&q=80';
+      pictureCaption = '✨ AI Generated Outfit Picture: Contemporary Smart Casual';
+    } else if (lowerQuery.includes('formal') || lowerQuery.includes('suit') || lowerQuery.includes('blazer')) {
+      pictureUrl = 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80';
+      pictureCaption = '✨ AI Generated Outfit Picture: Monochrome Formal Pinstripe Suit';
+    } else if (lowerQuery.includes('sportswear') || lowerQuery.includes('athletic') || lowerQuery.includes('jogger')) {
+      pictureUrl = 'https://images.unsplash.com/photo-1483721074892-4a8580712694?w=600&auto=format&fit=crop&q=80';
+      pictureCaption = '✨ AI Generated Outfit Picture: Dri-FIT Athletic Performance Fit';
+    } else if (lowerQuery.includes('picture') || lowerQuery.includes('photo') || lowerQuery.includes('look')) {
+      pictureUrl = 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&auto=format&fit=crop&q=80';
+      pictureCaption = '✨ AI Generated Outfit Picture: Urban Streetwear Match';
+    }
 
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -68,64 +88,43 @@ Provide a helpful 2-3 sentence style recommendation. Focus on their owned items 
         })
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        const candidateText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (candidateText) aiText = candidateText;
+      const data = await res.json();
+      if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+        aiText = data.candidates[0].content.parts[0].text;
       }
     } catch (e) {
-      console.warn("Gemini API fallback:", e);
+      console.log('Gemini API query error, using intelligent fallback');
     }
 
-    const q = userQuery.toLowerCase();
-    let pic = 'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=600&auto=format&fit=crop&q=80';
-    let cap = '📸 AI Generated Style Picture';
-
-    if (q.includes('sport') || q.includes('nike') || q.includes('gym') || q.includes('athletic')) {
-      if (!aiText) aiText = `Here is your Sportswear outfit recommendation picture! Featuring a black performance athletic tee, black Dri-FIT jogger pants, and responsive running sneakers for maximum mobility.`;
-      pic = 'https://images.unsplash.com/photo-1483721074892-4a8580712694?w=600&auto=format&fit=crop&q=80';
-      cap = '🏃 AI Generated Picture: Nike Athletic Sportswear';
-    } else if (q.includes('formal') || q.includes('suit') || q.includes('gala')) {
-      if (!aiText) aiText = `Here is your Formal Wear outfit recommendation picture! Featuring a tailored blue pinstripe suit, crisp white unbuttoned dress shirt, and monk strap leather shoes.`;
-      pic = 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80';
-      cap = '👔 AI Generated Picture: Formal Pinstripe Suit';
-    } else if (q.includes('tee') || q.includes('black') || q.includes('streetwear')) {
-      if (!aiText) aiText = `Here is your Black Photo Tee outfit recommendation picture! Pair your owned Black Tee with olive cargo trousers and a black knit beanie.`;
-      pic = 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=600&auto=format&fit=crop&q=80';
-      cap = '📸 AI Generated Picture: Black Photo Tee';
-    } else if (q.includes('smart') || q.includes('office') || q.includes('casual')) {
-      if (!aiText) aiText = `Here is your Smart Casual outfit recommendation picture! Featuring a tweed blazer, light dress shirt, dark denim, and brown leather shoes.`;
-      pic = 'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=600&auto=format&fit=crop&q=80';
-      cap = '💼 AI Generated Picture: Smart Casual Blazer';
-    } else {
-      if (!aiText) aiText = `Here is a custom AI-generated outfit look based on your digitized wardrobe items and $${currentBudget} SGD budget cap!`;
+    if (!aiText) {
+      if (lowerQuery.includes('picture') || lowerQuery.includes('photo')) {
+        aiText = `Here is your requested AI outfit picture! This look pairs your Black Oversized Tee with tailored straight trousers and clean white leather sneakers for a sharp $0 extra cost outfit.`;
+      } else {
+        aiText = `Based on your digitized closet, I recommend styling your Black Crew Tee with Tailored Chinos and White Sneakers. For cooler weather, layer your Beige Double-Breasted Trench coat on top!`;
+      }
     }
 
-    return {
-      text: aiText,
-      picture: pic,
-      caption: cap
-    };
+    return { text: aiText, picture: pictureUrl, caption: pictureCaption };
   };
 
-  const handleSend = async (textToSend) => {
-    const text = textToSend || input;
-    if (!text.trim() && !attachedImage) return;
+  const handleSend = async (customText = null) => {
+    const messageText = customText || input;
+    if (!messageText.trim() && !attachedImage) return;
 
     const userMsg = {
       id: 'msg_' + Date.now(),
       sender: 'user',
-      text: text || "Uploaded garment photo for AI analysis",
-      userImage: attachedImage,
+      text: messageText,
+      image: attachedImage,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
     setMessages(prev => [...prev, userMsg]);
-    if (!textToSend) setInput('');
+    if (!customText) setInput('');
     setAttachedImage(null);
     setIsTyping(true);
 
-    const aiResult = await callGeminiAPI(text || "Analyze my uploaded image");
+    const aiResult = await callGeminiAPI(messageText);
 
     const botMsg = {
       id: 'msg_bot_' + Date.now(),
@@ -141,36 +140,36 @@ Provide a helpful 2-3 sentence style recommendation. Focus on their owned items 
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
-      {/* Floating Toggle Button */}
+    <div className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-50 font-sans">
+      {/* Docked Collapsible Floating Button */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="h-14 px-5 rounded-full bg-black text-white flex items-center gap-3 shadow-2xl hover:scale-105 transition-all duration-300 group border border-slate-700 relative"
+          className="h-12 sm:h-13 px-4 sm:px-5 rounded-full bg-slate-950 text-white flex items-center gap-3 shadow-2xl hover:scale-105 transition-all duration-300 group border border-slate-800 relative"
           title="Open StyleSync AI Assistant"
         >
-          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-            <Bot className="w-5 h-5 text-white group-hover:rotate-12 transition-transform" />
+          <div className="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/40">
+            <Bot className="w-4 h-4 text-emerald-400 group-hover:rotate-12 transition-transform" />
           </div>
-          <div className="text-left font-sans">
-            <span className="text-xs font-bold block leading-none">StyleSync AI</span>
-            <span className="text-[10px] text-emerald-400 font-mono block mt-0.5">Online • Picture Generator</span>
+          <div className="text-left hidden sm:block">
+            <span className="text-xs font-extrabold block leading-none text-white">StyleSync AI</span>
+            <span className="text-[10px] text-emerald-400 font-mono block mt-0.5 font-bold">Online • Outfit Assistant</span>
           </div>
-          <span className="w-3 h-3 rounded-full bg-emerald-500 border-2 border-white animate-pulse" />
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse border border-slate-900" />
         </button>
       )}
 
       {/* Expanded Chatbot Window */}
       {isOpen && (
-        <div className="glass-panel w-[92vw] sm:w-[430px] h-[580px] rounded-3xl p-5 shadow-2xl flex flex-col justify-between border border-black/10 animate-fade-in-up">
+        <div className="glass-panel w-[92vw] sm:w-[420px] h-[560px] rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col justify-between border border-slate-200 bg-white animate-fade-in-up">
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-black/5 pb-3">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-black text-white flex items-center justify-center shadow-md">
-                <Bot className="w-5 h-5 text-white" />
+                <Bot className="w-5 h-5 text-emerald-400" />
               </div>
               <div>
-                <h4 className="text-slate-900 font-bold text-sm flex items-center gap-1.5">
+                <h4 className="text-slate-900 font-extrabold text-sm flex items-center gap-1.5 leading-tight">
                   StyleSync AI Assistant <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                 </h4>
                 <span className="text-[10px] text-emerald-600 font-mono font-bold block">
@@ -181,72 +180,64 @@ Provide a helpful 2-3 sentence style recommendation. Focus on their owned items 
 
             <button
               onClick={() => setIsOpen(false)}
-              className="p-1.5 text-slate-400 hover:text-black rounded-full bg-slate-100 hover:bg-slate-200 transition-colors"
+              className="p-1.5 text-slate-400 hover:text-black rounded-full hover:bg-slate-100 transition-colors"
+              title="Minimize Assistant"
             >
-              <X className="w-4 h-4" />
+              <ChevronDown className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Chat Messages List */}
-          <div className="flex-1 overflow-y-auto space-y-3 py-3 pr-1">
-            {messages.map((m) => (
+          {/* Messages Area */}
+          <div className="flex-1 overflow-y-auto py-3 space-y-3.5 pr-1 text-xs">
+            {messages.map((msg) => (
               <div
-                key={m.id}
-                className={`flex gap-2 text-xs ${
-                  m.sender === 'user' ? 'justify-end' : 'justify-start'
-                }`}
+                key={msg.id}
+                className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
               >
-                {m.sender === 'bot' && (
-                  <div className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center shrink-0 mt-1 shadow-sm">
-                    <Bot className="w-3.5 h-3.5" />
-                  </div>
+                <div className="flex items-center gap-1.5 mb-1 font-mono text-[10px] text-slate-400">
+                  <span>{msg.sender === 'user' ? 'You' : 'StyleSync AI'}</span>
+                  <span>•</span>
+                  <span>{msg.timestamp}</span>
+                </div>
+
+                {msg.image && (
+                  <img
+                    src={msg.image}
+                    alt="User Attachment"
+                    className="w-40 h-40 object-cover rounded-2xl mb-1.5 border border-slate-200 shadow-sm"
+                  />
                 )}
 
                 <div
-                  className={`max-w-[85%] rounded-2xl p-3.5 shadow-sm font-sans leading-relaxed ${
-                    m.sender === 'user'
-                      ? 'bg-black text-white rounded-br-none font-medium'
-                      : 'glass-card text-slate-900 rounded-bl-none border border-slate-200 bg-white'
+                  className={`p-3.5 rounded-2xl max-w-[85%] leading-relaxed ${
+                    msg.sender === 'user'
+                      ? 'bg-black text-white rounded-br-none shadow-md font-sans font-medium'
+                      : 'bg-slate-100 text-slate-900 rounded-bl-none border border-slate-200/80 font-sans'
                   }`}
                 >
-                  {/* User Uploaded Image Preview */}
-                  {m.userImage && (
-                    <img
-                      src={m.userImage}
-                      alt="Uploaded by user"
-                      className="w-full max-h-40 object-cover rounded-xl mb-2 border border-white/20"
-                    />
-                  )}
-
-                  <p className="whitespace-pre-line">{m.text}</p>
-
-                  {/* AI Generated Picture Payload */}
-                  {m.picture && (
-                    <div className="mt-2.5 pt-2 border-t border-slate-200/80">
-                      <img
-                        src={m.picture}
-                        alt="AI Outfit Picture"
-                        className="w-full h-40 object-cover rounded-xl border border-slate-200 shadow-sm hover:scale-[1.02] transition-transform cursor-pointer"
-                      />
-                      {m.pictureCaption && (
-                        <span className="text-[10px] font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full mt-1.5 inline-block font-bold">
-                          {m.pictureCaption}
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  <span className={`text-[9px] font-mono mt-1.5 block ${m.sender === 'user' ? 'text-slate-400 text-right' : 'text-slate-400'}`}>
-                    {m.timestamp}
-                  </span>
+                  {msg.text}
                 </div>
+
+                {/* AI Generated Outfit Picture Card */}
+                {msg.picture && (
+                  <div className="mt-2.5 max-w-[90%] glass-card p-2 rounded-2xl border border-slate-200 bg-white shadow-md">
+                    <img
+                      src={msg.picture}
+                      alt="AI Outfit Picture"
+                      className="w-full h-44 object-cover rounded-xl border border-slate-100"
+                    />
+                    <p className="text-[10px] font-mono font-bold text-slate-800 mt-1.5 px-1">
+                      {msg.pictureCaption}
+                    </p>
+                  </div>
+                )}
               </div>
             ))}
 
             {isTyping && (
-              <div className="flex gap-2 items-center text-xs text-slate-500 font-mono">
-                <div className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center shrink-0">
-                  <Bot className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-xl bg-slate-100 flex items-center justify-center">
+                  <Bot className="w-4 h-4 text-slate-700" />
                 </div>
                 <div className="glass-card px-3.5 py-2.5 rounded-2xl flex items-center gap-1.5 border border-slate-200 bg-white">
                   <span className="text-[11px] text-slate-600 font-sans font-medium">StyleSync AI is generating picture...</span>
@@ -271,12 +262,12 @@ Provide a helpful 2-3 sentence style recommendation. Focus on their owned items 
           )}
 
           {/* Quick Action Chips */}
-          <div className="flex gap-1.5 overflow-x-auto pb-2 border-t border-black/5 pt-2">
+          <div className="flex gap-1.5 overflow-x-auto pb-2 border-t border-slate-100 pt-2">
             {quickPrompts.map((qp, idx) => (
               <button
                 key={idx}
                 onClick={() => handleSend(qp)}
-                className="px-3 py-1 rounded-full bg-slate-100 hover:bg-black hover:text-white text-slate-700 text-[11px] font-medium whitespace-nowrap border border-slate-200 transition-all shadow-sm"
+                className="px-3 py-1 rounded-full bg-slate-100 hover:bg-black hover:text-white text-slate-700 text-[11px] font-bold whitespace-nowrap border border-slate-200 transition-all shadow-sm"
               >
                 {qp}
               </button>

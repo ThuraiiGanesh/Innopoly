@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Lock, Mail, User, Shirt, ArrowRight, CheckCircle2, UserPlus, LogIn, Sparkles } from 'lucide-react';
+import { X, Lock, Mail, User, Shirt, ArrowRight, CheckCircle2, UserPlus, LogIn, Sparkles, ShieldCheck } from 'lucide-react';
 import { loginUser, registerUser } from '../utils/database';
 
 export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialRegisterMode = false }) {
@@ -7,6 +7,8 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialReg
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [termsChecked, setTermsChecked] = useState(false);
+  const [marketingChecked, setMarketingChecked] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -31,6 +33,12 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialReg
         setError('Please enter your full name.');
         return;
       }
+
+      if (!termsChecked || !marketingChecked) {
+        setError('You must accept both the Terms & Conditions and Marketing Communications to register.');
+        return;
+      }
+
       const result = registerUser(name, email, password);
       if (result.success) {
         onLoginSuccess(result.user);
@@ -55,26 +63,21 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialReg
     setEmail('');
     setPassword('');
     setName('');
+    setTermsChecked(false);
+    setMarketingChecked(false);
     setError('');
   };
 
-  const handleQuickDemo = () => {
-    const result = loginUser('alex@stylesync.ai', 'demo');
-    if (result.success) {
-      onLoginSuccess(result.user);
-      onClose();
-      resetForm();
-    }
-  };
+  const isSubmitDisabled = isRegister && (!termsChecked || !marketingChecked);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-lg animate-fade-in-up">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-lg animate-fade-in-up">
       <div className="glass-panel w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden bg-white border border-black/10">
         
         {/* Brand Header */}
         <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-2xl bg-black text-white flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 rounded-2xl bg-black text-white flex items-center justify-center shadow-md">
               <Shirt className="w-5 h-5 text-emerald-400" />
             </div>
             <div>
@@ -117,8 +120,6 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialReg
             <UserPlus className="w-3.5 h-3.5" /> Register Account
           </button>
         </div>
-
-
 
         {error && (
           <div className="p-3 mb-4 rounded-xl bg-red-50 text-red-700 text-xs font-semibold border border-red-200 animate-fade-in-up">
@@ -178,9 +179,43 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialReg
             </div>
           </div>
 
+          {/* Registration Checkboxes (Terms & Conditions + Marketing Ads) */}
+          {isRegister && (
+            <div className="space-y-2.5 pt-2 border-t border-slate-100 text-xs">
+              <label className="flex items-start gap-2.5 cursor-pointer text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={termsChecked}
+                  onChange={(e) => setTermsChecked(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-slate-300 text-black focus:ring-black accent-black shrink-0"
+                />
+                <span className="leading-tight">
+                  I agree to the <strong className="text-slate-900 underline">Terms of Service</strong> & <strong className="text-slate-900 underline">Privacy Policy</strong>.
+                </span>
+              </label>
+
+              <label className="flex items-start gap-2.5 cursor-pointer text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={marketingChecked}
+                  onChange={(e) => setMarketingChecked(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-slate-300 text-black focus:ring-black accent-black shrink-0"
+                />
+                <span className="leading-tight">
+                  I agree to receive personalized style updates, trend recommendations, & marketing ads.
+                </span>
+              </label>
+            </div>
+          )}
+
           <button
             type="submit"
-            className="w-full primary-button py-3 text-xs uppercase tracking-wider flex items-center justify-center gap-2 font-extrabold mt-2 shadow-md shimmer-hover"
+            disabled={isSubmitDisabled}
+            className={`w-full py-3 text-xs uppercase tracking-wider flex items-center justify-center gap-2 font-extrabold mt-2 shadow-md transition-all ${
+              isSubmitDisabled
+                ? 'bg-slate-300 text-slate-500 cursor-not-allowed border border-slate-300'
+                : 'primary-button shimmer-hover'
+            }`}
           >
             {isRegister ? 'Create & Launch Setup' : 'Sign In & Launch Setup'} <ArrowRight className="w-4 h-4" />
           </button>

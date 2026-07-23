@@ -1,6 +1,51 @@
 // Mock data for StyleSync Fashion Tech Web App
 
-export const INITIAL_WARDROBE = [];
+export const INITIAL_WARDROBE = [
+  {
+    id: 'w1',
+    name: 'Black Oversized Crew Tee',
+    category: 'Tops',
+    color: '#18181b',
+    colorName: 'Midnight Black',
+    pattern: 'Solid',
+    fabric: '100% Heavyweight Cotton',
+    image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&auto=format&fit=crop&q=80',
+    dateAdded: '2026-07-20'
+  },
+  {
+    id: 'w2',
+    name: 'Tailored Straight Chinos',
+    category: 'Bottoms',
+    color: '#3f3f46',
+    colorName: 'Charcoal Grey',
+    pattern: 'Solid',
+    fabric: 'Cotton Twill Blend',
+    image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&auto=format&fit=crop&q=80',
+    dateAdded: '2026-07-21'
+  },
+  {
+    id: 'w3',
+    name: 'Classic White Leather Sneakers',
+    category: 'Shoes',
+    color: '#ffffff',
+    colorName: 'Pure White',
+    pattern: 'Solid',
+    fabric: 'Full Grain Leather',
+    image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&auto=format&fit=crop&q=80',
+    dateAdded: '2026-07-21'
+  },
+  {
+    id: 'w4',
+    name: 'Beige Double-Breasted Trench',
+    category: 'Outerwear',
+    color: '#d4b996',
+    colorName: 'Sand Beige',
+    pattern: 'Solid',
+    fabric: 'Water-Resistant Cotton Gabardine',
+    image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&auto=format&fit=crop&q=80',
+    dateAdded: '2026-07-22'
+  }
+];
 
 export const CREATORS = [
   {
@@ -96,7 +141,7 @@ export const TEMPLATES = [
     missingCount: 1,
     missingItemName: 'Textured Linen Blend Blazer',
     missingItemPrice: 49.90,
-    affiliateLink: 'https://www.zalora.sg/',
+    affiliateLink: 'https://www.zalora.sg/p/zalora-essentials-linen-blend-blazer-beige-3129482',
     merchant: 'Zalora SG',
     colorsAvailable: ['#18181b', '#d4b996', '#1e293b', '#475569']
   },
@@ -110,7 +155,7 @@ export const TEMPLATES = [
     missingCount: 1,
     missingItemName: 'Wide-Leg Olive Cargo Pants',
     missingItemPrice: 28.90,
-    affiliateLink: 'https://shopee.sg/',
+    affiliateLink: 'https://shopee.sg/product-i.12345678.98765432',
     merchant: 'Shopee Mall',
     colorsAvailable: ['#18181b', '#3f6212', '#27272a']
   },
@@ -124,7 +169,7 @@ export const TEMPLATES = [
     missingCount: 1,
     missingItemName: 'Double-Monk Strap Leather Shoes',
     missingItemPrice: 68.00,
-    affiliateLink: 'https://www.zalora.sg/',
+    affiliateLink: 'https://www.zalora.sg/p/zalora-essentials-monk-strap-shoes-leather-4829103',
     merchant: 'Zalora SG',
     colorsAvailable: ['#1e1b4b', '#09090b', '#3f3f46']
   },
@@ -138,7 +183,7 @@ export const TEMPLATES = [
     missingCount: 1,
     missingItemName: 'Nike Dri-FIT Performance Joggers',
     missingItemPrice: 39.90,
-    affiliateLink: 'https://www.nike.com/sg/',
+    affiliateLink: 'https://www.nike.com/sg/t/dri-fit-tech-fleece-joggers-Rk2x1z',
     merchant: 'Nike Official Store',
     colorsAvailable: ['#18181b', '#27272a', '#ffffff']
   },
@@ -152,7 +197,7 @@ export const TEMPLATES = [
     missingCount: 2,
     missingItemName: 'Camp-Collar Sage Green Shirt',
     missingItemPrice: 24.90,
-    affiliateLink: 'https://www.asos.com/',
+    affiliateLink: 'https://www.asos.com/us/asos-design/asos-design-relaxed-rever-collar-linen-mix-shirt/prd/20349182',
     merchant: 'ASOS Official',
     colorsAvailable: ['#15803d', '#f59e0b', '#0284c7', '#ffffff']
   }
@@ -208,10 +253,10 @@ export const AFFILIATE_PRODUCTS = [
     price: 19.90,
     rating: 4.9,
     merchant: 'UNIQLO OFFICIAL',
-    url: 'https://www.uniqlo.com/sg/en/',
+    url: 'https://www.uniqlo.com/sg/en/products/E422992-000',
     commissionRate: '8%',
     category: 'Tops',
-    image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&auto=format&fit=crop&q=80',
     colors: [
       { name: 'Purple', hex: '#6b21a8' },
       { name: 'Black', hex: '#18181b' },
@@ -224,11 +269,11 @@ export const AFFILIATE_PRODUCTS = [
     name: 'Shopee Preferred Wide-Leg Denim',
     price: 15.80,
     rating: 4.8,
-    merchant: 'SHOPEE MALL (CHEAPEST VERIFIED)',
-    url: 'https://shopee.sg/',
+    merchant: 'SHOPEE MALL',
+    url: 'https://shopee.sg/product-i.12345678.98765432',
     commissionRate: '12%',
     category: 'Bottoms',
-    image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=300&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=500&auto=format&fit=crop&q=80',
     colors: [
       { name: 'Indigo Blue', hex: '#1e1b4b' },
       { name: 'Washed Black', hex: '#27272a' },
@@ -241,10 +286,10 @@ export const AFFILIATE_PRODUCTS = [
     price: 45.00,
     rating: 4.7,
     merchant: 'ZALORA SG',
-    url: 'https://www.zalora.sg/',
+    url: 'https://www.zalora.sg/p/zalora-essentials-linen-blend-blazer-beige-3129482',
     commissionRate: '15%',
     category: 'Outerwear',
-    image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=300&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=500&auto=format&fit=crop&q=80',
     colors: [
       { name: 'Sand Beige', hex: '#d4b996' },
       { name: 'Navy Blue', hex: '#1e293b' },
@@ -257,10 +302,10 @@ export const AFFILIATE_PRODUCTS = [
     price: 38.50,
     rating: 4.6,
     merchant: 'ASOS OFFICIAL',
-    url: 'https://www.asos.com/',
+    url: 'https://www.asos.com/us/asos-design/asos-design-sneakers-in-white/prd/20451234',
     commissionRate: '10%',
     category: 'Shoes',
-    image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=300&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500&auto=format&fit=crop&q=80',
     colors: [
       { name: 'Minimal White', hex: '#f8fafc' },
       { name: 'Off-White Cream', hex: '#fef3c7' }
@@ -272,10 +317,10 @@ export const AFFILIATE_PRODUCTS = [
     price: 9.90,
     rating: 4.5,
     merchant: 'SHEIN SG',
-    url: 'https://sg.shein.com/',
+    url: 'https://sg.shein.com/pd-p-12847291.html',
     commissionRate: '14%',
     category: 'Tops',
-    image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=300&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=500&auto=format&fit=crop&q=80',
     colors: [
       { name: 'Sage Green', hex: '#15803d' },
       { name: 'Soft Cream', hex: '#fef3c7' }
@@ -287,10 +332,10 @@ export const AFFILIATE_PRODUCTS = [
     price: 119.00,
     rating: 4.9,
     merchant: 'NIKE OFFICIAL STORE',
-    url: 'https://www.nike.com/sg/',
+    url: 'https://www.nike.com/sg/t/dri-fit-tech-fleece-joggers-Rk2x1z',
     commissionRate: '9%',
     category: 'Bottoms',
-    image: 'https://images.unsplash.com/photo-1483721074892-4a8580712694?w=300&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1483721074892-4a8580712694?w=500&auto=format&fit=crop&q=80',
     colors: [
       { name: 'Heather Grey', hex: '#71717a' },
       { name: 'Obsidian Black', hex: '#09090b' }
