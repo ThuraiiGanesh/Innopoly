@@ -173,16 +173,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Section View 2: Personal Color Season Analyzer */}
-        {activeTab === 'color' && (
-          <div className="animate-fade-in-up">
-            <ColorSeasonAnalyzer
-              wardrobe={wardrobe}
-            />
-          </div>
-        )}
-
-        {/* Section View 3: Closet Digitizer */}
+        {/* Section View 2: Closet Digitizer */}
         {activeTab === 'closet' && (
           <div className="animate-fade-in-up">
             <WardrobeDigitizer
@@ -194,7 +185,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Section View 4: Creators Page (Two Horizontal Columns) */}
+        {/* Section View 3: Creators Page (Two Horizontal Columns) */}
         {activeTab === 'creators' && (
           <div className="animate-fade-in-up">
             <BodyCreatorMatcher
@@ -205,7 +196,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Section View 5: Occasion Templates */}
+        {/* Section View 4: Occasion Templates */}
         {activeTab === 'templates' && (
           <div className="animate-fade-in-up">
             <CategoryTemplates
@@ -214,7 +205,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Section View 6: Interactive Outfit Mixer (Outfit Canvas) */}
+        {/* Section View 5: Interactive Outfit Mixer (Outfit Canvas) */}
         {activeTab === 'styling' && (
           <div className="animate-fade-in-up">
             <OutfitMixer
@@ -224,16 +215,6 @@ export default function App() {
               selectedTemplate={selectedTemplate}
               selectedCreator={selectedCreator}
               onNavigate={handleNavigate}
-            />
-          </div>
-        )}
-
-        {/* Section View 7: Budget Controls */}
-        {activeTab === 'compliance' && (
-          <div className="animate-fade-in-up">
-            <BudgetCompliance
-              currentBudget={currentBudget}
-              onBudgetChange={handleBudgetChange}
             />
           </div>
         )}

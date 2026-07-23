@@ -405,16 +405,16 @@ export default function Hero({ user, onNavigate, onOpenLogin }) {
           </div>
 
           <div 
-            onClick={() => onNavigate('color')}
+            onClick={() => onNavigate('closet')}
             className="p-4 rounded-2xl border border-slate-800 bg-slate-900/90 hover:border-slate-700 backdrop-blur-xl cursor-pointer transition-all flex items-center gap-3.5 shadow-lg group"
           >
-            <div className="p-2.5 rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/30 shrink-0 group-hover:scale-105 transition-transform">
-              <Palette className="w-5 h-5" />
+            <div className="p-2.5 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/30 shrink-0 group-hover:scale-105 transition-transform">
+              <Layers className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-sm font-extrabold text-white block">Color Season</span>
+              <span className="text-sm font-extrabold text-white block">My Closet</span>
               <p className="text-[11px] text-slate-300 leading-normal font-medium">
-                Face photo undertone diagnosis.
+                Digitize garments & camera scanner.
               </p>
             </div>
           </div>
