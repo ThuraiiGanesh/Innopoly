@@ -7,10 +7,8 @@ import CategoryTemplates from './components/CategoryTemplates';
 import OutfitMixer from './components/OutfitMixer';
 import BudgetCompliance from './components/BudgetCompliance';
 import PitchDeckModal from './components/PitchDeckModal';
-import ComplianceModal from './components/ComplianceModal';
 import LoginModal from './components/LoginModal';
 import ProfileDashboardModal from './components/ProfileDashboardModal';
-import Chatbot from './components/Chatbot';
 import Footer from './components/Footer';
 import Toast from './components/Toast';
 
@@ -37,7 +35,6 @@ export default function App() {
   const [selectedCreator, setSelectedCreator] = useState(null);
 
   const [pitchDeckOpen, setPitchDeckOpen] = useState(false);
-  const [complianceOpen, setComplianceOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [loginRegisterMode, setLoginRegisterMode] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
@@ -106,7 +103,6 @@ export default function App() {
     const userWardrobe = getUserWardrobeFromDB(loggedInUser.id, INITIAL_WARDROBE);
     setWardrobe(userWardrobe);
     showToast(`Welcome, ${loggedInUser.name}!`);
-    // Bring user to Profile Dashboard for style aesthetic & body metrics setup
     setProfileModalOpen(true);
   };
 
@@ -131,7 +127,7 @@ export default function App() {
         onClose={() => setToast({ message: '', type: 'success' })} 
       />
 
-      {/* Header Navigation Bar with Active Section Tabs & Mobile Bottom Bar */}
+      {/* Header Navigation Bar */}
       <Header
         user={user}
         activeTab={activeTab}
@@ -139,7 +135,6 @@ export default function App() {
         onOpenLogin={() => handleOpenLoginModal(false)}
         onOpenProfile={() => setProfileModalOpen(true)}
         onLogout={handleLogout}
-        onOpenPitch={() => setPitchDeckOpen(true)}
       />
 
       <main className="flex-1 pb-16 lg:pb-12">
@@ -150,7 +145,6 @@ export default function App() {
               user={user}
               onNavigate={handleNavigate}
               onOpenLogin={handleOpenLoginModal}
-              onOpenCompliance={() => setComplianceOpen(true)} 
             />
           </div>
         )}
@@ -205,7 +199,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Section View 7: Interactive Outfit Mixer & "Choose Color" Canvas */}
+        {/* Section View 7: Interactive Outfit Mixer */}
         {activeTab === 'styling' && (
           <div className="animate-fade-in-up">
             <OutfitMixer
@@ -218,29 +212,20 @@ export default function App() {
           </div>
         )}
 
-        {/* Section View 8: Budget Controls & Regulatory Rules */}
+        {/* Section View 8: Budget Controls */}
         {activeTab === 'compliance' && (
           <div className="animate-fade-in-up">
             <BudgetCompliance
               currentBudget={currentBudget}
               onBudgetChange={handleBudgetChange}
-              onOpenCompliance={() => setComplianceOpen(true)}
             />
           </div>
         )}
       </main>
 
-      {/* Floating AI Fashion Stylist Chatbot */}
-      <Chatbot
-        userProfile={user}
-        wardrobe={wardrobe}
-        currentBudget={currentBudget}
-      />
-
       {/* Footer */}
       <Footer
         onOpenPitch={() => setPitchDeckOpen(true)}
-        onOpenCompliance={() => setComplianceOpen(true)}
       />
 
       {/* Login & Registration Modal */}
@@ -251,7 +236,7 @@ export default function App() {
         onLoginSuccess={handleLoginSuccess}
       />
 
-      {/* Profile Dashboard Modal (Style Aesthetic Themes & Full Body Metrics Setup) */}
+      {/* Profile Dashboard Modal */}
       <ProfileDashboardModal
         isOpen={profileModalOpen}
         onClose={() => setProfileModalOpen(false)}
@@ -269,12 +254,6 @@ export default function App() {
       <PitchDeckModal
         isOpen={pitchDeckOpen}
         onClose={() => setPitchDeckOpen(false)}
-      />
-
-      {/* Compliance Rules Modal */}
-      <ComplianceModal
-        isOpen={complianceOpen}
-        onClose={() => setComplianceOpen(false)}
       />
     </div>
   );

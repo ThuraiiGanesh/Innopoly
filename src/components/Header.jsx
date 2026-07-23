@@ -1,5 +1,5 @@
 import React from 'react';
-import { Camera, User, Shirt, LogIn, LogOut, Sparkles, Layers, Palette, ShieldCheck, Home, Sun, Settings } from 'lucide-react';
+import { Camera, User, Shirt, LogIn, LogOut, Sparkles, Layers, Palette, Sliders, Home, Sun, Settings } from 'lucide-react';
 
 export default function Header({ user, activeTab, onTabChange, onOpenLogin, onLogout, onOpenProfile }) {
   const desktopTabs = [
@@ -9,7 +9,7 @@ export default function Header({ user, activeTab, onTabChange, onOpenLogin, onLo
     { id: 'closet', label: 'My Closet', icon: Layers },
     { id: 'styling', label: 'Outfit Canvas', icon: Palette },
     { id: 'creators', label: 'Body & Creators', icon: User },
-    { id: 'compliance', label: 'Rules & Budget', icon: ShieldCheck }
+    { id: 'compliance', label: 'Store Budget', icon: Sliders }
   ];
 
   const mobileBottomTabs = [
