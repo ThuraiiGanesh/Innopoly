@@ -39,6 +39,7 @@ export default function App() {
   const [pitchDeckOpen, setPitchDeckOpen] = useState(false);
   const [complianceOpen, setComplianceOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [loginRegisterMode, setLoginRegisterMode] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
 
   // Floating Toast Notification State
@@ -54,8 +55,8 @@ export default function App() {
     } else {
       const savedWardrobe = getUserWardrobeFromDB(null, INITIAL_WARDROBE);
       setWardrobe(savedWardrobe);
-      // Auto-open Login / Register screen on app start if no active session
-      setLoginModalOpen(true);
+      // Explicitly start logged out on site launch
+      setUser(null);
     }
   }, []);
 
@@ -102,12 +103,17 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleOpenLoginModal = (isRegister = false) => {
+    setLoginRegisterMode(isRegister);
+    setLoginModalOpen(true);
+  };
+
   const handleLoginSuccess = (loggedInUser) => {
     setUser(loggedInUser);
     const userWardrobe = getUserWardrobeFromDB(loggedInUser.id, INITIAL_WARDROBE);
     setWardrobe(userWardrobe);
     showToast(`Welcome, ${loggedInUser.name}!`);
-    // Immediately bring user to Profile Dashboard (Style Aesthetic & Body Metrics Setup)
+    // Bring user to Profile Dashboard for style aesthetic & body metrics setup
     setProfileModalOpen(true);
   };
 
@@ -116,7 +122,6 @@ export default function App() {
     setUser(null);
     setWardrobe(INITIAL_WARDROBE);
     showToast("Signed out successfully", "info");
-    setLoginModalOpen(true);
   };
 
   const handleNavigate = (tab) => {
@@ -138,7 +143,7 @@ export default function App() {
         user={user}
         activeTab={activeTab}
         onTabChange={handleNavigate}
-        onOpenLogin={() => setLoginModalOpen(true)}
+        onOpenLogin={() => handleOpenLoginModal(false)}
         onOpenProfile={() => setProfileModalOpen(true)}
         onLogout={handleLogout}
         onOpenPitch={() => setPitchDeckOpen(true)}
@@ -149,7 +154,9 @@ export default function App() {
         {activeTab === 'home' && (
           <div className="animate-fade-in-up">
             <Hero 
+              user={user}
               onNavigate={handleNavigate}
+              onOpenLogin={handleOpenLoginModal}
               onOpenCompliance={() => setComplianceOpen(true)} 
             />
           </div>
@@ -243,9 +250,10 @@ export default function App() {
         onOpenCompliance={() => setComplianceOpen(true)}
       />
 
-      {/* Login & Registration Modal (App Launch Screen) */}
+      {/* Login & Registration Modal */}
       <LoginModal
         isOpen={loginModalOpen}
+        initialRegisterMode={loginRegisterMode}
         onClose={() => setLoginModalOpen(false)}
         onLoginSuccess={handleLoginSuccess}
       />

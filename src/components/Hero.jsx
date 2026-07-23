@@ -1,7 +1,7 @@
 import React from 'react';
-import { Clock, ShieldCheck, ShoppingBag, ChevronRight, Sparkles, Layers, User, Sun, Palette } from 'lucide-react';
+import { Clock, ShieldCheck, ShoppingBag, ChevronRight, Sparkles, Layers, User, Sun, Palette, LogIn, UserPlus, Lock } from 'lucide-react';
 
-export default function Hero({ onNavigate, onOpenCompliance }) {
+export default function Hero({ user, onNavigate, onOpenLogin, onOpenRegister, onOpenCompliance }) {
   return (
     <section className="relative min-h-[70vh] flex flex-col justify-center items-center px-4 sm:px-6 py-8 sm:py-12 text-center">
       {/* Background Soft Lighting Gradients */}
@@ -24,7 +24,7 @@ export default function Hero({ onNavigate, onOpenCompliance }) {
         </p>
 
         {/* Action Navigation Buttons */}
-        <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 mb-8 sm:mb-12 w-full px-2">
+        <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 mb-8 sm:mb-10 w-full px-2">
           <button
             onClick={() => onNavigate('styling')}
             className="primary-button px-5 sm:px-6 py-2.5 sm:py-3 text-xs uppercase tracking-wider flex items-center gap-2 font-bold shimmer-hover"
@@ -48,7 +48,7 @@ export default function Hero({ onNavigate, onOpenCompliance }) {
         </div>
 
         {/* Responsive Feature Overview Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 w-full max-w-3xl text-left">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 w-full max-w-3xl text-left mb-8">
           <div 
             onClick={() => onNavigate('weather')}
             className="glass-card p-4 sm:p-5 rounded-2xl border border-black/5 cursor-pointer hover:border-black/20 flex items-center sm:flex-col sm:items-start gap-3 sm:gap-1.5"
@@ -94,6 +94,37 @@ export default function Hero({ onNavigate, onOpenCompliance }) {
             </div>
           </div>
         </div>
+
+        {/* User Account Login & Registration Action Box (Right below Weather AI / Color Season / Body & Creators cards) */}
+        {!user && (
+          <div className="w-full max-w-3xl glass-panel p-6 rounded-3xl border border-black/10 bg-white/90 shadow-md text-center flex flex-col items-center gap-4 animate-fade-in-up">
+            <div className="flex items-center justify-center gap-2">
+              <Lock className="w-4 h-4 text-emerald-600" />
+              <span className="text-xs font-extrabold uppercase font-mono text-slate-900 tracking-wider">
+                Create or Access Your Saved Style Profile
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 max-w-xl">
+              Sign in or register to save your exact body measurements, style theme (Preppy, Starboy, Old Money), and digitized closet items across sessions!
+            </p>
+
+            <div className="flex flex-wrap items-center justify-center gap-3 w-full max-w-md">
+              <button
+                onClick={() => onOpenLogin && onOpenLogin(false)}
+                className="flex-1 primary-button py-3 px-5 text-xs uppercase tracking-wider font-extrabold flex items-center justify-center gap-2 shadow-sm"
+              >
+                <LogIn className="w-4 h-4" /> Sign In to Account
+              </button>
+
+              <button
+                onClick={() => onOpenLogin && onOpenLogin(true)}
+                className="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white py-3 px-5 text-xs uppercase tracking-wider font-extrabold flex items-center justify-center gap-2 rounded-xl transition-all shadow-sm"
+              >
+                <UserPlus className="w-4 h-4" /> Register Account
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

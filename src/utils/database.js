@@ -78,9 +78,7 @@ export const initDatabase = () => {
   if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
     localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify([DEFAULT_USER]));
   }
-  if (!localStorage.getItem(STORAGE_KEYS.CURRENT_USER)) {
-    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(DEFAULT_USER));
-  }
+  // Start logged out initially unless a user has actively signed in
 };
 
 export const getUsersFromDB = () => {
@@ -96,7 +94,7 @@ export const getCurrentUser = () => {
     const data = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
     return data ? JSON.parse(data) : null;
   } catch (e) {
-    return DEFAULT_USER;
+    return null;
   }
 };
 

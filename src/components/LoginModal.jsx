@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Lock, Mail, User, Shirt, ArrowRight, CheckCircle2, UserPlus, LogIn, Sparkles } from 'lucide-react';
 import { loginUser, registerUser } from '../utils/database';
 
-export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
-  const [isRegister, setIsRegister] = useState(false);
+export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialRegisterMode = false }) {
+  const [isRegister, setIsRegister] = useState(initialRegisterMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsRegister(initialRegisterMode);
+    }
+  }, [isOpen, initialRegisterMode]);
 
   if (!isOpen) return null;
 
