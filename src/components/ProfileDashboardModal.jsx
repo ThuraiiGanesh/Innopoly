@@ -28,7 +28,9 @@ import {
   DollarSign,
   Edit3,
   Sun,
-  Sliders
+  Sliders,
+  Plus,
+  Trash2
 } from 'lucide-react';
 import { 
   DEFAULT_BODY_METRICS, 
@@ -84,8 +86,51 @@ export default function ProfileDashboardModal({ isOpen, initialTab = 'metrics', 
   const [budgetValue, setBudgetValue] = useState(currentBudget || 80);
   const [customBudgetInput, setCustomBudgetInput] = useState(currentBudget || 80);
 
-  // Color Season state
+  // Color Season & Custom Colors state
   const [selectedSeason, setSelectedSeason] = useState('autumn');
+  const [customColors, setCustomColors] = useState(() => {
+    try {
+      const saved = localStorage.getItem('innopoly_custom_colors');
+      return saved ? JSON.parse(saved) : [
+        { id: 1, name: 'Royal Emerald', hex: '#059669' },
+        { id: 2, name: 'Midnight Navy', hex: '#1e3a8a' }
+      ];
+    } catch (e) {
+      return [
+        { id: 1, name: 'Royal Emerald', hex: '#059669' },
+        { id: 2, name: 'Midnight Navy', hex: '#1e3a8a' }
+      ];
+    }
+  });
+  const [newColorHex, setNewColorHex] = useState('#6366f1');
+  const [newColorName, setNewColorName] = useState('');
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('innopoly_custom_colors', JSON.stringify(customColors));
+    } catch (e) {}
+  }, [customColors]);
+
+  const handleAddCustomColor = (e) => {
+    e.preventDefault();
+    if (!newColorHex) return;
+    const colorName = newColorName.trim() || `Custom ${newColorHex.toUpperCase()}`;
+    const newColorItem = {
+      id: Date.now(),
+      name: colorName,
+      hex: newColorHex
+    };
+    setCustomColors([...customColors, newColorItem]);
+    setNewColorName('');
+    setAutoSaveStatus('Custom Color Saved');
+    setTimeout(() => setAutoSaveStatus('Auto-Saved'), 2000);
+  };
+
+  const handleRemoveCustomColor = (id) => {
+    setCustomColors(customColors.filter(c => c.id !== id));
+    setAutoSaveStatus('Color Removed');
+    setTimeout(() => setAutoSaveStatus('Auto-Saved'), 2000);
+  };
 
   // Real Weather API & Geolocation Live State
   const [weatherLoading, setWeatherLoading] = useState(false);
@@ -849,6 +894,88 @@ export default function ProfileDashboardModal({ isOpen, initialTab = 'metrics', 
                   </div>
                 </div>
               )}
+
+              {/* 🎨 CUSTOM COLOR PALETTE CREATOR & MANAGER */}
+              <div className="glass-card p-5 rounded-2xl border border-indigo-200 bg-gradient-to-r from-indigo-50/60 via-purple-50/40 to-slate-50 space-y-4 shadow-sm">
+                <div className="flex items-center justify-between border-b border-indigo-100 pb-3">
+                  <div>
+                    <h5 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                      <Palette className="w-4 h-4 text-indigo-600" /> Add Custom Colors
+                    </h5>
+                    <p className="text-[11px] text-slate-600 font-medium">Pick any custom hue or type hex color codes to complement your season palette</p>
+                  </div>
+                  <span className="text-xs font-mono font-bold text-indigo-700 bg-indigo-100 px-3 py-1 rounded-full border border-indigo-200">
+                    {customColors.length} Custom Added
+                  </span>
+                </div>
+
+                {/* Add Custom Color Input Form */}
+                <form onSubmit={handleAddCustomColor} className="flex flex-wrap sm:flex-nowrap items-center gap-3 p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs">
+                  <div className="flex items-center gap-2 shrink-0">
+                    <input
+                      type="color"
+                      value={newColorHex}
+                      onChange={(e) => setNewColorHex(e.target.value)}
+                      className="w-10 h-10 rounded-xl cursor-pointer border border-slate-300 p-0.5 shadow-sm bg-slate-100"
+                      title="Click to open color picker wheel"
+                    />
+                    <input
+                      type="text"
+                      value={newColorHex}
+                      onChange={(e) => setNewColorHex(e.target.value)}
+                      placeholder="#6366f1"
+                      className="w-24 px-2.5 py-2 text-xs font-mono font-extrabold text-slate-900 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black uppercase"
+                    />
+                  </div>
+
+                  <input
+                    type="text"
+                    value={newColorName}
+                    onChange={(e) => setNewColorName(e.target.value)}
+                    placeholder="Color Name (e.g. Sage Green, Electric Purple)"
+                    className="flex-1 min-w-[180px] px-3 py-2 text-xs font-bold text-slate-900 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                  />
+
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-slate-950 hover:bg-slate-800 text-white rounded-lg text-xs font-mono font-extrabold flex items-center gap-1.5 transition-all shadow-md active:scale-95 whitespace-nowrap shrink-0"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-emerald-400" /> Add Color
+                  </button>
+                </form>
+
+                {/* Display List of Custom Added Colors */}
+                {customColors.length > 0 && (
+                  <div className="space-y-2 pt-1">
+                    <label className="text-[10px] uppercase font-bold font-mono text-slate-600 tracking-wider block">
+                      Your Saved Custom Color Palette:
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {customColors.map((color) => (
+                        <div
+                          key={color.id}
+                          className="px-3.5 py-1.5 rounded-xl text-xs font-bold border border-indigo-200 bg-white text-slate-900 flex items-center gap-2 shadow-xs"
+                        >
+                          <div
+                            className="w-4 h-4 rounded-full border border-black/20 shadow-xs shrink-0"
+                            style={{ backgroundColor: color.hex }}
+                          />
+                          <span className="font-extrabold text-slate-900">{color.name}</span>
+                          <span className="text-[10px] font-mono text-slate-500 uppercase">({color.hex})</span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveCustomColor(color.id)}
+                            className="text-slate-400 hover:text-rose-600 transition-colors ml-1 p-0.5"
+                            title="Delete custom color"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
