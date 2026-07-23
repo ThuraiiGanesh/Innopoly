@@ -42,10 +42,10 @@ export const STYLE_THEMES = [
   },
   {
     id: 'streetwear',
-    name: 'Urban Streetwear',
-    tagline: 'Boxy oversized graphic tees, baggy denim, retro sneakers & hoodies',
+    name: 'Urban Streetwear & Gorpcore',
+    tagline: 'Boxy oversized graphic tees, baggy denim, retro sneakers & technical shell jackets',
     image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=600&auto=format&fit=crop&q=80',
-    tags: ['Oversized Tee', 'Baggy Denim', 'Sneakers', 'Cargo']
+    tags: ['Oversized Tee', 'Baggy Denim', 'Sneakers', 'Gorpcore']
   },
   {
     id: 'minimalist',
@@ -60,19 +60,36 @@ export const STYLE_THEMES = [
     tagline: 'Open-collar linen camp shirts, cream shorts & breezy resort wear',
     image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&auto=format&fit=crop&q=80',
     tags: ['Linen Camp Shirt', 'Cream Shorts', 'Vacation', 'Resort']
+  },
+  {
+    id: 'y2k',
+    name: 'Y2K & Cyberpunk Street',
+    tagline: 'Low-rise baggy cargos, chrome metallic accents, graphic hoodies & visor shades',
+    image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop&q=80',
+    tags: ['Y2K Cargo', 'Chrome', 'Graphic Hoodie', 'Futuristic']
+  },
+  {
+    id: 'opium',
+    name: 'Opium & Darkwear Minimal',
+    tagline: 'Oversized black silhouettes, chunky platform boots, silver hardware & dark drape',
+    image: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=600&auto=format&fit=crop&q=80',
+    tags: ['Opium Dark', 'Platform Boots', 'Silver Chains', 'Avant-Garde']
+  },
+  {
+    id: 'clean_aesthetic',
+    name: 'Clean Girl / Clean Boy Fit',
+    tagline: 'Neutral monochrome sweat sets, fitted ribbed tops, caps & sleek white trainers',
+    image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&auto=format&fit=crop&q=80',
+    tags: ['Neutral Set', 'Athleisure', 'Caps', 'Sleek Trainers']
+  },
+  {
+    id: 'vintage_90s',
+    name: 'Vintage Thrift & Retro 90s',
+    tagline: 'Patterned cardigans, relaxed vintage denim & distressed leather bomber jackets',
+    image: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=600&auto=format&fit=crop&q=80',
+    tags: ['Thrift Vintage', 'Retro Denim', 'Leather Bomber', '90s Vibe']
   }
 ];
-
-const DEFAULT_USER = {
-  id: 'u_101',
-  name: 'Alex Vance',
-  email: 'alex@stylesync.ai',
-  password: 'demo',
-  avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-  budgetCap: 50,
-  styleTheme: 'old_money',
-  bodyMetrics: DEFAULT_BODY_METRICS
-};
 
 export const initDatabase = () => {
   if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
@@ -120,7 +137,7 @@ export const registerUser = (name, email, password) => {
     password: password,
     avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
     budgetCap: 50,
-    styleTheme: 'old_money',
+    styleTheme: ['old_money'],
     bodyMetrics: DEFAULT_BODY_METRICS,
     isFirstLogin: true
   };
@@ -188,23 +205,31 @@ export const getUserProfileMetricsFromDB = (userId, fallback = DEFAULT_BODY_METR
   }
 };
 
-export const saveUserStyleThemeInDB = (userId, themeId) => {
+export const saveUserStyleThemeInDB = (userId, themeIds) => {
   const key = userId ? `${STORAGE_KEYS.STYLE_THEME_PREFIX}${userId}` : 'stylesync_db_theme_guest';
-  localStorage.setItem(key, themeId);
+  const dataToSave = Array.isArray(themeIds) ? JSON.stringify(themeIds) : JSON.stringify([themeIds]);
+  localStorage.setItem(key, dataToSave);
 
   const currentUser = getCurrentUser();
   if (currentUser && (currentUser.id === userId || (!userId && !currentUser.id))) {
-    currentUser.styleTheme = themeId;
+    currentUser.styleTheme = themeIds;
     setCurrentUserInDB(currentUser);
   }
 };
 
-export const getUserStyleThemeFromDB = (userId, fallback = 'old_money') => {
+export const getUserStyleThemeFromDB = (userId, fallback = ['old_money']) => {
   try {
     const key = userId ? `${STORAGE_KEYS.STYLE_THEME_PREFIX}${userId}` : 'stylesync_db_theme_guest';
-    return localStorage.getItem(key) || fallback;
+    const raw = localStorage.getItem(key);
+    if (!raw) return Array.isArray(fallback) ? fallback : [fallback];
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [parsed];
+    } catch {
+      return [raw];
+    }
   } catch (e) {
-    return fallback;
+    return Array.isArray(fallback) ? fallback : [fallback];
   }
 };
 

@@ -47,17 +47,10 @@ export default function App() {
 
   useEffect(() => {
     initDatabase();
-    const currentUser = getCurrentUser();
-    if (currentUser) {
-      setUser(currentUser);
-      const savedWardrobe = getUserWardrobeFromDB(currentUser.id, []);
-      setWardrobe(savedWardrobe);
-    } else {
-      const savedWardrobe = getUserWardrobeFromDB(null, []);
-      setWardrobe(savedWardrobe);
-      // Explicitly start logged out on site launch
-      setUser(null);
-    }
+    // Guarantee 100% brand new logged-out launch state on site open
+    logoutUserInDB();
+    setUser(null);
+    setWardrobe([]);
   }, []);
 
   useEffect(() => {
