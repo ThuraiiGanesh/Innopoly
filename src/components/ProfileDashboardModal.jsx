@@ -172,6 +172,21 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
   const inches = Math.round((metrics.height % 30.48) / 2.54);
   const heightFormatted = `${metrics.height} cm (${feet}'${inches}")`;
 
+  const BUILD_PRESETS = {
+    Slim: { height: 175, chest: 34, waist: 28, hips: 34, shoulders: 40, inseam: 30, build: 'Slim' },
+    Athletic: { height: 178, chest: 38, waist: 30, hips: 38, shoulders: 44, inseam: 30, build: 'Athletic' },
+    Regular: { height: 176, chest: 40, waist: 34, hips: 40, shoulders: 43, inseam: 30, build: 'Regular' },
+    Muscular: { height: 182, chest: 44, waist: 32, hips: 42, shoulders: 48, inseam: 32, build: 'Muscular' }
+  };
+
+  const handleBuildSelect = (buildName) => {
+    const preset = BUILD_PRESETS[buildName] || { ...metrics, build: buildName };
+    setMetrics(preset);
+    saveUserProfileMetricsInDB(user?.id, preset);
+    setAutoSaveStatus(`Adjusted to ${buildName} Preset!`);
+    setTimeout(() => setAutoSaveStatus('Auto-Restored'), 1500);
+  };
+
   // Real-time metric handler
   const handleMetricChange = (key, val) => {
     const num = Number(val) || 0;
@@ -562,7 +577,7 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
                       <button
                         key={b}
                         type="button"
-                        onClick={() => handleMetricChange('build', b)}
+                        onClick={() => handleBuildSelect(b)}
                         className={`py-2 rounded-xl text-xs font-extrabold border transition-all ${
                           metrics.build === b
                             ? 'bg-black text-white border-black shadow-md scale-[1.02]'

@@ -118,23 +118,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialReg
           </button>
         </div>
 
-        {/* 1-Click Demo Login Card */}
-        <div className="glass-card p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 mb-5 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-emerald-600" />
-            <div>
-              <span className="text-xs font-extrabold text-emerald-950 block">1-Click Demo Login</span>
-              <span className="text-[10px] text-emerald-700 font-mono">Instant testing with preset closet</span>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={handleQuickDemo}
-            className="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-extrabold transition-all shadow-sm shrink-0"
-          >
-            Sign In Demo
-          </button>
-        </div>
+
 
         {error && (
           <div className="p-3 mb-4 rounded-xl bg-red-50 text-red-700 text-xs font-semibold border border-red-200 animate-fade-in-up">
