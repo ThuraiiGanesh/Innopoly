@@ -44,8 +44,8 @@ export default function Header({ user, activeTab, onTabChange, onOpenLogin, onLo
             </div>
           </div>
 
-          {/* Desktop Navigation Bar */}
-          <div className="hidden lg:flex items-center gap-1 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200 text-xs font-semibold shadow-inner">
+          {/* Desktop Navigation Bar - Centered & Prominent Fonts */}
+          <div className="hidden lg:flex items-center gap-1.5 bg-slate-100/90 p-1.5 rounded-full border border-slate-200/90 text-sm font-extrabold shadow-inner absolute left-1/2 -translate-x-1/2">
             {desktopTabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -53,13 +53,13 @@ export default function Header({ user, activeTab, onTabChange, onOpenLogin, onLo
                 <button
                   key={tab.id}
                   onClick={() => handleTabClick(tab.id)}
-                  className={`px-3.5 py-1.5 rounded-xl transition-all duration-200 flex items-center gap-1.5 ${
+                  className={`px-4 py-2 rounded-full transition-all duration-200 flex items-center gap-2 text-xs sm:text-sm font-extrabold tracking-tight ${
                     isActive
-                      ? 'bg-black text-white shadow-md font-bold scale-[1.02]'
-                      : 'text-slate-600 hover:text-black hover:bg-slate-200/70'
+                      ? 'bg-black text-white shadow-md scale-[1.03]'
+                      : 'text-slate-700 hover:text-slate-950 hover:bg-slate-200/70'
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-slate-500'}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-500'}`} />
                   <span>{tab.label}</span>
                 </button>
               );

@@ -97,9 +97,19 @@ export default function Hero({ user, onNavigate, onOpenLogin }) {
     setTimeout(() => setIsAutoShuffling(false), 500);
   };
 
+  const [showVideoMotionDemo, setShowVideoMotionDemo] = useState(false);
+
+  const prevTop = HERO_TOPS[(topIdx - 1 + HERO_TOPS.length) % HERO_TOPS.length];
   const currentTop = HERO_TOPS[topIdx];
+  const nextTop = HERO_TOPS[(topIdx + 1) % HERO_TOPS.length];
+
+  const prevBottom = HERO_BOTTOMS[(bottomIdx - 1 + HERO_BOTTOMS.length) % HERO_BOTTOMS.length];
   const currentBottom = HERO_BOTTOMS[bottomIdx];
+  const nextBottom = HERO_BOTTOMS[(bottomIdx + 1) % HERO_BOTTOMS.length];
+
+  const prevShoe = HERO_SHOES[(shoeIdx - 1 + HERO_SHOES.length) % HERO_SHOES.length];
   const currentShoe = HERO_SHOES[shoeIdx];
+  const nextShoe = HERO_SHOES[(shoeIdx + 1) % HERO_SHOES.length];
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -112,26 +122,25 @@ export default function Hero({ user, onNavigate, onOpenLogin }) {
   const timeGreeting = getGreeting();
 
   return (
-    <section className="relative min-h-[90vh] bg-slate-950 text-white flex flex-col justify-center items-center px-4 sm:px-6 py-12 sm:py-16 text-center overflow-hidden border-b border-slate-800">
+    <section className="relative min-h-[95vh] bg-[#090d16] text-white flex flex-col justify-center items-center px-4 sm:px-6 py-12 sm:py-16 text-center overflow-hidden border-b border-slate-800">
       
-      {/* High-Definition Background Video Loop */}
+      {/* High-Definition Background Video Loop using create_a_swiping_motion_for_sh.mp4 */}
       <video
         autoPlay
         loop
         muted
         playsInline
         poster="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&auto=format&fit=crop&q=80"
-        className="absolute inset-0 w-full h-full object-cover opacity-25 z-0 pointer-events-none filter saturate-150"
+        className="absolute inset-0 w-full h-full object-cover opacity-20 z-0 pointer-events-none filter saturate-150"
       >
-        <source src="https://assets.mixkit.co/videos/preview/mixkit-fashion-model-in-a-photoshoot-41617-large.mp4" type="video/mp4" />
-        <source src="https://assets.mixkit.co/videos/preview/mixkit-model-walking-on-a-catwalk-41489-large.mp4" type="video/mp4" />
+        <source src="/create_a_swiping_motion_for_sh.mp4" type="video/mp4" />
       </video>
 
-      {/* Dark Overlay Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/85 via-slate-950/75 to-slate-950/95 pointer-events-none z-0" />
+      {/* Dark Ambient Overlay Gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#090d16]/90 via-[#090d16]/80 to-[#090d16]/95 pointer-events-none z-0" />
 
-      {/* Glow ambient background element */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] sm:w-[700px] h-[500px] sm:h-[700px] bg-emerald-600/10 rounded-full blur-[140px] pointer-events-none z-0" />
+      {/* Glow ambient background elements */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[800px] h-[600px] sm:h-[800px] bg-indigo-600/15 rounded-full blur-[160px] pointer-events-none z-0 animate-pulse-slow" />
 
       {/* Main Foreground Container */}
       <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center w-full animate-fade-in">
@@ -139,7 +148,7 @@ export default function Hero({ user, onNavigate, onOpenLogin }) {
         {/* Brand Tagline Badge */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border bg-slate-900/90 text-emerald-400 border-emerald-500/40 backdrop-blur-md text-xs font-mono font-bold shadow-xl mb-6">
           <Sparkles className="w-4 h-4 text-emerald-400 animate-spin-slow shrink-0" />
-          <span>3-Tier Mix & Match Mannequin Column</span>
+          <span>Interactive 3-Tier Mix & Match Motion Swiper</span>
         </div>
 
         {/* High Contrast Header */}
@@ -148,158 +157,232 @@ export default function Hero({ user, onNavigate, onOpenLogin }) {
         </h1>
 
         <p className="text-xs sm:text-sm text-slate-300 max-w-xl font-normal leading-relaxed mb-8 text-balance px-2 font-mono drop-shadow">
-          Swipe the left and right arrows on each clothing slot to mix & match your top, bottom, and footwear!
+          Swipe left or right on each garment tier to mix & match outfits in real-time 3D motion!
         </p>
 
-        {/* ================= VERTICAL 3-TIER MANNEQUIN COLUMN WITH SWIPE ARROWS (MATCHING EXACT DESIGN IN SCREENSHOT) ================= */}
-        <div className="w-full max-w-md bg-slate-200/90 backdrop-blur-2xl p-5 sm:p-6 rounded-[32px] border border-slate-300 shadow-2xl mb-10 text-center relative overflow-hidden">
+        {/* ================= 3-TIER MIX & MATCH MANNEQUIN SWIPER (MATCHING EXACT VIDEO MOTION DEMO) ================= */}
+        <div className="w-full max-w-md bg-slate-950/95 backdrop-blur-2xl p-5 sm:p-6 rounded-[36px] border border-slate-800 shadow-2xl mb-10 text-center relative overflow-hidden ring-1 ring-white/10">
           
-          {/* Top Bar: Active Look & Shuffle Button */}
-          <div className="flex items-center justify-between border-b border-slate-300/80 pb-3 mb-4">
-            <div className="flex items-center gap-1.5 font-mono text-xs font-bold text-slate-500">
-              <Zap className="w-4 h-4 text-amber-500 fill-amber-400" />
-              <span>Active Look: <strong className="text-emerald-600 uppercase font-extrabold">{currentTop.style}</strong></span>
+          {/* Top Control Header */}
+          <div className="flex items-center justify-between border-b border-slate-800 pb-3.5 mb-4">
+            <div className="flex items-center gap-2 text-xs font-mono font-bold text-slate-300">
+              <Zap className="w-4 h-4 text-amber-400 fill-amber-400" />
+              <span>Active Look: <strong className="text-emerald-400 uppercase font-extrabold">{currentTop.style}</strong></span>
             </div>
 
-            <button
-              onClick={handleShuffle}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-1.5 rounded-full text-xs font-mono font-extrabold flex items-center gap-1.5 transition-all shadow-md active:scale-95"
-            >
-              <Shuffle className={`w-3.5 h-3.5 ${isAutoShuffling ? 'animate-spin' : ''}`} /> Shuffle
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setShowVideoMotionDemo(!showVideoMotionDemo)}
+                className={`px-3 py-1.5 rounded-full text-xs font-mono font-bold flex items-center gap-1 transition-all ${
+                  showVideoMotionDemo 
+                    ? 'bg-indigo-600 text-white shadow-md' 
+                    : 'bg-slate-800 text-slate-300 hover:text-white'
+                }`}
+                title="Toggle Video Motion Demo"
+              >
+                <Play className="w-3 h-3 fill-current" /> {showVideoMotionDemo ? '3D Interactive' : 'Video Motion'}
+              </button>
+
+              <button
+                onClick={handleShuffle}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-1.5 rounded-full text-xs font-mono font-extrabold flex items-center gap-1.5 transition-all shadow-md active:scale-95"
+              >
+                <Shuffle className={`w-3.5 h-3.5 ${isAutoShuffling ? 'animate-spin' : ''}`} /> Shuffle
+              </button>
+            </div>
           </div>
 
-          {/* Vertical Stacked 3-Slot Mannequin Tower */}
-          <div className="space-y-3.5">
-            
-            {/* ROW 1: TOP / SHIRT SLOT WITH LEFT (<--) AND RIGHT (-->) ARROWS */}
-            <div className="bg-white p-3 rounded-[20px] border border-slate-200/90 relative flex items-center justify-between gap-3 shadow-sm group">
-              {/* Left Arrow <-- */}
-              <button
-                onClick={() => handleTopSlide('left')}
-                className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#0f172a] hover:bg-slate-800 text-white flex items-center justify-center transition-all shadow-md shrink-0 active:scale-90"
-                title="Swipe Top Left"
+          {/* Render Mode 1: Video Motion Demo Playback */}
+          {showVideoMotionDemo ? (
+            <div className="relative rounded-2xl overflow-hidden border border-slate-800 bg-black aspect-[9/16] max-h-[460px] shadow-2xl flex items-center justify-center">
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover"
               >
-                <ChevronLeft className="w-5 h-5 text-white" />
-              </button>
+                <source src="/create_a_swiping_motion_for_sh.mp4" type="video/mp4" />
+              </video>
+              <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md text-[10px] font-mono text-emerald-400 font-bold border border-emerald-500/30">
+                🎥 HD MOTION DEMO LOOP
+              </div>
+            </div>
+          ) : (
+            /* Render Mode 2: Interactive 3D Carousel Swiper Tower */
+            <div className="space-y-4">
+              
+              {/* TIER 1: TOP GARMENTS SWIPER ROW */}
+              <div className="relative flex items-center justify-center gap-1 group">
+                {/* Outer Left Arrow */}
+                <button
+                  onClick={() => handleTopSlide('left')}
+                  className="w-9 h-9 rounded-full bg-slate-900/90 hover:bg-emerald-600 text-white flex items-center justify-center transition-all border border-slate-700 shadow-lg shrink-0 z-30 active:scale-90"
+                >
+                  <ChevronLeft className="w-5 h-5 text-white" />
+                </button>
 
-              {/* Center Garment Card: Shirt */}
-              <div className="flex-1 h-36 rounded-xl overflow-hidden relative bg-slate-900 border border-slate-200 flex items-center justify-center">
-                <img
-                  src={currentTop.image}
-                  alt={currentTop.name}
-                  className={`w-full h-full object-cover transition-all duration-300 ${
-                    animatingRow === 'top' || isAutoShuffling ? 'scale-110 opacity-70 blur-xs' : 'scale-100 opacity-100'
-                  }`}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-                <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-md bg-[#0f172a]/80 backdrop-blur-md text-[10px] font-mono text-emerald-400 font-bold flex items-center gap-1.5 border border-emerald-500/20">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400" /> TOP GARMENT
+                {/* Left Peeking Garment Card */}
+                <div 
+                  onClick={() => handleTopSlide('left')}
+                  className="w-24 h-28 rounded-xl overflow-hidden border border-slate-800 bg-slate-900 opacity-40 hover:opacity-75 cursor-pointer shrink-0 transition-all transform scale-90 -mr-4 z-10 hidden sm:block"
+                >
+                  <img src={prevTop.image} alt={prevTop.name} className="w-full h-full object-cover" />
                 </div>
-                <span className="absolute bottom-2.5 left-2.5 right-2.5 text-xs sm:text-sm font-extrabold text-white truncate font-sans text-left drop-shadow-md">
-                  {currentTop.name}
-                </span>
+
+                {/* Main Center Garment Card */}
+                <div className="flex-1 max-w-[240px] h-36 rounded-2xl overflow-hidden relative bg-slate-900 border-2 border-emerald-400/80 shadow-2xl z-20 transition-all duration-300">
+                  <img
+                    src={currentTop.image}
+                    alt={currentTop.name}
+                    className={`w-full h-full object-cover transition-all duration-300 ${
+                      animatingRow === 'top' || isAutoShuffling ? 'scale-110 opacity-70 blur-xs' : 'scale-100 opacity-100'
+                    }`}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-85" />
+                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/80 backdrop-blur-md text-[9px] font-mono text-emerald-400 font-bold border border-emerald-500/30">
+                    👕 TOP GARMENT
+                  </div>
+                  <span className="absolute bottom-2 left-2 right-2 text-xs font-extrabold text-white truncate font-sans text-left">
+                    {currentTop.name}
+                  </span>
+                </div>
+
+                {/* Right Peeking Garment Card */}
+                <div 
+                  onClick={() => handleTopSlide('right')}
+                  className="w-24 h-28 rounded-xl overflow-hidden border border-slate-800 bg-slate-900 opacity-40 hover:opacity-75 cursor-pointer shrink-0 transition-all transform scale-90 -ml-4 z-10 hidden sm:block"
+                >
+                  <img src={nextTop.image} alt={nextTop.name} className="w-full h-full object-cover" />
+                </div>
+
+                {/* Outer Right Arrow */}
+                <button
+                  onClick={() => handleTopSlide('right')}
+                  className="w-9 h-9 rounded-full bg-slate-900/90 hover:bg-emerald-600 text-white flex items-center justify-center transition-all border border-slate-700 shadow-lg shrink-0 z-30 active:scale-90"
+                >
+                  <ChevronRight className="w-5 h-5 text-white" />
+                </button>
               </div>
 
-              {/* Right Arrow --> */}
-              <button
-                onClick={() => handleTopSlide('right')}
-                className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#0f172a] hover:bg-slate-800 text-white flex items-center justify-center transition-all shadow-md shrink-0 active:scale-90"
-                title="Swipe Top Right"
-              >
-                <ChevronRight className="w-5 h-5 text-white" />
-              </button>
-            </div>
+              {/* TIER 2: PANTS / BOTTOM GARMENTS SWIPER ROW */}
+              <div className="relative flex items-center justify-center gap-1 group">
+                {/* Outer Left Arrow */}
+                <button
+                  onClick={() => handleBottomSlide('left')}
+                  className="w-9 h-9 rounded-full bg-slate-900/90 hover:bg-emerald-600 text-white flex items-center justify-center transition-all border border-slate-700 shadow-lg shrink-0 z-30 active:scale-90"
+                >
+                  <ChevronLeft className="w-5 h-5 text-white" />
+                </button>
 
-            {/* ROW 2: PANTS / BOTTOM SLOT WITH LEFT (<--) AND RIGHT (-->) ARROWS */}
-            <div className="bg-white p-3 rounded-[20px] border border-slate-200/90 relative flex items-center justify-between gap-3 shadow-sm group">
-              {/* Left Arrow <-- */}
-              <button
-                onClick={() => handleBottomSlide('left')}
-                className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#0f172a] hover:bg-slate-800 text-white flex items-center justify-center transition-all shadow-md shrink-0 active:scale-90"
-                title="Swipe Pants Left"
-              >
-                <ChevronLeft className="w-5 h-5 text-white" />
-              </button>
-
-              {/* Center Garment Card: Pants */}
-              <div className="flex-1 h-36 rounded-xl overflow-hidden relative bg-slate-900 border border-slate-200 flex items-center justify-center">
-                <img
-                  src={currentBottom.image}
-                  alt={currentBottom.name}
-                  className={`w-full h-full object-cover transition-all duration-300 ${
-                    animatingRow === 'bottom' || isAutoShuffling ? 'scale-110 opacity-70 blur-xs' : 'scale-100 opacity-100'
-                  }`}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-                <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-md bg-[#0f172a]/80 backdrop-blur-md text-[10px] font-mono text-emerald-400 font-bold flex items-center gap-1.5 border border-emerald-500/20">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400" /> BOTTOM GARMENT
+                {/* Left Peeking Pants Card */}
+                <div 
+                  onClick={() => handleBottomSlide('left')}
+                  className="w-24 h-28 rounded-xl overflow-hidden border border-slate-800 bg-slate-900 opacity-40 hover:opacity-75 cursor-pointer shrink-0 transition-all transform scale-90 -mr-4 z-10 hidden sm:block"
+                >
+                  <img src={prevBottom.image} alt={prevBottom.name} className="w-full h-full object-cover" />
                 </div>
-                <span className="absolute bottom-2.5 left-2.5 right-2.5 text-xs sm:text-sm font-extrabold text-white truncate font-sans text-left drop-shadow-md">
-                  {currentBottom.name}
-                </span>
+
+                {/* Main Center Pants Card */}
+                <div className="flex-1 max-w-[240px] h-36 rounded-2xl overflow-hidden relative bg-slate-900 border-2 border-emerald-400/80 shadow-2xl z-20 transition-all duration-300">
+                  <img
+                    src={currentBottom.image}
+                    alt={currentBottom.name}
+                    className={`w-full h-full object-cover transition-all duration-300 ${
+                      animatingRow === 'bottom' || isAutoShuffling ? 'scale-110 opacity-70 blur-xs' : 'scale-100 opacity-100'
+                    }`}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-85" />
+                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/80 backdrop-blur-md text-[9px] font-mono text-emerald-400 font-bold border border-emerald-500/30">
+                    👖 BOTTOM GARMENT
+                  </div>
+                  <span className="absolute bottom-2 left-2 right-2 text-xs font-extrabold text-white truncate font-sans text-left">
+                    {currentBottom.name}
+                  </span>
+                </div>
+
+                {/* Right Peeking Pants Card */}
+                <div 
+                  onClick={() => handleBottomSlide('right')}
+                  className="w-24 h-28 rounded-xl overflow-hidden border border-slate-800 bg-slate-900 opacity-40 hover:opacity-75 cursor-pointer shrink-0 transition-all transform scale-90 -ml-4 z-10 hidden sm:block"
+                >
+                  <img src={nextBottom.image} alt={nextBottom.name} className="w-full h-full object-cover" />
+                </div>
+
+                {/* Outer Right Arrow */}
+                <button
+                  onClick={() => handleBottomSlide('right')}
+                  className="w-9 h-9 rounded-full bg-slate-900/90 hover:bg-emerald-600 text-white flex items-center justify-center transition-all border border-slate-700 shadow-lg shrink-0 z-30 active:scale-90"
+                >
+                  <ChevronRight className="w-5 h-5 text-white" />
+                </button>
               </div>
 
-              {/* Right Arrow --> */}
-              <button
-                onClick={() => handleBottomSlide('right')}
-                className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#0f172a] hover:bg-slate-800 text-white flex items-center justify-center transition-all shadow-md shrink-0 active:scale-90"
-                title="Swipe Pants Right"
-              >
-                <ChevronRight className="w-5 h-5 text-white" />
-              </button>
-            </div>
+              {/* TIER 3: FOOTWEAR SWIPER ROW */}
+              <div className="relative flex items-center justify-center gap-1 group">
+                {/* Outer Left Arrow */}
+                <button
+                  onClick={() => handleShoeSlide('left')}
+                  className="w-9 h-9 rounded-full bg-slate-900/90 hover:bg-emerald-600 text-white flex items-center justify-center transition-all border border-slate-700 shadow-lg shrink-0 z-30 active:scale-90"
+                >
+                  <ChevronLeft className="w-5 h-5 text-white" />
+                </button>
 
-            {/* ROW 3: SHOES / FOOTWEAR SLOT WITH LEFT (<--) AND RIGHT (-->) ARROWS */}
-            <div className="bg-white p-3 rounded-[20px] border border-slate-200/90 relative flex items-center justify-between gap-3 shadow-sm group">
-              {/* Left Arrow <-- */}
-              <button
-                onClick={() => handleShoeSlide('left')}
-                className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#0f172a] hover:bg-slate-800 text-white flex items-center justify-center transition-all shadow-md shrink-0 active:scale-90"
-                title="Swipe Shoes Left"
-              >
-                <ChevronLeft className="w-5 h-5 text-white" />
-              </button>
-
-              {/* Center Garment Card: Shoes */}
-              <div className="flex-1 h-36 rounded-xl overflow-hidden relative bg-slate-900 border border-slate-200 flex items-center justify-center">
-                <img
-                  src={currentShoe.image}
-                  alt={currentShoe.name}
-                  className={`w-full h-full object-cover transition-all duration-300 ${
-                    animatingRow === 'shoes' || isAutoShuffling ? 'scale-110 opacity-70 blur-xs' : 'scale-100 opacity-100'
-                  }`}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-                <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-md bg-[#0f172a]/80 backdrop-blur-md text-[10px] font-mono text-emerald-400 font-bold flex items-center gap-1.5 border border-emerald-500/20">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400" /> FOOTWEAR
+                {/* Left Peeking Shoe Card */}
+                <div 
+                  onClick={() => handleShoeSlide('left')}
+                  className="w-24 h-28 rounded-xl overflow-hidden border border-slate-800 bg-slate-900 opacity-40 hover:opacity-75 cursor-pointer shrink-0 transition-all transform scale-90 -mr-4 z-10 hidden sm:block"
+                >
+                  <img src={prevShoe.image} alt={prevShoe.name} className="w-full h-full object-cover" />
                 </div>
-                <span className="absolute bottom-2.5 left-2.5 right-2.5 text-xs sm:text-sm font-extrabold text-white truncate font-sans text-left drop-shadow-md">
-                  {currentShoe.name}
-                </span>
+
+                {/* Main Center Shoe Card */}
+                <div className="flex-1 max-w-[240px] h-36 rounded-2xl overflow-hidden relative bg-slate-900 border-2 border-emerald-400/80 shadow-2xl z-20 transition-all duration-300">
+                  <img
+                    src={currentShoe.image}
+                    alt={currentShoe.name}
+                    className={`w-full h-full object-cover transition-all duration-300 ${
+                      animatingRow === 'shoes' || isAutoShuffling ? 'scale-110 opacity-70 blur-xs' : 'scale-100 opacity-100'
+                    }`}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-85" />
+                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/80 backdrop-blur-md text-[9px] font-mono text-emerald-400 font-bold border border-emerald-500/30">
+                    👟 FOOTWEAR
+                  </div>
+                  <span className="absolute bottom-2 left-2 right-2 text-xs font-extrabold text-white truncate font-sans text-left">
+                    {currentShoe.name}
+                  </span>
+                </div>
+
+                {/* Right Peeking Shoe Card */}
+                <div 
+                  onClick={() => handleShoeSlide('right')}
+                  className="w-24 h-28 rounded-xl overflow-hidden border border-slate-800 bg-slate-900 opacity-40 hover:opacity-75 cursor-pointer shrink-0 transition-all transform scale-90 -ml-4 z-10 hidden sm:block"
+                >
+                  <img src={nextShoe.image} alt={nextShoe.name} className="w-full h-full object-cover" />
+                </div>
+
+                {/* Outer Right Arrow */}
+                <button
+                  onClick={() => handleShoeSlide('right')}
+                  className="w-9 h-9 rounded-full bg-slate-900/90 hover:bg-emerald-600 text-white flex items-center justify-center transition-all border border-slate-700 shadow-lg shrink-0 z-30 active:scale-90"
+                >
+                  <ChevronRight className="w-5 h-5 text-white" />
+                </button>
               </div>
 
-              {/* Right Arrow --> */}
-              <button
-                onClick={() => handleShoeSlide('right')}
-                className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#0f172a] hover:bg-slate-800 text-white flex items-center justify-center transition-all shadow-md shrink-0 active:scale-90"
-                title="Swipe Shoes Right"
-              >
-                <ChevronRight className="w-5 h-5 text-white" />
-              </button>
             </div>
+          )}
 
-          </div>
-
-          {/* Bottom Bar: Active Combination Status & Link */}
-          <div className="mt-4 pt-3.5 border-t border-slate-300/80 flex items-center justify-between text-xs">
-            <span className="flex items-center gap-1.5 font-mono text-slate-500 text-[11px] font-bold truncate">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" /> {currentTop.name.split(' ')[0]} + {currentBottom.name.split(' ')[0]}
+          {/* Bottom Bar Status & Link */}
+          <div className="mt-4 pt-3.5 border-t border-slate-800 flex items-center justify-between text-xs text-slate-300">
+            <span className="flex items-center gap-1.5 font-mono text-[11px] truncate">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> {currentTop.name.split(' ')[0]} + {currentBottom.name.split(' ')[0]}
             </span>
 
             <button
               onClick={() => onNavigate('styling')}
-              className="text-emerald-600 font-extrabold hover:underline flex items-center gap-1 font-mono text-[11px] shrink-0"
+              className="text-emerald-400 font-extrabold hover:underline flex items-center gap-1 font-mono text-[11px] shrink-0"
             >
               Open Outfit Canvas →
             </button>
