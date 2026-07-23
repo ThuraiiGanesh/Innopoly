@@ -14,7 +14,6 @@ import Toast from './components/Toast';
 
 // Smart AI Components
 import ColorSeasonAnalyzer from './components/ColorSeasonAnalyzer';
-import Chatbot from './components/Chatbot';
 
 import { INITIAL_WARDROBE } from './data/mockData';
 import { 
@@ -38,6 +37,7 @@ export default function App() {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [loginRegisterMode, setLoginRegisterMode] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [profileModalTab, setProfileModalTab] = useState('metrics');
 
   // Floating Toast Notification State
   const [toast, setToast] = useState({ message: '', type: 'success' });
@@ -137,6 +137,11 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleOpenProfileWithTab = (tab = 'budget') => {
+    setProfileModalTab(tab);
+    setProfileModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col justify-between selection:bg-black selection:text-white pb-safe">
       {/* Floating Action Toast Notification */}
@@ -152,7 +157,7 @@ export default function App() {
         activeTab={activeTab}
         onTabChange={handleNavigate}
         onOpenLogin={() => handleOpenLoginModal(false)}
-        onOpenProfile={() => setProfileModalOpen(true)}
+        onOpenProfile={(tab) => handleOpenProfileWithTab(tab || 'budget')}
         onLogout={handleLogout}
       />
 
@@ -195,7 +200,7 @@ export default function App() {
             <BodyCreatorMatcher
               user={user}
               onSelectCreatorOutfit={handleSelectCreatorOutfit}
-              onOpenProfile={() => setProfileModalOpen(true)}
+              onOpenProfile={() => handleOpenProfileWithTab('metrics')}
             />
           </div>
         )}
@@ -234,9 +239,6 @@ export default function App() {
         )}
       </main>
 
-      {/* Floating StyleSync AI Widget (Docked Bottom Right) */}
-      <Chatbot user={user} onNavigate={handleNavigate} />
-
       {/* Footer */}
       <Footer
         onOpenPitch={() => setPitchDeckOpen(true)}
@@ -250,18 +252,20 @@ export default function App() {
         onLoginSuccess={handleLoginSuccess}
       />
 
-      {/* Profile Dashboard Modal */}
+      {/* Profile Dashboard & Settings Modal */}
       <ProfileDashboardModal
         isOpen={profileModalOpen}
+        initialTab={profileModalTab}
         onClose={() => setProfileModalOpen(false)}
         user={user}
+        wardrobe={wardrobe}
         currentBudget={currentBudget}
         onBudgetChange={handleBudgetChange}
         onSaveMetrics={(metrics) => {
           showToast("Saved body metrics & style preferences!", "success");
         }}
         onCompleteOnboarding={() => {
-          showToast("✨ Profile setup complete! Welcome to StyleSync.");
+          showToast("✨ Profile & Settings saved! Welcome to StyleSync.");
         }}
         onLogout={handleLogout}
       />

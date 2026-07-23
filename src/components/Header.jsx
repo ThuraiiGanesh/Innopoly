@@ -19,6 +19,16 @@ export default function Header({ user, activeTab, onTabChange, onOpenLogin, onLo
     { id: 'creators', label: 'Discover', icon: User }
   ];
 
+  const handleTabClick = (tabId) => {
+    if (tabId === 'color') {
+      onOpenProfile('color');
+    } else if (tabId === 'compliance') {
+      onOpenProfile('budget');
+    } else {
+      onTabChange(tabId);
+    }
+  };
+
   return (
     <>
       <header className="sticky top-0 z-40 transition-all duration-300">
@@ -51,7 +61,7 @@ export default function Header({ user, activeTab, onTabChange, onOpenLogin, onLo
               return (
                 <button
                   key={tab.id}
-                  onClick={() => onTabChange(tab.id)}
+                  onClick={() => handleTabClick(tab.id)}
                   className={`px-3.5 py-1.5 rounded-xl transition-all duration-200 flex items-center gap-1.5 ${
                     isActive
                       ? 'bg-black text-white shadow-md font-bold scale-[1.02]'
@@ -70,7 +80,7 @@ export default function Header({ user, activeTab, onTabChange, onOpenLogin, onLo
             {user ? (
               <div className="flex items-center gap-2">
                 <button
-                  onClick={onOpenProfile}
+                  onClick={() => onOpenProfile('budget')}
                   title="Open User Profile & Settings"
                   className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 p-1 pr-2.5 rounded-full border border-slate-200 transition-colors shadow-sm"
                 >
@@ -120,7 +130,7 @@ export default function Header({ user, activeTab, onTabChange, onOpenLogin, onLo
           return (
             <button
               key={tab.id}
-              onClick={() => onTabChange(tab.id)}
+              onClick={() => handleTabClick(tab.id)}
               className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all ${
                 isActive ? 'text-black font-extrabold scale-105' : 'text-slate-500 hover:text-slate-800'
               }`}

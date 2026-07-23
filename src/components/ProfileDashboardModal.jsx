@@ -73,7 +73,7 @@ const SEASONS_DATA = {
   }
 };
 
-export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMetrics, onLogout, onCompleteOnboarding, currentBudget, onBudgetChange }) {
+export default function ProfileDashboardModal({ isOpen, initialTab = 'metrics', onClose, user, onSaveMetrics, onLogout, onCompleteOnboarding, currentBudget, onBudgetChange }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [metrics, setMetrics] = useState(DEFAULT_BODY_METRICS);
   const [selectedThemes, setSelectedThemes] = useState(['old_money']);
@@ -123,13 +123,19 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
       }
       setBudgetValue(currentBudget || 80);
       setCustomBudgetInput(currentBudget || 80);
-      setCurrentStep(1);
+
+      if (initialTab === 'budget') setCurrentStep(3);
+      else if (initialTab === 'color') setCurrentStep(4);
+      else if (initialTab === 'metrics') setCurrentStep(2);
+      else if (initialTab === 'style') setCurrentStep(1);
+      else if (initialTab === 'sync') setCurrentStep(5);
+      else setCurrentStep(1);
 
       if (savedIntegrations.weatherSync) {
         fetchRealWeather();
       }
     }
-  }, [user, isOpen]);
+  }, [user, isOpen, initialTab]);
 
   if (!isOpen) return null;
 
@@ -302,11 +308,11 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
   };
 
   const stepLabels = [
-    { icon: Palette, label: 'Style', full: `Step 2: Style Preference (${selectedThemes.length})` },
-    { icon: Ruler, label: 'Metrics', full: 'Step 3: Body Metrics Profile' },
-    { icon: DollarSign, label: 'Budget', full: 'Step 4: Store Budget' },
-    { icon: Sun, label: 'Color', full: 'Step 5: Color Season' },
-    { icon: Smartphone, label: 'Sync', full: 'App Sync' }
+    { icon: Palette, label: 'Style', full: `1. Style Aesthetic (${selectedThemes.length})` },
+    { icon: Ruler, label: 'Metrics', full: '2. Body Metrics' },
+    { icon: DollarSign, label: 'Budget', full: '3. Store Budget Settings' },
+    { icon: Sun, label: 'Color', full: '4. Color Season Settings' },
+    { icon: Smartphone, label: 'Sync', full: '5. App Integrations' }
   ];
 
   return (
@@ -320,7 +326,10 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
               <User className="w-5 h-5 text-emerald-400" />
             </div>
             <div>
-              <h3 className="text-lg font-extrabold tracking-tight">Profile & Style Dashboard</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-extrabold tracking-tight">Profile & Settings Hub</h3>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-[10px] font-bold border border-emerald-500/30">⚙️ SETTINGS ACTIVE</span>
+              </div>
               <p className="text-xs text-slate-400 font-mono">
                 {user ? user.email : 'New Guest Visitor Account'}
               </p>
