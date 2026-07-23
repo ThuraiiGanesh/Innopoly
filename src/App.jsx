@@ -12,8 +12,7 @@ import ProfileDashboardModal from './components/ProfileDashboardModal';
 import Footer from './components/Footer';
 import Toast from './components/Toast';
 
-// Smart AI Components
-import WeatherCalendarStylist from './components/WeatherCalendarStylist';
+// Smart AI Component
 import ColorSeasonAnalyzer from './components/ColorSeasonAnalyzer';
 
 import { INITIAL_WARDROBE } from './data/mockData';
@@ -27,7 +26,7 @@ import {
 import { syncWardrobeToCloud } from './utils/supabase';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'weather' | 'color' | 'closet' | 'styling' | 'creators' | 'templates' | 'compliance'
+  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'color' | 'closet' | 'styling' | 'creators' | 'templates' | 'compliance'
   const [user, setUser] = useState(null);
   const [wardrobe, setWardrobe] = useState([]);
   const [currentBudget, setCurrentBudget] = useState(50);
@@ -149,17 +148,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Section View 2: Weather & Calendar AI Stylist */}
-        {activeTab === 'weather' && (
-          <div className="animate-fade-in-up">
-            <WeatherCalendarStylist
-              wardrobe={wardrobe}
-              onSelectOutfit={() => handleNavigate('styling')}
-            />
-          </div>
-        )}
-
-        {/* Section View 3: Personal Color Season Analyzer */}
+        {/* Section View 2: Personal Color Season Analyzer */}
         {activeTab === 'color' && (
           <div className="animate-fade-in-up">
             <ColorSeasonAnalyzer
@@ -168,7 +157,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Section View 4: Closet Digitizer */}
+        {/* Section View 3: Closet Digitizer */}
         {activeTab === 'closet' && (
           <div className="animate-fade-in-up">
             <WardrobeDigitizer
@@ -179,7 +168,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Section View 5: Height, Waist & Creator Matcher */}
+        {/* Section View 4: Height, Waist & Creator Matcher */}
         {activeTab === 'creators' && (
           <div className="animate-fade-in-up">
             <BodyCreatorMatcher
@@ -190,7 +179,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Section View 6: Occasion Templates */}
+        {/* Section View 5: Occasion Templates */}
         {activeTab === 'templates' && (
           <div className="animate-fade-in-up">
             <CategoryTemplates
@@ -199,10 +188,11 @@ export default function App() {
           </div>
         )}
 
-        {/* Section View 7: Interactive Outfit Mixer */}
+        {/* Section View 6: Interactive Outfit Mixer */}
         {activeTab === 'styling' && (
           <div className="animate-fade-in-up">
             <OutfitMixer
+              user={user}
               wardrobe={wardrobe}
               currentBudget={currentBudget}
               selectedTemplate={selectedTemplate}
@@ -212,7 +202,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Section View 8: Budget Controls */}
+        {/* Section View 7: Budget Controls */}
         {activeTab === 'compliance' && (
           <div className="animate-fade-in-up">
             <BudgetCompliance

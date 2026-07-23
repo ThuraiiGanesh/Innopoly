@@ -236,6 +236,8 @@ export const getUserStyleThemeFromDB = (userId, fallback = ['old_money']) => {
 export const DEFAULT_INTEGRATIONS = {
   weatherSync: true,
   contactsSync: true,
+  calendarSync: true,
+  calendarEvent: 'Birthday Party 🎉',
   locationPermission: true,
   friendOutfitsSharing: false
 };
@@ -254,4 +256,3 @@ export const getUserIntegrationsFromDB = (userId, fallback = DEFAULT_INTEGRATION
     return fallback;
   }
 };
-

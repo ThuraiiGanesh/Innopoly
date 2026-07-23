@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { Camera, Check, Plus, Trash2, Tag, Layers, Sparkles, Cpu, Upload, Grid } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Camera, Check, Plus, Trash2, Tag, Layers, Sparkles, Cpu, Upload, Grid, Video, RefreshCw, X, Play } from 'lucide-react';
 
 export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem }) {
   const [itemName, setItemName] = useState('');
@@ -13,8 +13,112 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
   const [scanMode, setScanMode] = useState('single'); // 'single' | 'batch'
   const [batchCount, setBatchCount] = useState(0);
 
+  // Live Camera Stream Modal State
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const [cameraStream, setCameraStream] = useState(null);
+  const [capturedBatchPhotos, setCapturedBatchPhotos] = useState([]);
+
   const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
   const batchFileInputRef = useRef(null);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+
+  // Clean up camera stream when modal closes
+  useEffect(() => {
+    return () => {
+      stopCameraStream();
+    };
+  }, []);
+
+  const stopCameraStream = () => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      setCameraStream(null);
+    }
+  };
+
+  // Launch Live Device Camera Stream Modal
+  const startCameraStream = async () => {
+    setCameraOpen(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+      });
+      setCameraStream(stream);
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch (err) {
+      console.log('Live webcam stream not accessible, falling back to direct native capture prompt');
+      cameraInputRef.current?.click();
+    }
+  };
+
+  const closeCameraModal = () => {
+    stopCameraStream();
+    setCameraOpen(false);
+  };
+
+  // Snap Photo from Live Camera Stream
+  const snapLivePhoto = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg');
+
+      if (scanMode === 'single') {
+        setCustomImage(dataUrl);
+        if (!itemName) setItemName('Live Camera Snap Item');
+        closeCameraModal();
+      } else {
+        // Batch camera mode: accumulate photos
+        setCapturedBatchPhotos(prev => [dataUrl, ...prev]);
+      }
+    }
+  };
+
+  const handleFinishBatchCamera = () => {
+    if (capturedBatchPhotos.length === 0) {
+      closeCameraModal();
+      return;
+    }
+
+    setIsAnalyzing(true);
+    capturedBatchPhotos.forEach((imgData, index) => {
+      const categories = ['Tops', 'Bottoms', 'Outerwear', 'Shoes'];
+      const colors = ['Black', 'White', 'Navy', 'Olive', 'Beige'];
+      const autoCat = categories[index % categories.length];
+      const autoColor = colors[index % colors.length];
+
+      const newItem = {
+        id: 'w_camera_batch_' + Date.now() + '_' + index,
+        name: `Camera Shot Garment ${index + 1}`,
+        category: autoCat,
+        color: autoColor.toLowerCase().includes('white') ? '#ffffff' : '#18181b',
+        colorName: autoColor,
+        pattern: 'Solid',
+        style: 'Smart Casual',
+        image: imgData,
+        owned: true
+      };
+      onAddItem(newItem);
+    });
+
+    setBatchCount(capturedBatchPhotos.length);
+    setIsAnalyzing(false);
+    setAutoTagged({
+      category: `${capturedBatchPhotos.length} Camera Shots Auto-Tagged`,
+      color: 'Batch Processed',
+      pattern: 'Multi-Scan Ready'
+    });
+    setCapturedBatchPhotos([]);
+    closeCameraModal();
+  };
 
   const handleImageFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -167,6 +271,16 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
               </span>
             </div>
 
+            {/* Hidden native input for direct mobile camera capture fallback */}
+            <input
+              type="file"
+              ref={cameraInputRef}
+              accept="image/*"
+              capture="environment"
+              onChange={handleImageFileChange}
+              className="hidden"
+            />
+
             {scanMode === 'batch' ? (
               <div className="space-y-4">
                 <input
@@ -177,17 +291,31 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
                   onChange={handleBatchUpload}
                   className="hidden"
                 />
-                <div
-                  onClick={() => batchFileInputRef.current?.click()}
-                  className="border-2 border-dashed border-indigo-400 hover:border-black rounded-2xl p-8 text-center bg-indigo-50/40 cursor-pointer transition-all"
-                >
-                  <div className="w-12 h-12 rounded-full bg-indigo-600 text-white flex items-center justify-center mx-auto mb-3 shadow-md">
-                    <Camera className="w-6 h-6" />
-                  </div>
-                  <h4 className="text-sm font-bold text-slate-900 mb-1">Upload Up to 10 Closet Photos</h4>
-                  <p className="text-xs text-slate-500 max-w-xs mx-auto">
-                    Select multiple photos from your mobile camera or library. AI auto-tags category, color, and fit for all items instantly!
-                  </p>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={startCameraStream}
+                    className="p-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white flex flex-col items-center justify-center gap-2 transition-all shadow-md group"
+                  >
+                    <div className="p-3 rounded-full bg-white/20 group-hover:scale-110 transition-transform">
+                      <Camera className="w-6 h-6" />
+                    </div>
+                    <span className="text-xs font-extrabold uppercase tracking-wider">Open Live Camera</span>
+                    <span className="text-[10px] text-indigo-100 font-mono">Snap Batch Shots</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => batchFileInputRef.current?.click()}
+                    className="p-4 rounded-2xl bg-white border border-slate-300 hover:border-black text-slate-900 flex flex-col items-center justify-center gap-2 transition-all shadow-sm group"
+                  >
+                    <div className="p-3 rounded-full bg-slate-100 group-hover:scale-110 transition-transform">
+                      <Upload className="w-6 h-6 text-slate-700" />
+                    </div>
+                    <span className="text-xs font-extrabold uppercase tracking-wider">Select Files</span>
+                    <span className="text-[10px] text-slate-500 font-mono">Up to 10 Photos</span>
+                  </button>
                 </div>
               </div>
             ) : (
@@ -200,9 +328,30 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
                   className="hidden"
                 />
 
+                {/* Direct Camera Button & Upload Area Split */}
+                <div className="grid grid-cols-2 gap-3 mb-2">
+                  <button
+                    type="button"
+                    onClick={startCameraStream}
+                    className="p-3 rounded-2xl bg-slate-950 hover:bg-slate-800 text-white flex items-center justify-center gap-2 transition-all shadow-md"
+                  >
+                    <Camera className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs font-extrabold uppercase tracking-wider">Take Photo (Camera)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="p-3 rounded-2xl bg-white border border-slate-300 hover:border-slate-800 text-slate-900 flex items-center justify-center gap-2 transition-all shadow-sm"
+                  >
+                    <Upload className="w-4 h-4 text-slate-700" />
+                    <span className="text-xs font-extrabold uppercase tracking-wider">Upload File</span>
+                  </button>
+                </div>
+
                 <div 
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-slate-300 hover:border-slate-800 rounded-2xl p-6 text-center bg-white/60 cursor-pointer transition-all group relative overflow-hidden"
+                  className="border-2 border-dashed border-slate-300 hover:border-slate-800 rounded-2xl p-4 text-center bg-white/60 cursor-pointer transition-all group relative overflow-hidden"
                 >
                   {customImage ? (
                     <div className="relative">
@@ -217,14 +366,11 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
                     </div>
                   ) : (
                     <>
-                      <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-800 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                        <Upload className="w-6 h-6" />
-                      </div>
-                      <p className="text-sm font-semibold text-slate-800 mb-0.5">
-                        Click to Upload Garment Photo
+                      <p className="text-xs font-semibold text-slate-700">
+                        Click or drag garment photo here to upload
                       </p>
-                      <p className="text-xs text-slate-500">
-                        Select photo from camera or files • Auto Background Crop
+                      <p className="text-[10px] text-slate-500 font-mono mt-0.5">
+                        Auto background removal & auto-tagging
                       </p>
                     </>
                   )}
@@ -293,7 +439,7 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
                 <button
                   type="submit"
                   disabled={isAnalyzing || !itemName.trim()}
-                  className="w-full primary-button py-3 text-xs uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full primary-button py-3 text-xs uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-50 font-bold shadow-md"
                 >
                   {isAnalyzing ? (
                     <>
@@ -395,6 +541,76 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
           </p>
         </div>
       </div>
+
+      {/* ================= LIVE WEBCAM CAMERA CAPTURE MODAL ================= */}
+      {cameraOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+          <div className="relative w-full max-w-xl bg-slate-950 text-white rounded-3xl border border-slate-800 shadow-2xl p-6 overflow-hidden flex flex-col gap-4">
+            
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <Camera className="w-5 h-5 text-emerald-400 animate-pulse" />
+                <h3 className="text-base font-extrabold text-white">Live Garment Camera View</h3>
+              </div>
+              <button
+                onClick={closeCameraModal}
+                className="p-1 rounded-full text-slate-400 hover:text-white hover:bg-slate-800"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Live Camera Feed Canvas/Video */}
+            <div className="relative w-full h-72 rounded-2xl bg-black overflow-hidden border border-slate-800 flex items-center justify-center">
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-full h-full object-cover"
+              />
+              <canvas ref={canvasRef} className="hidden" />
+
+              <div className="absolute inset-0 border-2 border-dashed border-white/30 pointer-events-none m-4 rounded-xl flex items-center justify-center">
+                <span className="text-[10px] font-mono bg-black/60 px-3 py-1 rounded-full text-emerald-400 font-bold border border-emerald-500/30">
+                  Align Garment inside Box
+                </span>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={snapLivePhoto}
+                className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-3 px-4 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition-all"
+              >
+                <Camera className="w-4 h-4 text-white" /> 
+                {scanMode === 'batch' ? `Snap Garment (${capturedBatchPhotos.length} Taken)` : 'Snap Garment Photo'}
+              </button>
+
+              {scanMode === 'batch' && (
+                <button
+                  type="button"
+                  onClick={handleFinishBatchCamera}
+                  className="px-5 py-3 rounded-xl bg-white text-slate-950 font-extrabold text-xs uppercase tracking-wider shadow-md hover:bg-slate-200 transition-all"
+                >
+                  Done ({capturedBatchPhotos.length})
+                </button>
+              )}
+            </div>
+
+            {capturedBatchPhotos.length > 0 && scanMode === 'batch' && (
+              <div className="flex items-center gap-2 overflow-x-auto pt-2 border-t border-slate-800">
+                <span className="text-[10px] font-mono text-slate-400">Captured:</span>
+                {capturedBatchPhotos.map((img, idx) => (
+                  <img key={idx} src={img} alt="Snap preview" className="w-10 h-10 object-cover rounded-lg border border-slate-700" />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </section>
   );
 }

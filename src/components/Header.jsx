@@ -1,23 +1,22 @@
 import React from 'react';
-import { Camera, User, Shirt, LogIn, LogOut, Sparkles, Layers, Palette, Sliders, Home, Sun, Settings } from 'lucide-react';
+import { Camera, User, Shirt, LogIn, LogOut, Sparkles, Layers, Palette, Sliders, Home, Settings } from 'lucide-react';
 
 export default function Header({ user, activeTab, onTabChange, onOpenLogin, onLogout, onOpenProfile }) {
   const desktopTabs = [
     { id: 'home', label: 'Home', icon: Home },
-    { id: 'weather', label: '🌦️ Weather AI', icon: Sun },
     { id: 'color', label: '🎨 Color Season', icon: Palette },
     { id: 'closet', label: 'My Closet', icon: Layers },
-    { id: 'styling', label: 'Outfit Canvas', icon: Palette },
+    { id: 'styling', label: 'Outfit Canvas', icon: Sparkles },
     { id: 'creators', label: 'Body & Creators', icon: User },
     { id: 'compliance', label: 'Store Budget', icon: Sliders }
   ];
 
   const mobileBottomTabs = [
     { id: 'home', label: 'Home', icon: Home },
-    { id: 'weather', label: 'Weather', icon: Sun },
     { id: 'color', label: 'Color', icon: Palette },
     { id: 'closet', label: 'Closet', icon: Layers },
-    { id: 'styling', label: 'Canvas', icon: Palette }
+    { id: 'styling', label: 'Canvas', icon: Sparkles },
+    { id: 'creators', label: 'Body', icon: User }
   ];
 
   return (
@@ -52,7 +51,7 @@ export default function Header({ user, activeTab, onTabChange, onOpenLogin, onLo
                 <button
                   key={tab.id}
                   onClick={() => onTabChange(tab.id)}
-                  className={`px-3 py-1.5 rounded-xl transition-all duration-200 flex items-center gap-1.5 ${
+                  className={`px-3.5 py-1.5 rounded-xl transition-all duration-200 flex items-center gap-1.5 ${
                     isActive
                       ? 'bg-black text-white shadow-sm font-bold scale-[1.02]'
                       : 'text-slate-600 hover:text-black hover:bg-slate-200/60'
@@ -111,7 +110,7 @@ export default function Header({ user, activeTab, onTabChange, onOpenLogin, onLo
         </nav>
       </header>
 
-      {/* Sleek Mobile Bottom Tab Bar (Fixed at bottom for smartphones) */}
+      {/* Sleek Mobile Bottom Tab Bar */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 glass-panel border-t border-black/10 px-2 py-1.5 flex items-center justify-around text-[10px] font-semibold text-slate-600 pb-safe shadow-2xl bg-white/95 backdrop-blur-md">
         {mobileBottomTabs.map((tab) => {
           const Icon = tab.icon;

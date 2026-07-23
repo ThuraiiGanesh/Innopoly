@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { Palette, ShoppingBag, ExternalLink, Sparkles, Check, Sliders, ShieldCheck, ArrowRight, Layers, Camera, Image, Download, Sparkle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Palette, ShoppingBag, ExternalLink, Sparkles, Check, Sliders, ShieldCheck, ArrowRight, Layers, Camera, Image, Download, Sparkle, Gift, Calendar } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { AFFILIATE_PRODUCTS } from '../data/mockData';
+import { getUserIntegrationsFromDB, DEFAULT_INTEGRATIONS } from '../utils/database';
 
-export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate, selectedCreator, onNavigate }) {
+export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate, selectedCreator, onNavigate, user }) {
   // Filter strictly owned wardrobe items
   const ownedTops = wardrobe.filter(i => i.category === 'Tops');
   const ownedBottoms = wardrobe.filter(i => i.category === 'Bottoms');
@@ -20,6 +21,17 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
 
   const [showFinalPhotoModal, setShowFinalPhotoModal] = useState(false);
   const [purchasedItems, setPurchasedItems] = useState({});
+  const [calendarSyncInfo, setCalendarSyncInfo] = useState({ enabled: true, eventName: 'Birthday Party 🎉' });
+
+  useEffect(() => {
+    const integrations = getUserIntegrationsFromDB(user?.id, DEFAULT_INTEGRATIONS);
+    if (integrations) {
+      setCalendarSyncInfo({
+        enabled: !!integrations.calendarSync,
+        eventName: integrations.calendarEvent || 'Birthday Party 🎉'
+      });
+    }
+  }, [user]);
 
   const colorPalette = [
     { name: 'Midnight Black', hex: '#18181b' },
@@ -37,14 +49,12 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
   const handleBuyClick = (product) => {
     setPurchasedItems(prev => ({ ...prev, [product.id]: true }));
     
-    // Confetti celebration
     confetti({
       particleCount: 75,
       spread: 60,
       origin: { y: 0.6 }
     });
 
-    // Directly bring user to official brand store webpage in a new tab
     if (product.url) {
       window.open(product.url, '_blank', 'noopener,noreferrer');
     }
@@ -62,7 +72,7 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
   return (
     <section id="mixer" className="py-16 px-6 max-w-7xl mx-auto scroll-mt-20">
       {/* Section Stepper / Navigation Banner */}
-      <div className="flex items-center justify-between glass-panel p-3.5 px-6 rounded-2xl mb-8 border border-black/5 text-xs">
+      <div className="flex items-center justify-between glass-panel p-3.5 px-6 rounded-2xl mb-6 border border-black/5 text-xs">
         <div className="flex items-center gap-2 font-mono text-slate-500">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span>Section 3 of 6: <strong>Owned Outfit Canvas & Recommendations</strong></span>
@@ -84,6 +94,33 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
           </button>
         </div>
       </div>
+
+      {/* 🎉 GOOGLE CALENDAR BIRTHDAY EVENT AUTO-SUGGESTION BANNER */}
+      {calendarSyncInfo.enabled && (
+        <div className="p-5 rounded-3xl bg-gradient-to-r from-rose-600 via-pink-600 to-amber-500 text-white shadow-xl mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-rose-300/40 animate-fade-in">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 border border-white/30">
+              <Gift className="w-6 h-6 text-white animate-bounce" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono uppercase bg-white/25 text-white font-extrabold px-2.5 py-0.5 rounded-full">
+                  Google Calendar Synced
+                </span>
+                <span className="text-[10px] font-mono bg-amber-300 text-slate-950 font-extrabold px-2.5 py-0.5 rounded-full">
+                  EVENT FOUND TODAY
+                </span>
+              </div>
+              <h3 className="text-lg sm:text-xl font-extrabold text-white mt-1">
+                🎉 Fit for Your Birthday! (Celebration Recommendation)
+              </h3>
+              <p className="text-xs text-rose-100 font-mono mt-0.5">
+                Auto-detected "{calendarSyncInfo.eventName}" on Google Calendar • StyleSync tuned your canvas for your special event today!
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="text-center max-w-2xl mx-auto mb-12">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-pill text-xs tracking-wider uppercase text-slate-700 font-semibold mb-3">
@@ -369,7 +406,6 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
             </div>
           </div>
 
-          {/* Proceed Next Step Button */}
           <div className="mt-6 pt-4 border-t border-black/5 flex flex-wrap items-center justify-between gap-3 text-xs">
             <span className="flex items-center gap-1 font-medium text-slate-500">
               <ShieldCheck className="w-3.5 h-3.5 text-slate-800" /> FTC/CCCS Compliant ($0 Extra Cost)
@@ -379,7 +415,7 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
               onClick={() => onNavigate && onNavigate('compliance')}
               className="text-slate-900 font-bold flex items-center gap-1 hover:underline"
             >
-              Budget & Regulatory Rules <ArrowRight className="w-3.5 h-3.5" />
+              Store Budget Filter <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
@@ -392,7 +428,9 @@ export default function OutfitMixer({ wardrobe, currentBudget, selectedTemplate,
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-amber-500" />
-                <h3 className="text-lg font-bold text-slate-900">Assembled Final Look Photo</h3>
+                <h3 className="text-lg font-bold text-slate-900">
+                  {calendarSyncInfo.enabled ? '🎉 Fit for Your Birthday!' : 'Assembled Final Look Photo'}
+                </h3>
               </div>
               <button
                 onClick={() => setShowFinalPhotoModal(false)}

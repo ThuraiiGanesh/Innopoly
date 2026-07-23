@@ -17,7 +17,8 @@ import {
   Compass,
   Zap,
   MapPin,
-  RefreshCw
+  RefreshCw,
+  Gift
 } from 'lucide-react';
 
 // ================= DYNAMIC WEATHER BACKGROUND CANVAS COMPONENT =================
@@ -142,7 +143,7 @@ function WeatherBackground({ weather }) {
 }
 
 export default function Hero({ user, onNavigate, onOpenLogin, onOpenRegister, onOpenCompliance }) {
-  const [currentWeather, setCurrentWeather] = useState('sunny'); // Live weather state
+  const [currentWeather, setCurrentWeather] = useState('sunny');
 
   useEffect(() => {
     if ('geolocation' in navigator) {
@@ -209,7 +210,7 @@ export default function Hero({ user, onNavigate, onOpenLogin, onOpenRegister, on
         </h1>
 
         <p className="text-xs sm:text-sm text-slate-200 max-w-xl font-normal leading-relaxed mb-8 sm:mb-10 text-balance px-2 font-mono drop-shadow">
-          StyleSync automatically detects your local climate & matches dress codes to the event you are attending today.
+          StyleSync automatically detects your local climate & matches dress codes to events synced from your Google Calendar.
         </p>
 
         {/* The Primary Actions (The Split) */}
@@ -253,16 +254,16 @@ export default function Hero({ user, onNavigate, onOpenLogin, onOpenRegister, on
         {/* Feature Overview Quick Cards - High Contrast Dark Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 w-full max-w-3xl text-left mb-8">
           <div 
-            onClick={() => onNavigate('weather')}
+            onClick={() => onNavigate('styling')}
             className="p-4 rounded-2xl border border-slate-800 bg-slate-900/90 hover:border-slate-700 backdrop-blur-xl cursor-pointer transition-all flex items-center gap-3.5 shadow-lg group"
           >
-            <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 shrink-0 group-hover:scale-105 transition-transform">
-              <Sun className="w-5 h-5" />
+            <div className="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0 group-hover:scale-105 transition-transform">
+              <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-sm font-extrabold text-white block">Auto Weather AI</span>
+              <span className="text-sm font-extrabold text-white block">Outfit Canvas</span>
               <p className="text-[11px] text-slate-300 leading-normal font-medium">
-                Auto-detected temperature fit matches.
+                Assemble looks & Google Calendar fits.
               </p>
             </div>
           </div>

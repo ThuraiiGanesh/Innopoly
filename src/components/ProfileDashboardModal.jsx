@@ -22,7 +22,9 @@ import {
   Share2,
   RefreshCw,
   PhoneCall,
-  Send
+  Send,
+  Calendar,
+  Gift
 } from 'lucide-react';
 import { 
   DEFAULT_BODY_METRICS, 
@@ -62,6 +64,9 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
     { id: 3, name: 'David Chen', phone: '+65 9812 3456', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80', shared: false }
   ]);
 
+  // Google Calendar Detected Event State
+  const [detectedCalendarEvent, setDetectedCalendarEvent] = useState('Birthday Party 🎉');
+
   useEffect(() => {
     if (isOpen) {
       const savedMetrics = getUserProfileMetricsFromDB(user?.id, user?.bodyMetrics || DEFAULT_BODY_METRICS);
@@ -71,9 +76,11 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
       setMetrics(savedMetrics);
       setSelectedThemes(Array.isArray(savedThemes) ? savedThemes : [savedThemes]);
       setIntegrations(savedIntegrations);
-      setCurrentStep(1); // Reset to Step 1 when opened
+      if (savedIntegrations.calendarEvent) {
+        setDetectedCalendarEvent(savedIntegrations.calendarEvent);
+      }
+      setCurrentStep(1);
 
-      // Trigger initial real weather sync if enabled
       if (savedIntegrations.weatherSync) {
         fetchRealWeather();
       }
@@ -82,7 +89,6 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
 
   if (!isOpen) return null;
 
-  // Real Weather Fetcher using Browser HTML5 Geolocation & Open-Meteo Weather API
   const fetchRealWeather = () => {
     setWeatherLoading(true);
     if ('geolocation' in navigator) {
@@ -117,7 +123,6 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
           }
         },
         () => {
-          // Fallback if location permission denied
           setWeatherData({ city: 'Singapore (Default)', temp: 31, condition: 'Sunny 31°C', lat: 1.3521, lon: 103.8198, isRealSynced: true });
           setWeatherLoading(false);
         },
@@ -129,7 +134,6 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
     }
   };
 
-  // Real Phone Contacts Picker Handler
   const handlePickPhoneContacts = async () => {
     setContactsLoading(true);
     if ('contacts' in navigator && 'ContactsManager' in window) {
@@ -153,7 +157,6 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
         setContactsLoading(false);
       }
     } else {
-      // Simulate real device contact sync addition
       setTimeout(() => {
         const demoContact = {
           id: Date.now(),
@@ -170,7 +173,6 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
 
   const feet = Math.floor(metrics.height / 30.48);
   const inches = Math.round((metrics.height % 30.48) / 2.54);
-  const heightFormatted = `${metrics.height} cm (${feet}'${inches}")`;
 
   const BUILD_PRESETS = {
     Slim: { height: 175, chest: 34, waist: 28, hips: 34, shoulders: 40, inseam: 30, build: 'Slim' },
@@ -187,7 +189,6 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
     setTimeout(() => setAutoSaveStatus('Auto-Restored'), 1500);
   };
 
-  // Real-time metric handler
   const handleMetricChange = (key, val) => {
     const num = Number(val) || 0;
     const updated = { ...metrics, [key]: num };
@@ -197,11 +198,10 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
     setTimeout(() => setAutoSaveStatus('Auto-Restored'), 1500);
   };
 
-  // Multi-Select Theme Handler
   const handleThemeToggle = (themeId) => {
     let updated;
     if (selectedThemes.includes(themeId)) {
-      if (selectedThemes.length === 1) return; // Must keep at least 1
+      if (selectedThemes.length === 1) return;
       updated = selectedThemes.filter(id => id !== themeId);
     } else {
       updated = [...selectedThemes, themeId];
@@ -223,11 +223,20 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
     setTimeout(() => setAutoSaveStatus('Auto-Restored'), 1500);
   };
 
+  const handleCalendarEventSelect = (evt) => {
+    setDetectedCalendarEvent(evt);
+    const updated = { ...integrations, calendarEvent: evt };
+    setIntegrations(updated);
+    saveUserIntegrationsInDB(user?.id, updated);
+    setAutoSaveStatus(`Calendar Event: ${evt}`);
+    setTimeout(() => setAutoSaveStatus('Auto-Restored'), 1500);
+  };
+
   const handleSaveAndContinue = (e) => {
     e?.preventDefault();
     saveUserProfileMetricsInDB(user?.id, metrics);
     saveUserStyleThemeInDB(user?.id, selectedThemes);
-    saveUserIntegrationsInDB(user?.id, integrations);
+    saveUserIntegrationsInDB(user?.id, { ...integrations, calendarEvent: detectedCalendarEvent });
     if (onSaveMetrics) onSaveMetrics(metrics);
     if (onCompleteOnboarding) onCompleteOnboarding();
     onClose();
@@ -305,7 +314,7 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
         {/* Scrollable Content Body */}
         <div className="p-6 space-y-6 overflow-y-auto flex-1">
           
-          {/* ================= STEP 1: MULTI-SELECT STYLE AESTHETICS ================= */}
+          {/* STEP 1: MULTI-SELECT STYLE AESTHETICS */}
           {currentStep === 1 && (
             <div className="space-y-4 animate-fade-in">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -337,7 +346,6 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
                           : 'border-slate-200 hover:border-slate-400 hover:shadow-md opacity-85 hover:opacity-100'
                       }`}
                     >
-                      {/* Style Picture Box */}
                       <div className="relative h-36 overflow-hidden bg-slate-900">
                         <img
                           src={theme.image}
@@ -346,7 +354,6 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                         
-                        {/* Multi-Select Checkbox Badge */}
                         <div className={`absolute top-2.5 right-2.5 px-2.5 py-1 rounded-full font-mono text-[10px] font-bold flex items-center gap-1.5 shadow-md ${
                           isSelected ? 'bg-emerald-600 text-white' : 'bg-black/60 text-slate-300 border border-white/20'
                         }`}>
@@ -363,7 +370,6 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
                         </div>
                       </div>
 
-                      {/* Tagline & Specs */}
                       <div className="p-3 bg-white space-y-2 flex-1 flex flex-col justify-between">
                         <p className="text-[11px] text-slate-600 font-medium leading-snug">
                           {theme.tagline}
@@ -384,7 +390,7 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
             </div>
           )}
 
-          {/* ================= STEP 2: BODY METRICS WITH TYPED NUMBERS ================= */}
+          {/* STEP 2: BODY METRICS */}
           {currentStep === 2 && (
             <div className="space-y-4 animate-fade-in">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -399,7 +405,6 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
                 </span>
               </div>
 
-              {/* Auto-Saved Green Banner */}
               <div className="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs">
                 <span className="flex items-center gap-2 font-mono font-semibold">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" /> Saved in Profile Dashboard
@@ -409,9 +414,7 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
                 </span>
               </div>
 
-              {/* Sliders + Direct Typed Input Boxes */}
               <div className="glass-card p-5 sm:p-6 rounded-2xl border border-slate-200 bg-white space-y-5">
-                
                 {/* HEIGHT */}
                 <div className="space-y-1.5">
                   <div className="flex justify-between items-center">
@@ -571,7 +574,7 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
 
                 {/* BODY BUILD Selector */}
                 <div>
-                  <label className="text-xs uppercase font-bold text-slate-600 tracking-wider block mb-2">BODY BUILD</label>
+                  <label className="text-xs uppercase font-bold text-slate-600 tracking-wider block mb-2 font-mono">BODY BUILD</label>
                   <div className="grid grid-cols-4 gap-2">
                     {['Slim', 'Athletic', 'Regular', 'Muscular'].map((b) => (
                       <button
@@ -593,7 +596,7 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
             </div>
           )}
 
-          {/* ================= STEP 3: REAL WEATHER API & REAL CONTACTS SYNC ================= */}
+          {/* STEP 3: REAL WEATHER, CONTACTS & GOOGLE CALENDAR SYNC */}
           {currentStep === 3 && (
             <div className="space-y-5 animate-fade-in">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -606,6 +609,83 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
                 <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-mono font-bold">
                   ⚡ Live Sync Engine Active
                 </span>
+              </div>
+
+              {/* 📅 GOOGLE CALENDAR SYNC CARD */}
+              <div className="p-5 rounded-2xl border border-rose-200 bg-gradient-to-r from-rose-50/90 via-pink-50/60 to-amber-50/50 space-y-4 shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-2xl bg-rose-600 text-white flex items-center justify-center shadow-md shrink-0">
+                      <Calendar className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h5 className="text-sm font-extrabold text-slate-900">Sync Google Calendar</h5>
+                        <span className="px-2 py-0.5 rounded-full bg-rose-200 text-rose-900 text-[10px] font-mono font-bold">CALENDAR API</span>
+                      </div>
+                      <p className="text-xs text-slate-600 font-medium">Auto-detects birthdays, interviews & events to suggest tailored fits!</p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleIntegrationToggle('calendarSync')}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 shrink-0 ${
+                      integrations.calendarSync ? 'bg-rose-600' : 'bg-slate-300'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${
+                        integrations.calendarSync ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {integrations.calendarSync && (
+                  <div className="p-4 rounded-xl bg-white/90 border border-rose-100 space-y-3 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-1.5 text-rose-900 font-bold font-mono">
+                        <Gift className="w-4 h-4 text-rose-600" /> Event Found Today: <strong className="text-rose-700 underline">{detectedCalendarEvent}</strong>
+                      </span>
+                      <span className="text-[10px] font-mono bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full font-bold">
+                        AUTO-NOTED
+                      </span>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-slate-800 space-y-2">
+                      <p className="text-xs text-slate-700 font-medium leading-relaxed">
+                        🎉 StyleSync auto-detected <b>"{detectedCalendarEvent}"</b> on your Google Calendar! On the Outfit Canvas, it will automatically suggest a special <b>"Fit for Your Birthday"</b> celebration outfit.
+                      </p>
+
+                      <div className="pt-2 border-t border-rose-200/60">
+                        <label className="text-[10px] uppercase font-bold font-mono text-slate-500 block mb-1.5">
+                          Simulate Google Calendar Event Detection:
+                        </label>
+                        <div className="flex flex-wrap gap-1.5">
+                          {[
+                            'Birthday Party 🎉',
+                            'Anniversary Dinner 🍷',
+                            'Tech Job Interview 💼',
+                            'Beach Vacation 🏖️'
+                          ].map((evt) => (
+                            <button
+                              key={evt}
+                              type="button"
+                              onClick={() => handleCalendarEventSelect(evt)}
+                              className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-all ${
+                                detectedCalendarEvent === evt
+                                  ? 'bg-rose-600 text-white shadow-sm'
+                                  : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-300'
+                              }`}
+                            >
+                              {evt}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* 🌦️ REAL WEATHER API SYNC CARD */}
@@ -624,7 +704,6 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
                     </div>
                   </div>
 
-                  {/* Toggle Switch */}
                   <button
                     onClick={() => handleIntegrationToggle('weatherSync')}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 shrink-0 ${
@@ -664,15 +743,11 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
                         <span className="text-sm font-extrabold text-slate-900">{weatherData.condition}</span>
                       </div>
                     </div>
-
-                    <p className="text-[11px] text-slate-600 leading-snug">
-                      🟢 <b>Real-time outfit recommendation:</b> Based on your live {weatherData.temp}°C weather forecast, StyleSync auto-selects breathable linen shirts & lightweight trousers for high heat!
-                    </p>
                   </div>
                 )}
               </div>
 
-              {/* 🎴 REAL CONTACTS SYNC & SHARE CARD */}
+              {/* 🎴 REAL CONTACTS SYNC CARD */}
               <div className="p-5 rounded-2xl border border-indigo-200 bg-gradient-to-r from-indigo-50/90 to-purple-50/60 space-y-4 shadow-sm">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
@@ -688,7 +763,6 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
                     </div>
                   </div>
 
-                  {/* Toggle Switch */}
                   <button
                     onClick={() => handleIntegrationToggle('contactsSync')}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 shrink-0 ${
@@ -754,10 +828,8 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
 
         </div>
 
-        {/* Footer Actions / Stepper Control Buttons */}
+        {/* Footer Actions */}
         <div className="p-4 sm:p-5 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 shrink-0">
-          
-          {/* Left Action: Sign Out or Back */}
           <div>
             {currentStep > 1 ? (
               <button
@@ -782,7 +854,6 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
             )}
           </div>
 
-          {/* Right Action: Next Step or Finish */}
           <div className="flex items-center gap-2 ml-auto">
             {currentStep < 3 ? (
               <button
