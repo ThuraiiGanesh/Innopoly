@@ -342,6 +342,51 @@ export default function Hero({ user, onNavigate, onOpenLogin }) {
           </button>
         </div>
 
+        {/* Onboarding Flow: 5 Sequential Steps Before Proceeding */}
+        <div className="w-full max-w-4xl p-5 sm:p-6 rounded-3xl border border-emerald-500/30 bg-slate-900/90 backdrop-blur-2xl shadow-2xl mb-8 text-left">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <span className="text-xs font-mono font-extrabold uppercase tracking-wider text-emerald-400">
+                User Onboarding Journey (Steps 1–5)
+              </span>
+            </div>
+            <span className="text-[10px] font-mono text-slate-400">First-Time User Setup</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-5 gap-2.5">
+            <div className="p-3 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-emerald-500/50 transition-all flex flex-col justify-between">
+              <span className="text-[10px] font-mono font-bold text-emerald-400 mb-1">01. STEP 1</span>
+              <h4 className="text-xs font-extrabold text-white leading-tight">Sign Up / Login</h4>
+              <p className="text-[10px] text-slate-400 mt-1">Access your saved profile session.</p>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-emerald-500/50 transition-all flex flex-col justify-between">
+              <span className="text-[10px] font-mono font-bold text-emerald-400 mb-1">02. STEP 2</span>
+              <h4 className="text-xs font-extrabold text-white leading-tight">Style Aesthetic</h4>
+              <p className="text-[10px] text-slate-400 mt-1">Select style themes to discover.</p>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-emerald-500/50 transition-all flex flex-col justify-between">
+              <span className="text-[10px] font-mono font-bold text-emerald-400 mb-1">03. STEP 3</span>
+              <h4 className="text-xs font-extrabold text-white leading-tight">Body Metrics</h4>
+              <p className="text-[10px] text-slate-400 mt-1">Full body measurements profile.</p>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-emerald-500/50 transition-all flex flex-col justify-between">
+              <span className="text-[10px] font-mono font-bold text-emerald-400 mb-1">04. STEP 4</span>
+              <h4 className="text-xs font-extrabold text-white leading-tight">Store Budget</h4>
+              <p className="text-[10px] text-slate-400 mt-1">Set store spending cap (SGD).</p>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-emerald-500/50 transition-all flex flex-col justify-between">
+              <span className="text-[10px] font-mono font-bold text-emerald-400 mb-1">05. STEP 5</span>
+              <h4 className="text-xs font-extrabold text-white leading-tight">Color Season</h4>
+              <p className="text-[10px] text-slate-400 mt-1">Undertone analysis & palette.</p>
+            </div>
+          </div>
+        </div>
+
         {/* Feature Quick Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 w-full max-w-3xl text-left mb-8">
           <div 
@@ -382,9 +427,9 @@ export default function Hero({ user, onNavigate, onOpenLogin }) {
               <User className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-sm font-extrabold text-white block">Creators</span>
+              <span className="text-sm font-extrabold text-white block">Discover</span>
               <p className="text-[11px] text-slate-300 leading-normal font-medium">
-                Match cuts to your height & waist.
+                Outfits matched to your metrics & trending creators.
               </p>
             </div>
           </div>

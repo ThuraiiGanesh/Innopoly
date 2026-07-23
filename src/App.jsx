@@ -255,6 +255,8 @@ export default function App() {
         isOpen={profileModalOpen}
         onClose={() => setProfileModalOpen(false)}
         user={user}
+        currentBudget={currentBudget}
+        onBudgetChange={handleBudgetChange}
         onSaveMetrics={(metrics) => {
           showToast("Saved body metrics & style preferences!", "success");
         }}

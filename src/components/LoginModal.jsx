@@ -75,28 +75,33 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialReg
       <div className="glass-panel w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden bg-white border border-black/10">
         
         {/* Brand Header */}
-        <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-black text-white flex items-center justify-center shadow-md">
-              <Shirt className="w-5 h-5 text-emerald-400" />
-            </div>
-            <div>
-              <h3 className="text-lg font-extrabold text-slate-900 leading-tight">
-                {isRegister ? 'Create Your Account' : 'Sign In to StyleSync'}
-              </h3>
-              <span className="text-[11px] text-slate-500 font-mono">
-                Fashion-Tech Digital Wardrobe Engine
-              </span>
-            </div>
+        <div className="border-b border-slate-100 pb-4 mb-5">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-mono text-[10px] font-bold mb-2 border border-emerald-200">
+            <Sparkles className="w-3 h-3 text-emerald-600" /> STEP 1 OF 5: SIGN UP & LOGIN
           </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-2xl bg-black text-white flex items-center justify-center shadow-md">
+                <Shirt className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-extrabold text-slate-900 leading-tight">
+                  {isRegister ? 'Create Your Account' : 'Sign In to StyleSync'}
+                </h3>
+                <span className="text-[11px] text-slate-500 font-mono">
+                  Fashion-Tech Digital Wardrobe Engine
+                </span>
+              </div>
+            </div>
 
-          <button
-            onClick={() => { onClose(); resetForm(); }}
-            className="p-2 text-slate-400 hover:text-black rounded-full bg-slate-100 hover:bg-slate-200 transition-colors"
-            title="Close"
-          >
-            <X className="w-4 h-4" />
-          </button>
+            <button
+              onClick={() => { onClose(); resetForm(); }}
+              className="p-2 text-slate-400 hover:text-black rounded-full bg-slate-100 hover:bg-slate-200 transition-colors"
+              title="Close"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Tab Switcher */}

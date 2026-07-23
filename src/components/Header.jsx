@@ -7,7 +7,7 @@ export default function Header({ user, activeTab, onTabChange, onOpenLogin, onLo
     { id: 'color', label: '🎨 Color Season', icon: Palette },
     { id: 'closet', label: 'My Closet', icon: Layers },
     { id: 'styling', label: 'Outfit Canvas', icon: Sparkles },
-    { id: 'creators', label: 'Creators', icon: User },
+    { id: 'creators', label: 'Discover', icon: User },
     { id: 'compliance', label: 'Store Budget', icon: Sliders }
   ];
 
@@ -16,7 +16,7 @@ export default function Header({ user, activeTab, onTabChange, onOpenLogin, onLo
     { id: 'color', label: 'Color', icon: Palette },
     { id: 'closet', label: 'Closet', icon: Layers },
     { id: 'styling', label: 'Canvas', icon: Sparkles },
-    { id: 'creators', label: 'Creators', icon: User }
+    { id: 'creators', label: 'Discover', icon: User }
   ];
 
   return (

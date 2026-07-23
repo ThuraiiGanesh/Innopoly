@@ -24,7 +24,11 @@ import {
   PhoneCall,
   Send,
   Calendar,
-  Gift
+  Gift,
+  DollarSign,
+  Edit3,
+  Sun,
+  Sliders
 } from 'lucide-react';
 import { 
   DEFAULT_BODY_METRICS, 
@@ -37,13 +41,51 @@ import {
   saveUserIntegrationsInDB,
   getUserIntegrationsFromDB
 } from '../utils/database';
+import { STORE_TIERS } from '../data/mockData';
 
-export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMetrics, onLogout, onCompleteOnboarding }) {
-  const [currentStep, setCurrentStep] = useState(1); // 1: Style Theme, 2: Body Metrics, 3: App Integrations
+const TOTAL_STEPS = 5;
+
+// Color season data used in Step 4
+const SEASONS_DATA = {
+  autumn: {
+    id: 'autumn', title: 'Warm Autumn', undertone: 'Warm Golden & Olive',
+    description: 'Rich, earthy warm tones like Terracotta, Olive, Mustard illuminate your complexion.',
+    palette: ['#994d1c', '#6b8e23', '#cc7722', '#d2b48c', '#8b4513'],
+    tags: ['Terracotta', 'Olive', 'Mustard', 'Warm Beige', 'Mahogany']
+  },
+  summer: {
+    id: 'summer', title: 'Cool Summer', undertone: 'Cool Rose & Slate',
+    description: 'Soft, muted pastel shades like Lavender, Slate Blue, Dusty Rose enhance your facial tones.',
+    palette: ['#4682b4', '#bc8f8f', '#d8bfd8', '#708090', '#b0c4de'],
+    tags: ['Slate Blue', 'Dusty Rose', 'Lavender', 'Charcoal', 'Soft Denim']
+  },
+  winter: {
+    id: 'winter', title: 'Bold Winter', undertone: 'Cool Blue & Porcelain',
+    description: 'High-contrast vivid shades like True Black, Stark White, Electric Blue for maximum impact.',
+    palette: ['#000000', '#dc143c', '#1e3a5f', '#ffffff', '#8b008b'],
+    tags: ['True Black', 'Crimson', 'Navy', 'Pure White', 'Magenta']
+  },
+  spring: {
+    id: 'spring', title: 'Bright Spring', undertone: 'Warm Peach & Ivory',
+    description: 'Clear, warm and lively tones like Coral, Bright Green, Sunny Yellow energize your look.',
+    palette: ['#ff6b6b', '#f9a825', '#4caf50', '#ff8a65', '#64b5f6'],
+    tags: ['Coral', 'Sunny Yellow', 'Fresh Green', 'Peach', 'Sky Blue']
+  }
+};
+
+export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMetrics, onLogout, onCompleteOnboarding, currentBudget, onBudgetChange }) {
+  const [currentStep, setCurrentStep] = useState(1);
   const [metrics, setMetrics] = useState(DEFAULT_BODY_METRICS);
   const [selectedThemes, setSelectedThemes] = useState(['old_money']);
   const [integrations, setIntegrations] = useState(DEFAULT_INTEGRATIONS);
   const [autoSaveStatus, setAutoSaveStatus] = useState('Auto-Restored');
+
+  // Store Budget state
+  const [budgetValue, setBudgetValue] = useState(currentBudget || 80);
+  const [customBudgetInput, setCustomBudgetInput] = useState(currentBudget || 80);
+
+  // Color Season state
+  const [selectedSeason, setSelectedSeason] = useState('autumn');
 
   // Real Weather API & Geolocation Live State
   const [weatherLoading, setWeatherLoading] = useState(false);
@@ -79,6 +121,8 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
       if (savedIntegrations.calendarEvent) {
         setDetectedCalendarEvent(savedIntegrations.calendarEvent);
       }
+      setBudgetValue(currentBudget || 80);
+      setCustomBudgetInput(currentBudget || 80);
       setCurrentStep(1);
 
       if (savedIntegrations.weatherSync) {
@@ -232,15 +276,38 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
     setTimeout(() => setAutoSaveStatus('Auto-Restored'), 1500);
   };
 
+  // Budget handlers
+  const handleBudgetPresetSelect = (tier) => {
+    setBudgetValue(tier.max);
+    setCustomBudgetInput(tier.max);
+    if (onBudgetChange) onBudgetChange(tier.max);
+  };
+
+  const handleCustomBudgetChange = (e) => {
+    const val = Math.max(1, Number(e.target.value) || 0);
+    setCustomBudgetInput(val);
+    setBudgetValue(val);
+    if (onBudgetChange) onBudgetChange(val);
+  };
+
   const handleSaveAndContinue = (e) => {
     e?.preventDefault();
     saveUserProfileMetricsInDB(user?.id, metrics);
     saveUserStyleThemeInDB(user?.id, selectedThemes);
     saveUserIntegrationsInDB(user?.id, { ...integrations, calendarEvent: detectedCalendarEvent });
     if (onSaveMetrics) onSaveMetrics(metrics);
+    if (onBudgetChange) onBudgetChange(budgetValue);
     if (onCompleteOnboarding) onCompleteOnboarding();
     onClose();
   };
+
+  const stepLabels = [
+    { icon: Palette, label: 'Style', full: `Step 2: Style Preference (${selectedThemes.length})` },
+    { icon: Ruler, label: 'Metrics', full: 'Step 3: Body Metrics Profile' },
+    { icon: DollarSign, label: 'Budget', full: 'Step 4: Store Budget' },
+    { icon: Sun, label: 'Color', full: 'Step 5: Color Season' },
+    { icon: Smartphone, label: 'Sync', full: 'App Sync' }
+  ];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-md animate-fade-in">
@@ -268,58 +335,48 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
           </button>
         </div>
 
-        {/* Stepper Navigation Header */}
-        <div className="bg-slate-100/80 border-b border-slate-200 px-4 py-2.5 flex items-center justify-around shrink-0 text-xs font-bold font-mono">
-          <button
-            onClick={() => setCurrentStep(1)}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-xl transition-all ${
-              currentStep === 1
-                ? 'bg-black text-white shadow-sm'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-            }`}
-          >
-            <Palette className="w-3.5 h-3.5 text-emerald-400" />
-            <span>1. Style Aesthetics ({selectedThemes.length})</span>
-          </button>
-
-          <ChevronRight className="w-4 h-4 text-slate-300 shrink-0" />
-
-          <button
-            onClick={() => setCurrentStep(2)}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-xl transition-all ${
-              currentStep === 2
-                ? 'bg-black text-white shadow-sm'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-            }`}
-          >
-            <Ruler className="w-3.5 h-3.5 text-emerald-400" />
-            <span>2. Body Metrics</span>
-          </button>
-
-          <ChevronRight className="w-4 h-4 text-slate-300 shrink-0" />
-
-          <button
-            onClick={() => setCurrentStep(3)}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-xl transition-all ${
-              currentStep === 3
-                ? 'bg-black text-white shadow-sm'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-            }`}
-          >
-            <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
-            <span>3. Integrations</span>
-          </button>
+        {/* Stepper Navigation Header — 5 steps */}
+        <div className="bg-slate-100/80 border-b border-slate-200 px-2 sm:px-4 py-2.5 flex items-center justify-around shrink-0 text-xs font-bold font-mono overflow-x-auto gap-1">
+          {stepLabels.map((step, idx) => {
+            const stepNum = idx + 1;
+            const Icon = step.icon;
+            return (
+              <React.Fragment key={stepNum}>
+                {idx > 0 && <ChevronRight className="w-3 h-3 text-slate-300 shrink-0 hidden sm:block" />}
+                <button
+                  onClick={() => setCurrentStep(stepNum)}
+                  className={`flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-xl transition-all whitespace-nowrap ${
+                    currentStep === stepNum
+                      ? 'bg-black text-white shadow-sm'
+                      : currentStep > stepNum
+                        ? 'text-emerald-700 hover:bg-emerald-50'
+                        : 'text-slate-500 hover:text-slate-900 hover:bg-white/60'
+                  }`}
+                >
+                  {currentStep > stepNum ? (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                  ) : (
+                    <Icon className="w-3.5 h-3.5 text-emerald-400" />
+                  )}
+                  <span className="hidden sm:inline">{step.full}</span>
+                  <span className="sm:hidden">{step.label}</span>
+                </button>
+              </React.Fragment>
+            );
+          })}
         </div>
 
         {/* Scrollable Content Body */}
         <div className="p-6 space-y-6 overflow-y-auto flex-1">
           
-          {/* STEP 1: MULTI-SELECT STYLE AESTHETICS */}
+          {/* ═══════════════════════════════════════════ */}
+          {/* STEP 1: MULTI-SELECT STYLE AESTHETICS      */}
+          {/* ═══════════════════════════════════════════ */}
           {currentStep === 1 && (
             <div className="space-y-4 animate-fade-in">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div>
-                  <span className="text-[10px] font-mono uppercase font-bold text-emerald-600 tracking-wider block">STEP 1 OF 3</span>
+                  <span className="text-[10px] font-mono uppercase font-bold text-emerald-600 tracking-wider block">STEP 1 OF {TOTAL_STEPS}</span>
                   <h4 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
                     <Palette className="w-4 h-4 text-emerald-600" /> Select Your Style Aesthetic Themes (Multi-Select)
                   </h4>
@@ -390,12 +447,14 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
             </div>
           )}
 
-          {/* STEP 2: BODY METRICS */}
+          {/* ═══════════════════════════════════════════ */}
+          {/* STEP 2: BODY METRICS                       */}
+          {/* ═══════════════════════════════════════════ */}
           {currentStep === 2 && (
             <div className="space-y-4 animate-fade-in">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div>
-                  <span className="text-[10px] font-mono uppercase font-bold text-emerald-600 tracking-wider block">STEP 2 OF 3</span>
+                  <span className="text-[10px] font-mono uppercase font-bold text-emerald-600 tracking-wider block">STEP 2 OF {TOTAL_STEPS}</span>
                   <h4 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
                     <Ruler className="w-4 h-4 text-slate-800" /> Full Body Metrics Profile
                   </h4>
@@ -502,7 +561,7 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
                       <input
                         type="number"
                         min="28"
-                        max="58"
+                        max="60"
                         value={metrics.hips}
                         onChange={(e) => handleMetricChange('hips', e.target.value)}
                         className="w-20 px-2.5 py-1 text-xs font-extrabold text-right font-mono bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
@@ -513,7 +572,7 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
                   <input
                     type="range"
                     min="28"
-                    max="58"
+                    max="60"
                     value={metrics.hips}
                     onChange={(e) => handleMetricChange('hips', e.target.value)}
                     className="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-black"
@@ -523,33 +582,33 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
                 {/* SHOULDERS */}
                 <div className="space-y-1.5">
                   <div className="flex justify-between items-center">
-                    <label className="text-xs uppercase font-bold text-slate-700 tracking-wider">SHOULDERS (CM)</label>
+                    <label className="text-xs uppercase font-bold text-slate-700 tracking-wider">SHOULDERS (INCHES)</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
-                        min="32"
-                        max="60"
+                        min="34"
+                        max="56"
                         value={metrics.shoulders}
                         onChange={(e) => handleMetricChange('shoulders', e.target.value)}
                         className="w-20 px-2.5 py-1 text-xs font-extrabold text-right font-mono bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                       />
-                      <span className="text-xs font-bold text-slate-500">cm</span>
+                      <span className="text-xs font-bold text-slate-500">in</span>
                     </div>
                   </div>
                   <input
                     type="range"
-                    min="32"
-                    max="60"
+                    min="34"
+                    max="56"
                     value={metrics.shoulders}
                     onChange={(e) => handleMetricChange('shoulders', e.target.value)}
                     className="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-black"
                   />
                 </div>
 
-                {/* INSEAM LENGTH */}
+                {/* INSEAM */}
                 <div className="space-y-1.5">
                   <div className="flex justify-between items-center">
-                    <label className="text-xs uppercase font-bold text-slate-700 tracking-wider">INSEAM LENGTH (INCHES)</label>
+                    <label className="text-xs uppercase font-bold text-slate-700 tracking-wider">INSEAM (INCHES)</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -572,11 +631,11 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
                   />
                 </div>
 
-                {/* BODY BUILD Selector */}
-                <div>
-                  <label className="text-xs uppercase font-bold text-slate-600 tracking-wider block mb-2 font-mono">BODY BUILD</label>
+                {/* BUILD TYPE QUICK PRESET */}
+                <div className="pt-3 border-t border-slate-100 space-y-2">
+                  <label className="text-xs uppercase font-bold text-slate-600 tracking-wider font-mono">Quick Build Preset</label>
                   <div className="grid grid-cols-4 gap-2">
-                    {['Slim', 'Athletic', 'Regular', 'Muscular'].map((b) => (
+                    {Object.keys(BUILD_PRESETS).map(b => (
                       <button
                         key={b}
                         type="button"
@@ -596,12 +655,202 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
             </div>
           )}
 
-          {/* STEP 3: REAL WEATHER, CONTACTS & GOOGLE CALENDAR SYNC */}
+          {/* ═══════════════════════════════════════════ */}
+          {/* STEP 3: STORE BUDGET (NEW)                 */}
+          {/* ═══════════════════════════════════════════ */}
           {currentStep === 3 && (
+            <div className="space-y-4 animate-fade-in">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div>
+                  <span className="text-[10px] font-mono uppercase font-bold text-emerald-600 tracking-wider block">STEP 3 OF {TOTAL_STEPS}</span>
+                  <h4 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                    <DollarSign className="w-4 h-4 text-emerald-600" /> Set Your Store Budget
+                  </h4>
+                </div>
+                <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-mono font-bold">
+                  Capped: ${budgetValue} SGD
+                </span>
+              </div>
+
+              <p className="text-xs text-slate-600">
+                Select a store budget tier arranged by clothing brand stores, or type your exact target price. All affiliate recommendations will be dynamically capped at your chosen budget.
+              </p>
+
+              <div className="glass-card p-5 sm:p-6 rounded-2xl border border-slate-200 bg-white space-y-5">
+                {/* Store Preset Budget Boxes */}
+                <div className="space-y-2.5">
+                  <label className="text-xs uppercase font-bold text-slate-600 tracking-wider block font-mono">
+                    Select Store Budget Range Box:
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {STORE_TIERS.map((tier) => {
+                      const isSelected = budgetValue === tier.max || (tier.id === 'all' && budgetValue >= 999);
+                      return (
+                        <div
+                          key={tier.id}
+                          onClick={() => handleBudgetPresetSelect(tier)}
+                          className={`p-4 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between ${
+                            isSelected
+                              ? 'bg-slate-950 text-white border-slate-950 shadow-md scale-[1.02]'
+                              : 'bg-white text-slate-900 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="text-xs font-extrabold">{tier.label}</span>
+                            {isSelected && <span className="text-[9px] font-mono bg-emerald-500 text-white px-2 py-0.5 rounded font-bold">ACTIVE</span>}
+                          </div>
+                          <span className={`text-[10px] font-mono block ${isSelected ? 'text-slate-300' : 'text-slate-500'}`}>
+                            {tier.sublabel}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Custom Exact Price Typing Input */}
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                  <label className="text-xs uppercase font-bold text-slate-700 tracking-wider flex items-center gap-1.5 mb-2 font-mono">
+                    <Edit3 className="w-3.5 h-3.5 text-indigo-600" /> Or Type Your Custom Target Price:
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <div className="relative flex-1">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono font-bold text-slate-400 text-sm">$</span>
+                      <input
+                        type="number"
+                        min="1"
+                        max="1000"
+                        value={customBudgetInput}
+                        onChange={handleCustomBudgetChange}
+                        placeholder="Enter max price (e.g. 50)"
+                        className="w-full bg-white border border-slate-300 rounded-xl pl-8 pr-16 py-2.5 text-sm font-extrabold text-slate-900 focus:outline-none focus:border-black focus:ring-1 focus:ring-black shadow-inner"
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 font-mono text-xs font-bold text-slate-500">SGD</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="glass-card p-4 rounded-2xl border border-emerald-200 bg-emerald-50/50">
+                  <h4 className="text-emerald-900 text-xs font-bold mb-1 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Active Store Budget Enforcement
+                  </h4>
+                  <p className="text-xs text-slate-700 leading-relaxed">
+                    All affiliate recommendations across our catalog are dynamically capped at <strong className="text-slate-900">${budgetValue} SGD</strong>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ═══════════════════════════════════════════ */}
+          {/* STEP 4: COLOR SEASON (NEW)                 */}
+          {/* ═══════════════════════════════════════════ */}
+          {currentStep === 4 && (
+            <div className="space-y-4 animate-fade-in">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div>
+                  <span className="text-[10px] font-mono uppercase font-bold text-emerald-600 tracking-wider block">STEP 4 OF {TOTAL_STEPS}</span>
+                  <h4 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                    <Palette className="w-4 h-4 text-emerald-600" /> Choose Your Color Season
+                  </h4>
+                </div>
+                <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-mono font-bold">
+                  🎨 {SEASONS_DATA[selectedSeason]?.title}
+                </span>
+              </div>
+
+              <p className="text-xs text-slate-600">
+                Your <b>color season</b> determines which clothing colors best complement your skin undertone. Select one below — this will influence color-matched recommendations across the app.
+              </p>
+
+              {/* Season Selection Cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {Object.values(SEASONS_DATA).map((season) => {
+                  const isSelected = selectedSeason === season.id;
+                  return (
+                    <button
+                      key={season.id}
+                      onClick={() => setSelectedSeason(season.id)}
+                      className={`p-4 rounded-2xl border text-left transition-all ${
+                        isSelected
+                          ? 'bg-slate-950 text-white border-slate-950 shadow-lg scale-[1.02]'
+                          : 'bg-white text-slate-900 border-slate-200 hover:border-slate-400 hover:shadow-md'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        {isSelected && <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />}
+                        <span className="text-xs font-extrabold">{season.title}</span>
+                      </div>
+                      <div className="flex gap-1 mb-2">
+                        {season.palette.map((hex, i) => (
+                          <div
+                            key={i}
+                            className="w-5 h-5 rounded-full border border-white/30"
+                            style={{ backgroundColor: hex }}
+                          />
+                        ))}
+                      </div>
+                      <span className={`text-[10px] font-mono ${isSelected ? 'text-slate-300' : 'text-slate-500'}`}>
+                        {season.undertone}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Expanded Season Detail */}
+              {selectedSeason && SEASONS_DATA[selectedSeason] && (
+                <div className="glass-card p-5 rounded-2xl border border-slate-200 bg-white space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex gap-1">
+                      {SEASONS_DATA[selectedSeason].palette.map((hex, i) => (
+                        <div
+                          key={i}
+                          className="w-8 h-8 rounded-xl border border-black/10 shadow-sm"
+                          style={{ backgroundColor: hex }}
+                        />
+                      ))}
+                    </div>
+                    <div>
+                      <h5 className="text-sm font-extrabold text-slate-900">{SEASONS_DATA[selectedSeason].title}</h5>
+                      <p className="text-[10px] text-slate-500 font-mono">{SEASONS_DATA[selectedSeason].undertone}</p>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-slate-700 leading-relaxed">
+                    {SEASONS_DATA[selectedSeason].description}
+                  </p>
+
+                  <div>
+                    <h6 className="text-[10px] uppercase font-bold font-mono text-slate-500 tracking-wider mb-2">Best Colors for You</h6>
+                    <div className="flex flex-wrap gap-2">
+                      {SEASONS_DATA[selectedSeason].tags.map((tag, i) => (
+                        <span
+                          key={i}
+                          className="px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-200 bg-slate-50 text-slate-800 flex items-center gap-1.5"
+                        >
+                          <div
+                            className="w-3.5 h-3.5 rounded-full border border-black/10"
+                            style={{ backgroundColor: SEASONS_DATA[selectedSeason].palette[i] || '#ccc' }}
+                          />
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ═══════════════════════════════════════════ */}
+          {/* STEP 5: INTEGRATIONS (Weather, Calendar, Contacts) */}
+          {/* ═══════════════════════════════════════════ */}
+          {currentStep === 5 && (
             <div className="space-y-5 animate-fade-in">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div>
-                  <span className="text-[10px] font-mono uppercase font-bold text-emerald-600 tracking-wider block">STEP 3 OF 3</span>
+                  <span className="text-[10px] font-mono uppercase font-bold text-emerald-600 tracking-wider block">STEP 5 OF {TOTAL_STEPS}</span>
                   <h4 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
                     <Smartphone className="w-4 h-4 text-emerald-600" /> Device & External App Live Sync
                   </h4>
@@ -855,13 +1104,13 @@ export default function ProfileDashboardModal({ isOpen, onClose, user, onSaveMet
           </div>
 
           <div className="flex items-center gap-2 ml-auto">
-            {currentStep < 3 ? (
+            {currentStep < TOTAL_STEPS ? (
               <button
                 type="button"
                 onClick={() => setCurrentStep(prev => prev + 1)}
                 className="primary-button px-6 py-2.5 text-xs uppercase font-extrabold tracking-wider flex items-center gap-2 shadow-md shimmer-hover"
               >
-                Next Step ({currentStep + 1} of 3) <ChevronRight className="w-4 h-4" />
+                Next Step ({currentStep + 1} of {TOTAL_STEPS}) <ChevronRight className="w-4 h-4" />
               </button>
             ) : (
               <button
