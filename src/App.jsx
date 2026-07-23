@@ -9,6 +9,7 @@ import BudgetCompliance from './components/BudgetCompliance';
 import PitchDeckModal from './components/PitchDeckModal';
 import ComplianceModal from './components/ComplianceModal';
 import LoginModal from './components/LoginModal';
+import ProfileDashboardModal from './components/ProfileDashboardModal';
 import Chatbot from './components/Chatbot';
 import Footer from './components/Footer';
 import Toast from './components/Toast';
@@ -38,6 +39,7 @@ export default function App() {
   const [pitchDeckOpen, setPitchDeckOpen] = useState(false);
   const [complianceOpen, setComplianceOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
 
   // Floating Toast Notification State
   const [toast, setToast] = useState({ message: '', type: 'success' });
@@ -102,7 +104,9 @@ export default function App() {
     setUser(loggedInUser);
     const userWardrobe = getUserWardrobeFromDB(loggedInUser.id, INITIAL_WARDROBE);
     setWardrobe(userWardrobe);
-    showToast(`Welcome back, ${loggedInUser.name}!`);
+    showToast(`Welcome, ${loggedInUser.name}!`);
+    // Automatically open Profile Dashboard Modal for user onboarding
+    setProfileModalOpen(true);
   };
 
   const handleLogout = () => {
@@ -132,6 +136,7 @@ export default function App() {
         activeTab={activeTab}
         onTabChange={handleNavigate}
         onOpenLogin={() => setLoginModalOpen(true)}
+        onOpenProfile={() => setProfileModalOpen(true)}
         onLogout={handleLogout}
         onOpenPitch={() => setPitchDeckOpen(true)}
       />
@@ -181,7 +186,9 @@ export default function App() {
         {activeTab === 'creators' && (
           <div className="animate-fade-in-up">
             <BodyCreatorMatcher
+              user={user}
               onSelectCreatorOutfit={handleSelectCreatorOutfit}
+              onOpenProfile={() => setProfileModalOpen(true)}
             />
           </div>
         )}
@@ -238,6 +245,17 @@ export default function App() {
         isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
         onLoginSuccess={handleLoginSuccess}
+      />
+
+      {/* Profile & Body Metrics Dashboard Modal */}
+      <ProfileDashboardModal
+        isOpen={profileModalOpen}
+        onClose={() => setProfileModalOpen(false)}
+        user={user}
+        onSaveMetrics={(metrics) => {
+          showToast("Saved body metrics profile!", "success");
+        }}
+        onLogout={handleLogout}
       />
 
       {/* Pitch Deck Modal */}

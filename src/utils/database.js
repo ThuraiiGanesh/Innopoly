@@ -1,9 +1,20 @@
-// StyleSync Client-Side Persistent Database Layer (User Auth & Per-User Storage)
+// StyleSync Client-Side Persistent Database Layer (User Auth, Body Metrics & Storage)
 
 const STORAGE_KEYS = {
   USERS: 'stylesync_db_users',
   CURRENT_USER: 'stylesync_db_current_user',
-  WARDROBE_PREFIX: 'stylesync_db_wardrobe_'
+  WARDROBE_PREFIX: 'stylesync_db_wardrobe_',
+  METRICS_PREFIX: 'stylesync_db_metrics_'
+};
+
+export const DEFAULT_BODY_METRICS = {
+  height: 178,   // cm
+  chest: 38,     // inches
+  waist: 30,     // inches
+  hips: 38,      // inches
+  shoulders: 44, // cm
+  inseam: 30,    // inches
+  build: 'Athletic'
 };
 
 const DEFAULT_USER = {
@@ -12,7 +23,8 @@ const DEFAULT_USER = {
   email: 'alex@stylesync.ai',
   password: 'demo',
   avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-  budgetCap: 50
+  budgetCap: 50,
+  bodyMetrics: DEFAULT_BODY_METRICS
 };
 
 export const initDatabase = () => {
@@ -63,7 +75,9 @@ export const registerUser = (name, email, password) => {
     email: email.trim().toLowerCase(),
     password: password,
     avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
-    budgetCap: 50
+    budgetCap: 50,
+    bodyMetrics: DEFAULT_BODY_METRICS,
+    isFirstLogin: true
   };
 
   users.push(newUser);
@@ -78,7 +92,6 @@ export const loginUser = (email, password) => {
   const found = users.find(u => u.email.toLowerCase() === email.trim().toLowerCase());
 
   if (!found) {
-    // If not registered yet, auto-register for frictionless testing
     return registerUser(email.split('@')[0], email, password);
   }
 
@@ -102,6 +115,28 @@ export const saveUserWardrobeInDB = (userId, wardrobe) => {
 export const getUserWardrobeFromDB = (userId, fallback) => {
   try {
     const key = userId ? `${STORAGE_KEYS.WARDROBE_PREFIX}${userId}` : 'stylesync_db_wardrobe_guest';
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : fallback;
+  } catch (e) {
+    return fallback;
+  }
+};
+
+export const saveUserProfileMetricsInDB = (userId, metrics) => {
+  const key = userId ? `${STORAGE_KEYS.METRICS_PREFIX}${userId}` : 'stylesync_db_metrics_guest';
+  localStorage.setItem(key, JSON.stringify(metrics));
+  
+  // Also update current user object in storage if logged in
+  const currentUser = getCurrentUser();
+  if (currentUser && currentUser.id === userId) {
+    currentUser.bodyMetrics = metrics;
+    setCurrentUserInDB(currentUser);
+  }
+};
+
+export const getUserProfileMetricsFromDB = (userId, fallback = DEFAULT_BODY_METRICS) => {
+  try {
+    const key = userId ? `${STORAGE_KEYS.METRICS_PREFIX}${userId}` : 'stylesync_db_metrics_guest';
     const data = localStorage.getItem(key);
     return data ? JSON.parse(data) : fallback;
   } catch (e) {

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Camera, User, Shirt, LogIn, LogOut, Sparkles, Layers, Palette, ShieldCheck, Home, Sun } from 'lucide-react';
+import { Camera, User, Shirt, LogIn, LogOut, Sparkles, Layers, Palette, ShieldCheck, Home, Sun, Settings } from 'lucide-react';
 
-export default function Header({ user, activeTab, onTabChange, onOpenLogin, onLogout, onOpenPitch }) {
+export default function Header({ user, activeTab, onTabChange, onOpenLogin, onLogout, onOpenProfile }) {
   const desktopTabs = [
     { id: 'home', label: 'Home', icon: Home },
     { id: 'weather', label: '🌦️ Weather AI', icon: Sun },
@@ -69,16 +69,21 @@ export default function Header({ user, activeTab, onTabChange, onOpenLogin, onLo
           <div className="flex items-center gap-2">
             {user ? (
               <div className="flex items-center gap-1.5">
-                <div className="flex items-center gap-1.5 bg-slate-100 p-1 pr-2.5 rounded-full border border-slate-200">
+                <button
+                  onClick={onOpenProfile}
+                  title="Open User Profile & Body Metrics Dashboard"
+                  className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 p-1 pr-2.5 rounded-full border border-slate-200 transition-colors"
+                >
                   <img
                     src={user.avatar}
                     alt={user.name}
-                    className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover"
+                    className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover border border-white"
                   />
                   <span className="text-[11px] sm:text-xs font-bold text-slate-900 truncate max-w-[80px] sm:max-w-[120px]">
                     {user.name}
                   </span>
-                </div>
+                  <Settings className="w-3 h-3 text-slate-400 ml-0.5" />
+                </button>
                 <button
                   onClick={onLogout}
                   className="p-1.5 text-slate-500 hover:text-red-600 rounded-full hover:bg-red-50 transition-colors"

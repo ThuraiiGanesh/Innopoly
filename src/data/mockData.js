@@ -137,8 +137,8 @@ export const TEMPLATES = [
     missingCount: 1,
     missingItemName: 'Textured Linen Blend Blazer',
     missingItemPrice: 49.90,
-    affiliateLink: 'https://shopee.sg/product/linen-blazer',
-    merchant: 'Zalora / Shopee Mall',
+    affiliateLink: 'https://www.zalora.sg/',
+    merchant: 'Zalora SG',
     colorsAvailable: ['#18181b', '#d4b996', '#1e293b', '#475569']
   },
   {
@@ -151,8 +151,8 @@ export const TEMPLATES = [
     missingCount: 1,
     missingItemName: 'Wide-Leg Olive Cargo Pants',
     missingItemPrice: 28.90,
-    affiliateLink: 'https://shopee.sg/product/cargo-pants',
-    merchant: 'Shopee Preferred / Uniqlo',
+    affiliateLink: 'https://shopee.sg/',
+    merchant: 'Shopee Mall',
     colorsAvailable: ['#18181b', '#3f6212', '#27272a']
   },
   {
@@ -165,8 +165,8 @@ export const TEMPLATES = [
     missingCount: 1,
     missingItemName: 'Double-Monk Strap Leather Shoes',
     missingItemPrice: 68.00,
-    affiliateLink: 'https://amazon.sg/product/oxford-shoes',
-    merchant: 'Amazon Fashion',
+    affiliateLink: 'https://www.zalora.sg/',
+    merchant: 'Zalora SG',
     colorsAvailable: ['#1e1b4b', '#09090b', '#3f3f46']
   },
   {
@@ -179,7 +179,7 @@ export const TEMPLATES = [
     missingCount: 1,
     missingItemName: 'Nike Dri-FIT Performance Joggers',
     missingItemPrice: 39.90,
-    affiliateLink: 'https://nike.com/product/joggers',
+    affiliateLink: 'https://www.nike.com/sg/',
     merchant: 'Nike Official Store',
     colorsAvailable: ['#18181b', '#27272a', '#ffffff']
   },
@@ -193,9 +193,52 @@ export const TEMPLATES = [
     missingCount: 2,
     missingItemName: 'Camp-Collar Sage Green Shirt',
     missingItemPrice: 24.90,
-    affiliateLink: 'https://lazada.sg/product/camp-shirt',
-    merchant: 'ASOS / Lazada',
+    affiliateLink: 'https://www.asos.com/',
+    merchant: 'ASOS Official',
     colorsAvailable: ['#15803d', '#f59e0b', '#0284c7', '#ffffff']
+  }
+];
+
+export const STORE_TIERS = [
+  {
+    id: 'budget',
+    label: 'Under $30 SGD',
+    sublabel: 'Budget Stores (Shopee / Shein / Taobao)',
+    min: 0,
+    max: 30,
+    stores: ['Shopee Mall', 'Shein SG']
+  },
+  {
+    id: 'mid',
+    label: '$30 - $80 SGD',
+    sublabel: 'Mid-Range Stores (Uniqlo / ZARA / Cotton On)',
+    min: 30,
+    max: 80,
+    stores: ['Uniqlo Official', 'ZARA']
+  },
+  {
+    id: 'premium',
+    label: '$80 - $150 SGD',
+    sublabel: 'Premium Stores (Zalora / ASOS / Mango)',
+    min: 80,
+    max: 150,
+    stores: ['Zalora SG', 'ASOS Official']
+  },
+  {
+    id: 'luxury',
+    label: '$150+ SGD',
+    sublabel: 'Luxury & Designer Stores (Nike / Coach)',
+    min: 150,
+    max: 999,
+    stores: ['Nike Official Store']
+  },
+  {
+    id: 'all',
+    label: 'All Prices',
+    sublabel: 'Show All Brand Store Recommendations',
+    min: 0,
+    max: 999,
+    stores: ['All Stores']
   }
 ];
 
@@ -205,7 +248,8 @@ export const AFFILIATE_PRODUCTS = [
     name: 'Uniqlo AIRism Cotton Oversized Tee',
     price: 19.90,
     rating: 4.9,
-    merchant: 'Uniqlo Official',
+    merchant: 'UNIQLO OFFICIAL',
+    url: 'https://www.uniqlo.com/sg/en/',
     commissionRate: '8%',
     category: 'Tops',
     image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300&auto=format&fit=crop&q=80',
@@ -221,7 +265,8 @@ export const AFFILIATE_PRODUCTS = [
     name: 'Shopee Preferred Wide-Leg Denim',
     price: 15.80,
     rating: 4.8,
-    merchant: 'Shopee Mall (Cheapest Verified)',
+    merchant: 'SHOPEE MALL (CHEAPEST VERIFIED)',
+    url: 'https://shopee.sg/',
     commissionRate: '12%',
     category: 'Bottoms',
     image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=300&auto=format&fit=crop&q=80',
@@ -236,7 +281,8 @@ export const AFFILIATE_PRODUCTS = [
     name: 'Zalora Essentials Linen Blend Blazer',
     price: 45.00,
     rating: 4.7,
-    merchant: 'Zalora SG',
+    merchant: 'ZALORA SG',
+    url: 'https://www.zalora.sg/',
     commissionRate: '15%',
     category: 'Outerwear',
     image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=300&auto=format&fit=crop&q=80',
@@ -251,13 +297,44 @@ export const AFFILIATE_PRODUCTS = [
     name: 'ASOS Minimalist White Leather Sneakers',
     price: 38.50,
     rating: 4.6,
-    merchant: 'ASOS Official',
+    merchant: 'ASOS OFFICIAL',
+    url: 'https://www.asos.com/',
     commissionRate: '10%',
     category: 'Shoes',
     image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=300&auto=format&fit=crop&q=80',
     colors: [
       { name: 'Minimal White', hex: '#f8fafc' },
       { name: 'Off-White Cream', hex: '#fef3c7' }
+    ]
+  },
+  {
+    id: 'p5',
+    name: 'Shein Casual Ribbed Knit Crop Top',
+    price: 9.90,
+    rating: 4.5,
+    merchant: 'SHEIN SG',
+    url: 'https://sg.shein.com/',
+    commissionRate: '14%',
+    category: 'Tops',
+    image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=300&auto=format&fit=crop&q=80',
+    colors: [
+      { name: 'Sage Green', hex: '#15803d' },
+      { name: 'Soft Cream', hex: '#fef3c7' }
+    ]
+  },
+  {
+    id: 'p6',
+    name: 'Nike Dri-FIT Tech Fleece Joggers',
+    price: 119.00,
+    rating: 4.9,
+    merchant: 'NIKE OFFICIAL STORE',
+    url: 'https://www.nike.com/sg/',
+    commissionRate: '9%',
+    category: 'Bottoms',
+    image: 'https://images.unsplash.com/photo-1483721074892-4a8580712694?w=300&auto=format&fit=crop&q=80',
+    colors: [
+      { name: 'Heather Grey', hex: '#71717a' },
+      { name: 'Obsidian Black', hex: '#09090b' }
     ]
   }
 ];

@@ -1,20 +1,28 @@
-import React, { useState } from 'react';
-import { User, Ruler, Sparkles, CheckCircle2, Copy, Users, DollarSign, Shirt } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User, Ruler, Sparkles, CheckCircle2, Copy, Users, DollarSign, Shirt, Settings, Check } from 'lucide-react';
 import { CREATORS } from '../data/mockData';
+import { DEFAULT_BODY_METRICS, getUserProfileMetricsFromDB, saveUserProfileMetricsInDB } from '../utils/database';
 
-export default function BodyCreatorMatcher({ onSelectCreatorOutfit }) {
-  const [height, setHeight] = useState(178); // cm
-  const [chest, setChest] = useState(38); // inches (Bust/Chest)
-  const [waist, setWaist] = useState(30); // inches
-  const [hips, setHips] = useState(38); // inches
-  const [shoulders, setShoulders] = useState(44); // cm
-  const [inseam, setInseam] = useState(30); // inches
-  const [build, setBuild] = useState('Athletic');
+export default function BodyCreatorMatcher({ user, onSelectCreatorOutfit, onOpenProfile }) {
+  const [metrics, setMetrics] = useState(DEFAULT_BODY_METRICS);
   const [copiedId, setCopiedId] = useState(null);
+
+  useEffect(() => {
+    const saved = getUserProfileMetricsFromDB(user?.id, user?.bodyMetrics || DEFAULT_BODY_METRICS);
+    setMetrics(saved);
+  }, [user]);
+
+  const { height, chest, waist, hips, shoulders, inseam, build } = metrics;
 
   const feet = Math.floor(height / 30.48);
   const inches = Math.round((height % 30.48) / 2.54);
   const heightFormatted = `${height} cm (${feet}'${inches}")`;
+
+  const updateMetric = (key, val) => {
+    const next = { ...metrics, [key]: val };
+    setMetrics(next);
+    saveUserProfileMetricsInDB(user?.id, next);
+  };
 
   const getAIStyleAdvice = () => {
     if (height >= 180 && waist <= 32) {
@@ -62,30 +70,42 @@ export default function BodyCreatorMatcher({ onSelectCreatorOutfit }) {
     <section id="creator-matcher" className="py-16 px-6 max-w-7xl mx-auto scroll-mt-20">
       <div className="text-center max-w-2xl mx-auto mb-12">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-pill text-xs tracking-wider uppercase text-slate-700 font-semibold mb-3">
-          <User className="w-3.5 h-3.5" /> Body Metrics & Creator Alignment
+          <User className="w-3.5 h-3.5 text-indigo-600" /> Saved Body Metrics Profile
         </div>
         <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 mb-3">
           Creator Looks, Photos & Total Outfit Costs
         </h2>
         <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-          Explore full outfit photos from creators matching your exact body metrics profile (Bust/Chest, Waist, Hips, Shoulders & Inseam) with complete itemized costs.
+          Matches creators to your exact saved body metrics (Height, Bust, Waist, Hips, Shoulders & Inseam). Automatically restored from your user profile!
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column: Body Profile Sliders & AI Advice */}
+        {/* Left Column: Saved Body Profile Banner & Controls */}
         <div className="lg:col-span-5 glass-panel p-6 sm:p-8 rounded-3xl flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-6 border-b border-black/5 pb-4">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4 border-b border-black/5 pb-4">
               <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                 <Ruler className="w-4 h-4 text-slate-800" /> Full Body Metrics Profile
               </h3>
-              <span className="text-xs font-mono text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full">
-                6 Dimensions
-              </span>
+              <button
+                onClick={onOpenProfile}
+                className="text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-full border border-indigo-200 transition-colors flex items-center gap-1"
+              >
+                <Settings className="w-3 h-3" /> Profile Settings
+              </button>
             </div>
 
-            <div className="space-y-4 max-h-[460px] overflow-y-auto pr-1">
+            {/* Profile Saved Status Pill */}
+            <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold flex items-center justify-between mb-5">
+              <span className="flex items-center gap-1.5 font-mono text-[11px]">
+                <Check className="w-4 h-4 text-emerald-600 shrink-0" /> Saved in Profile Dashboard
+              </span>
+              <span className="text-[10px] font-bold text-emerald-700 font-mono">Auto-Restored</span>
+            </div>
+
+            <div className="space-y-4 max-h-[440px] overflow-y-auto pr-1">
               {/* Height Slider */}
               <div>
                 <div className="flex justify-between items-center mb-1">
@@ -99,7 +119,7 @@ export default function BodyCreatorMatcher({ onSelectCreatorOutfit }) {
                   min="150"
                   max="195"
                   value={height}
-                  onChange={(e) => setHeight(Number(e.target.value))}
+                  onChange={(e) => updateMetric('height', Number(e.target.value))}
                   className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-black"
                 />
               </div>
@@ -117,7 +137,7 @@ export default function BodyCreatorMatcher({ onSelectCreatorOutfit }) {
                   min="30"
                   max="52"
                   value={chest}
-                  onChange={(e) => setChest(Number(e.target.value))}
+                  onChange={(e) => updateMetric('chest', Number(e.target.value))}
                   className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-black"
                 />
               </div>
@@ -135,7 +155,7 @@ export default function BodyCreatorMatcher({ onSelectCreatorOutfit }) {
                   min="24"
                   max="44"
                   value={waist}
-                  onChange={(e) => setWaist(Number(e.target.value))}
+                  onChange={(e) => updateMetric('waist', Number(e.target.value))}
                   className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-black"
                 />
               </div>
@@ -151,9 +171,9 @@ export default function BodyCreatorMatcher({ onSelectCreatorOutfit }) {
                 <input
                   type="range"
                   min="30"
-                  max="54"
+                  max="50"
                   value={hips}
-                  onChange={(e) => setHips(Number(e.target.value))}
+                  onChange={(e) => updateMetric('hips', Number(e.target.value))}
                   className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-black"
                 />
               </div>
@@ -168,15 +188,15 @@ export default function BodyCreatorMatcher({ onSelectCreatorOutfit }) {
                 </div>
                 <input
                   type="range"
-                  min="35"
-                  max="58"
+                  min="36"
+                  max="54"
                   value={shoulders}
-                  onChange={(e) => setShoulders(Number(e.target.value))}
+                  onChange={(e) => updateMetric('shoulders', Number(e.target.value))}
                   className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-black"
                 />
               </div>
 
-              {/* Inseam Slider */}
+              {/* Inseam Length Slider */}
               <div>
                 <div className="flex justify-between items-center mb-1">
                   <label className="text-xs uppercase font-semibold text-slate-600 tracking-wider">Inseam Length</label>
@@ -189,25 +209,23 @@ export default function BodyCreatorMatcher({ onSelectCreatorOutfit }) {
                   min="26"
                   max="36"
                   value={inseam}
-                  onChange={(e) => setInseam(Number(e.target.value))}
+                  onChange={(e) => updateMetric('inseam', Number(e.target.value))}
                   className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-black"
                 />
               </div>
 
-              {/* Build Type Selector */}
+              {/* Body Build selector buttons */}
               <div>
-                <label className="block text-xs uppercase tracking-wider text-slate-500 mb-1.5 font-mono">
-                  Body Build
-                </label>
-                <div className="grid grid-cols-4 gap-1.5">
+                <label className="text-xs uppercase font-semibold text-slate-600 tracking-wider block mb-1.5">Body Build</label>
+                <div className="grid grid-cols-4 gap-2">
                   {['Slim', 'Athletic', 'Regular', 'Muscular'].map((b) => (
                     <button
                       key={b}
-                      onClick={() => setBuild(b)}
-                      className={`py-1.5 rounded-xl text-xs font-semibold transition-all border ${
+                      onClick={() => updateMetric('build', b)}
+                      className={`py-1.5 rounded-xl text-xs font-bold border transition-all ${
                         build === b
                           ? 'bg-black text-white border-black shadow-sm'
-                          : 'bg-white text-slate-600 border-slate-200 hover:border-black'
+                          : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300'
                       }`}
                     >
                       {b}
@@ -216,159 +234,116 @@ export default function BodyCreatorMatcher({ onSelectCreatorOutfit }) {
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* AI Silhouette Recommendation Box */}
-            <div className="glass-card p-4 rounded-2xl border border-slate-200 bg-slate-50 mt-4">
-              <div className="flex items-center gap-2 mb-1.5">
-                <Sparkles className="w-4 h-4 text-slate-900" />
-                <h4 className="text-slate-900 text-xs font-bold uppercase tracking-wider">
+          {/* AI Style Rules Box */}
+          <div className="mt-6 pt-4 border-t border-black/5">
+            <div className="glass-card p-4 rounded-2xl border border-indigo-200 bg-indigo-50/40">
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles className="w-4 h-4 text-indigo-600" />
+                <span className="text-xs font-bold text-slate-900 font-mono uppercase">
                   AI Proportion Rule: {aiAdvice.ratio}
-                </h4>
+                </span>
               </div>
-              <p className="text-xs text-slate-700 leading-relaxed mb-1">
+              <p className="text-xs text-slate-700 leading-relaxed mb-2">
                 <strong>Recommended Cuts:</strong> {aiAdvice.cuts}
               </p>
-              <p className="text-xs text-slate-500 leading-relaxed italic">
+              <p className="text-xs text-slate-500 italic">
                 <strong>Avoid:</strong> {aiAdvice.avoid}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Right Column: Matched Creator Cards with Full Outfit Photos & Total Costs */}
-        <div className="lg:col-span-7 glass-panel p-6 sm:p-8 rounded-3xl flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-6 border-b border-black/5 pb-4">
-              <div>
-                <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                  <Users className="w-4 h-4 text-slate-800" /> Creator Look Gallery & Total Costs
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Creators matching {heightFormatted}, {waist}" Waist
-                </p>
-              </div>
-              <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-mono font-bold">
-                Matches Calculated
-              </span>
+        {/* Right Column: Matched Creator Cards */}
+        <div className="lg:col-span-7 space-y-4">
+          <div className="flex items-center justify-between glass-panel p-4 rounded-2xl border border-black/5">
+            <div className="flex items-center gap-2 font-mono text-xs font-bold text-slate-900">
+              <Users className="w-4 h-4 text-slate-700" />
+              <span>Matched Creators for ({height}cm, {waist}" waist)</span>
             </div>
+            <span className="text-xs text-slate-500 font-mono">Sorted by Match Score</span>
+          </div>
 
-            {/* Creators List */}
-            <div className="space-y-6 max-h-[520px] overflow-y-auto pr-1">
-              {matchedCreators.map((creator) => (
-                <div
-                  key={creator.id}
-                  className="glass-card p-5 rounded-3xl border border-slate-200 bg-white flex flex-col gap-4 group"
-                >
-                  {/* Top Header: Creator Avatar & Match Badge */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {matchedCreators.map((creator) => (
+              <div
+                key={creator.id}
+                className="glass-card rounded-2xl border border-black/10 overflow-hidden flex flex-col justify-between group hover:border-black/30 transition-all shadow-sm"
+              >
+                {/* Outfit Photo Preview */}
+                <div className="relative h-60 overflow-hidden bg-slate-100">
+                  <img
+                    src={creator.outfitImage}
+                    alt={creator.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  
+                  {/* Match Score Badge */}
+                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/80 backdrop-blur-md text-emerald-400 font-mono text-xs font-bold border border-emerald-500/40">
+                    ★ {creator.matchScore}% Match
+                  </div>
+
+                  {/* Creator Avatar & Handle */}
+                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white">
+                    <div className="flex items-center gap-2">
                       <img
                         src={creator.avatar}
                         alt={creator.name}
-                        className="w-12 h-12 rounded-full object-cover border border-slate-200 shadow-sm"
+                        className="w-8 h-8 rounded-full object-cover border border-white"
                       />
                       <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="text-slate-900 font-bold text-base">
-                            {creator.name}
-                          </h4>
-                          <span className="text-xs text-slate-500 font-mono">
-                            {creator.handle}
-                          </span>
-                        </div>
-                        <span className="text-xs text-slate-500">
-                          {creator.height}cm • {creator.waist}" Waist • {creator.build} Build
-                        </span>
+                        <h4 className="text-sm font-bold leading-tight">{creator.name}</h4>
+                        <span className="text-[10px] text-slate-300 font-mono">{creator.handle}</span>
                       </div>
                     </div>
-
-                    <div className="text-right">
-                      <span className="text-xs font-mono text-emerald-600 font-bold block">
-                        {creator.matchScore}% Match
-                      </span>
-                      <span className="text-[10px] text-slate-400 font-mono">
-                        {creator.followers} Followers
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Creator Outfit Showcase Photo & Breakdown */}
-                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
-                    <div className="sm:col-span-5 relative overflow-hidden rounded-xl">
-                      <img
-                        src={creator.outfitImage}
-                        alt={creator.featuredLook}
-                        className="w-full h-44 object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <span className="absolute bottom-2 left-2 bg-black/70 backdrop-blur-md text-white text-[10px] font-mono px-2 py-0.5 rounded-md font-bold">
-                        {creator.featuredLook}
-                      </span>
-                    </div>
-
-                    <div className="sm:col-span-7 flex flex-col justify-between space-y-2 text-xs">
-                      <div>
-                        <span className="text-[10px] text-slate-400 font-mono uppercase font-bold block mb-1">
-                          Itemized Outfit Breakdown:
-                        </span>
-                        <ul className="space-y-1 text-slate-700 font-sans">
-                          <li className="flex justify-between border-b border-slate-200/60 pb-1">
-                            <span>Top:</span>
-                            <strong className="text-slate-900 font-semibold">{creator.outfit.top}</strong>
-                          </li>
-                          <li className="flex justify-between border-b border-slate-200/60 pb-1">
-                            <span>Bottom:</span>
-                            <strong className="text-slate-900 font-semibold">{creator.outfit.bottom}</strong>
-                          </li>
-                          <li className="flex justify-between border-b border-slate-200/60 pb-1">
-                            <span>Outer:</span>
-                            <strong className="text-slate-900 font-semibold">{creator.outfit.outer}</strong>
-                          </li>
-                          <li className="flex justify-between">
-                            <span>Shoes:</span>
-                            <strong className="text-slate-900 font-semibold">{creator.outfit.shoes}</strong>
-                          </li>
-                        </ul>
-                      </div>
-
-                      {/* Total Cost Badge */}
-                      <div className="flex items-center justify-between pt-2 border-t border-slate-200 font-mono">
-                        <span className="text-slate-500 font-medium">Total Outfit Cost:</span>
-                        <span className="text-emerald-700 text-sm font-bold bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200">
-                          {creator.totalCost}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Action Button */}
-                  <div className="flex items-center justify-end">
-                    <button
-                      onClick={() => handleCopyLook(creator)}
-                      className={`w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs uppercase font-semibold flex items-center justify-center gap-2 transition-all ${
-                        copiedId === creator.id
-                          ? 'bg-emerald-600 text-white'
-                          : 'primary-button'
-                      }`}
-                    >
-                      {copiedId === creator.id ? (
-                        <>
-                          <CheckCircle2 className="w-4 h-4" /> Outfit Loaded into Canvas!
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-4 h-4" /> Copy Creator Look to Canvas
-                        </>
-                      )}
-                    </button>
+                    <span className="text-[11px] font-mono bg-white/20 backdrop-blur-md px-2 py-0.5 rounded text-slate-200">
+                      {creator.height}cm / {creator.waist}"
+                    </span>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
 
-          <p className="text-xs text-slate-400 mt-6 pt-4 border-t border-black/5 text-center">
-            * Creator Revenue Sharing: When you buy missing outfit pieces inspired by creators, creators earn a 70% commission split.
-          </p>
+                {/* Outfit Details & Items Breakdown */}
+                <div className="p-4 space-y-3 bg-white flex-1 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold text-slate-900">{creator.featuredLook}</span>
+                      <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                        Total: {creator.totalCost}
+                      </span>
+                    </div>
+
+                    <ul className="text-xs text-slate-600 space-y-1 font-mono">
+                      <li className="truncate">👕 {creator.outfit.top}</li>
+                      <li className="truncate">👖 {creator.outfit.bottom}</li>
+                      {creator.outfit.outer !== 'None' && <li className="truncate">🧥 {creator.outfit.outer}</li>}
+                      <li className="truncate">👟 {creator.outfit.shoes}</li>
+                    </ul>
+                  </div>
+
+                  <button
+                    onClick={() => handleCopyLook(creator)}
+                    className={`w-full py-2 rounded-xl text-xs uppercase font-bold tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-sm ${
+                      copiedId === creator.id
+                        ? 'bg-emerald-600 text-white'
+                        : 'primary-button'
+                    }`}
+                  >
+                    {copiedId === creator.id ? (
+                      <>
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Matched to Outfit Mixer!
+                      </>
+                    ) : (
+                      <>
+                        <Shirt className="w-3.5 h-3.5 text-white" /> Copy Creator Cut to Mixer
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
