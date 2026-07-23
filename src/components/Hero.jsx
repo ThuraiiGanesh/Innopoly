@@ -3,171 +3,70 @@ import {
   Sparkles, 
   Layers, 
   User, 
-  Sun, 
-  CloudRain, 
-  Cloud, 
-  Thermometer, 
   Palette, 
   LogIn, 
   UserPlus, 
   Lock, 
   ChevronRight, 
+  ChevronLeft,
   Camera,
   Shirt,
-  Compass,
   Zap,
-  MapPin,
-  RefreshCw,
-  Gift
+  Shuffle,
+  Play,
+  CheckCircle2,
+  Sliders
 } from 'lucide-react';
 
-// ================= DYNAMIC WEATHER BACKGROUND CANVAS COMPONENT =================
-function WeatherBackground({ weather }) {
-  const canvasRef = useRef(null);
+// Mix and Match Sample Reel Items for Landing Page Swiping
+const HERO_TOPS = [
+  { id: 'ht1', name: 'Black Oversized Crew Tee', color: '#18181b', colorName: 'Midnight Black', image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&auto=format&fit=crop&q=80', style: 'Smart Casual' },
+  { id: 'ht2', name: 'Open Collar Linen Camp Shirt', color: '#d4b996', colorName: 'Sand Beige', image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&auto=format&fit=crop&q=80', style: 'Resort Vacation' },
+  { id: 'ht3', name: 'Silk Draped Satin Top', color: '#065f46', colorName: 'Emerald Green', image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80', style: 'Formal Gala' },
+  { id: 'ht4', name: 'Heavyweight Boxy Graphic Tee', color: '#3f3f46', colorName: 'Charcoal Grey', image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=600&auto=format&fit=crop&q=80', style: 'Urban Streetwear' }
+];
 
+const HERO_BOTTOMS = [
+  { id: 'hb1', name: 'Tailored Straight Chinos', color: '#3f3f46', colorName: 'Charcoal Grey', image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&auto=format&fit=crop&q=80', style: 'Smart Casual' },
+  { id: 'hb2', name: 'Wide-Leg Indigo Denim', color: '#1e1b4b', colorName: 'Deep Indigo', image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=600&auto=format&fit=crop&q=80', style: 'Streetwear' },
+  { id: 'hb3', name: 'Uniqlo Smart Ankle Trousers', color: '#18181b', colorName: 'Midnight Black', image: 'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=600&auto=format&fit=crop&q=80', style: 'Old Money' },
+  { id: 'hb4', name: 'Tailored Cream Shorts', color: '#fef3c7', colorName: 'Cream White', image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&auto=format&fit=crop&q=80', style: 'Resort' }
+];
+
+const HERO_SHOES = [
+  { id: 'hs1', name: 'Classic White Leather Sneakers', color: '#ffffff', colorName: 'Pure White', image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&auto=format&fit=crop&q=80', style: 'Clean Fit' },
+  { id: 'hs2', name: 'Leather Penny Loafers', color: '#451a03', colorName: 'Chestnut Brown', image: 'https://images.unsplash.com/photo-1533867617858-e7b97e060509?w=600&auto=format&fit=crop&q=80', style: 'Quiet Luxury' },
+  { id: 'hs3', name: 'Retro High Canvas Kicks', color: '#18181b', colorName: 'Black Canvas', image: 'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=600&auto=format&fit=crop&q=80', style: 'Streetwear' },
+  { id: 'hs4', name: 'Pointed Slingback Heels', color: '#09090b', colorName: 'Obsidian', image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600&auto=format&fit=crop&q=80', style: 'Evening Formal' }
+];
+
+export default function Hero({ user, onNavigate, onOpenLogin }) {
+  const [topIdx, setTopIdx] = useState(0);
+  const [bottomIdx, setBottomIdx] = useState(0);
+  const [shoeIdx, setShoeIdx] = useState(0);
+  const [isAutoShuffling, setIsAutoShuffling] = useState(false);
+
+  // Auto-swipe/mix loop interval
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    let animationFrameId;
-
-    const handleResize = () => {
-      canvas.width = canvas.parentElement ? canvas.parentElement.clientWidth : window.innerWidth;
-      canvas.height = canvas.parentElement ? canvas.parentElement.clientHeight : window.innerHeight;
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-
-    let raindrops = [];
-    let sunDust = [];
-
-    const width = canvas.width;
-    const height = canvas.height;
-
-    // Initialize Sun Dust / Flares
-    if (weather === 'sunny') {
-      for (let i = 0; i < 40; i++) {
-        sunDust.push({
-          x: Math.random() * width,
-          y: Math.random() * height,
-          radius: Math.random() * 4 + 1.5,
-          speedX: (Math.random() - 0.5) * 0.4,
-          speedY: -Math.random() * 0.5 - 0.2,
-          opacity: Math.random() * 0.7 + 0.2
-        });
-      }
-    } else {
-      // Rain default
-      const dropCount = Math.floor(width / 10);
-      for (let i = 0; i < dropCount; i++) {
-        raindrops.push({
-          x: Math.random() * width,
-          y: Math.random() * height,
-          length: Math.random() * 25 + 18,
-          speed: Math.random() * 9 + 11,
-          opacity: Math.random() * 0.5 + 0.3,
-          thickness: Math.random() * 1.8 + 0.8
-        });
-      }
-    }
-
-    // Animation Loop
-    const render = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      if (weather === 'sunny') {
-        const gradient = ctx.createRadialGradient(
-          canvas.width * 0.8,
-          0,
-          20,
-          canvas.width * 0.8,
-          0,
-          canvas.width * 0.7
-        );
-        gradient.addColorStop(0, 'rgba(251, 191, 36, 0.3)');
-        gradient.addColorStop(0.5, 'rgba(245, 158, 11, 0.1)');
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        sunDust.forEach((particle) => {
-          ctx.beginPath();
-          ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(252, 211, 77, ${particle.opacity})`;
-          ctx.fill();
-
-          particle.x += particle.speedX;
-          particle.y += particle.speedY;
-
-          if (particle.y < 0) particle.y = canvas.height;
-          if (particle.x < 0) particle.x = canvas.width;
-          if (particle.x > canvas.width) particle.x = 0;
-        });
-      } else {
-        ctx.lineCap = 'round';
-        raindrops.forEach((drop) => {
-          ctx.beginPath();
-          ctx.lineWidth = drop.thickness;
-          ctx.strokeStyle = `rgba(56, 189, 248, ${drop.opacity})`;
-          ctx.moveTo(drop.x, drop.y);
-          ctx.lineTo(drop.x - drop.speed * 0.15, drop.y + drop.length);
-          ctx.stroke();
-
-          drop.y += drop.speed;
-          drop.x -= drop.speed * 0.15;
-
-          if (drop.y > canvas.height) {
-            drop.y = -drop.length;
-            drop.x = Math.random() * canvas.width;
-          }
-        });
-      }
-
-      animationFrameId = requestAnimationFrame(render);
-    };
-
-    render();
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, [weather]);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 z-0 pointer-events-none transition-opacity duration-1000"
-    />
-  );
-}
-
-export default function Hero({ user, onNavigate, onOpenLogin, onOpenRegister, onOpenCompliance }) {
-  const [currentWeather, setCurrentWeather] = useState('sunny');
-
-  useEffect(() => {
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          try {
-            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}&current_weather=true`);
-            const data = await res.json();
-            if (data && data.current_weather) {
-              const code = data.current_weather.weathercode;
-              if (code >= 51 && code <= 99) {
-                setCurrentWeather('rainy');
-              } else {
-                setCurrentWeather('sunny');
-              }
-            }
-          } catch (e) {
-            // default sunny
-          }
-        },
-        () => {}
-      );
-    }
+    const interval = setInterval(() => {
+      setTopIdx(prev => (prev + 1) % HERO_TOPS.length);
+      setBottomIdx(prev => (prev + 1) % HERO_BOTTOMS.length);
+      setShoeIdx(prev => (prev + 1) % HERO_SHOES.length);
+    }, 4500);
+    return () => clearInterval(interval);
   }, []);
+
+  const handleShuffle = () => {
+    setIsAutoShuffling(true);
+    setTopIdx(Math.floor(Math.random() * HERO_TOPS.length));
+    setBottomIdx(Math.floor(Math.random() * HERO_BOTTOMS.length));
+    setShoeIdx(Math.floor(Math.random() * HERO_SHOES.length));
+    setTimeout(() => setIsAutoShuffling(false), 500);
+  };
+
+  const currentTop = HERO_TOPS[topIdx];
+  const currentBottom = HERO_BOTTOMS[bottomIdx];
+  const currentShoe = HERO_SHOES[shoeIdx];
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -180,40 +79,196 @@ export default function Hero({ user, onNavigate, onOpenLogin, onOpenRegister, on
   const timeGreeting = getGreeting();
 
   return (
-    <section className="relative min-h-[80vh] bg-slate-950 text-white flex flex-col justify-center items-center px-4 sm:px-6 py-10 sm:py-16 text-center overflow-hidden border-b border-slate-800">
+    <section className="relative min-h-[90vh] bg-slate-950 text-white flex flex-col justify-center items-center px-4 sm:px-6 py-12 sm:py-16 text-center overflow-hidden border-b border-slate-800">
       
-      {/* Full-Screen Dynamic Weather Background */}
-      <WeatherBackground weather={currentWeather} />
+      {/* High-Definition Background Video Loop */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        poster="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&auto=format&fit=crop&q=80"
+        className="absolute inset-0 w-full h-full object-cover opacity-25 z-0 pointer-events-none filter saturate-150"
+      >
+        <source src="https://assets.mixkit.co/videos/preview/mixkit-fashion-model-in-a-photoshoot-41617-large.mp4" type="video/mp4" />
+        <source src="https://assets.mixkit.co/videos/preview/mixkit-model-walking-on-a-catwalk-41489-large.mp4" type="video/mp4" />
+      </video>
 
-      {/* Dark Overlay gradient for crisp 100% legibility */}
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/60 to-slate-950/90 pointer-events-none z-0" />
+      {/* Dark Overlay Gradient for 100% Crisp Legibility */}
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/85 via-slate-950/75 to-slate-950/95 pointer-events-none z-0" />
 
-      {/* Soft Center Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[600px] h-[400px] sm:h-[600px] bg-slate-800/20 rounded-full blur-[120px] pointer-events-none z-0" />
+      {/* Glow ambient background element */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] sm:w-[700px] h-[500px] sm:h-[700px] bg-emerald-600/10 rounded-full blur-[140px] pointer-events-none z-0" />
 
-      {/* Main Interactive Foreground Container */}
-      <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center w-full animate-fade-in">
+      {/* Main Foreground Container */}
+      <div className="relative z-10 max-w-5xl mx-auto flex flex-col items-center w-full animate-fade-in">
         
-        {/* Auto-Detected Weather Badge Banner */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border bg-amber-950/80 text-amber-300 border-amber-500/40 backdrop-blur-md text-xs font-mono font-bold shadow-lg transition-all mb-6">
-          <Sun className="w-4 h-4 text-amber-400 animate-spin-slow shrink-0" />
-          <span>Auto-Detected Local Weather: {currentWeather === 'sunny' ? 'Sunny 32°C (Clear High UV)' : 'Rainy 24°C (Showers)'}</span>
+        {/* Brand Tagline Badge */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border bg-slate-900/90 text-emerald-400 border-emerald-500/40 backdrop-blur-md text-xs font-mono font-bold shadow-xl mb-6">
+          <Sparkles className="w-4 h-4 text-emerald-400 animate-spin-slow shrink-0" />
+          <span>Interactive Mix & Match Wardrobe Engine</span>
         </div>
 
-        {/* High Contrast Contextual Greeting Header */}
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-5 max-w-3xl leading-[1.15] drop-shadow-lg">
-          {timeGreeting} <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-sky-400">{userName}</span>, the weather forecast predicts it will be{' '}
-          <span className="underline decoration-wavy underline-offset-8 text-amber-400">
-            {currentWeather === 'sunny' ? 'sunny' : 'rainy'}
-          </span>{' '}
-          today, here are some outfit recommendations for you.
+        {/* High Contrast Header */}
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-4 max-w-4xl leading-[1.12] drop-shadow-md font-sans">
+          {timeGreeting} <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-sky-400">{userName}</span>, Swipe Tops, Bottoms & Shoes in Real-Time
         </h1>
 
-        <p className="text-xs sm:text-sm text-slate-200 max-w-xl font-normal leading-relaxed mb-8 sm:mb-10 text-balance px-2 font-mono drop-shadow">
-          StyleSync automatically detects your local climate & matches dress codes to events synced from your Google Calendar.
+        <p className="text-xs sm:text-sm text-slate-300 max-w-2xl font-normal leading-relaxed mb-8 text-balance px-2 font-mono drop-shadow">
+          Mix & match owned closet pieces, auto-tag new uploads, and generate instant top-to-bottom assembled outfit looks.
         </p>
 
-        {/* The Primary Actions (The Split) */}
+        {/* ================= INTERACTIVE LANDING PAGE SWIPEABLE MIX & MATCH REEL ================= */}
+        <div className="w-full max-w-3xl glass-panel p-5 sm:p-7 rounded-3xl border border-slate-800 bg-slate-900/90 backdrop-blur-2xl shadow-2xl mb-10 text-left">
+          
+          <div className="flex items-center justify-between border-b border-slate-800 pb-3.5 mb-5">
+            <div className="flex items-center gap-2 font-mono text-xs text-slate-300 font-bold">
+              <Zap className="w-4 h-4 text-amber-400" />
+              <span>Interactive Outfit Reel: <strong className="text-emerald-400 uppercase">{currentTop.style} Look</strong></span>
+            </div>
+
+            <button
+              onClick={handleShuffle}
+              className="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-1.5 rounded-xl text-xs font-mono font-extrabold flex items-center gap-1.5 transition-all shadow-md active:scale-95"
+            >
+              <Shuffle className={`w-3.5 h-3.5 ${isAutoShuffling ? 'animate-spin' : ''}`} /> ⚡ Shuffle Mix
+            </button>
+          </div>
+
+          {/* 3 Garment Swipe Reels Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
+            
+            {/* Reel 1: Tops */}
+            <div className="glass-card p-3 rounded-2xl border border-slate-800 bg-slate-950/80 relative flex flex-col justify-between group">
+              <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 uppercase font-bold mb-2">
+                <span>1. Top Layer</span>
+                <span className="text-emerald-400">Tops Reel</span>
+              </div>
+
+              <div className="relative h-44 rounded-xl overflow-hidden mb-3 bg-slate-900 border border-slate-800">
+                <img
+                  src={currentTop.image}
+                  alt={currentTop.name}
+                  className={`w-full h-full object-cover transition-all duration-300 ${isAutoShuffling ? 'scale-110 blur-sm' : 'scale-100'}`}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
+                
+                <span className="absolute bottom-2 left-2 right-2 text-[11px] font-extrabold text-white truncate font-sans">
+                  {currentTop.name}
+                </span>
+              </div>
+
+              {/* Swipe Controls */}
+              <div className="flex items-center justify-between gap-1">
+                <button
+                  onClick={() => setTopIdx(prev => (prev === 0 ? HERO_TOPS.length - 1 : prev - 1))}
+                  className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 transition-colors border border-slate-800"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="text-[10px] font-mono text-slate-400">Swipe Tops</span>
+                <button
+                  onClick={() => setTopIdx(prev => (prev + 1) % HERO_TOPS.length)}
+                  className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 transition-colors border border-slate-800"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Reel 2: Bottoms */}
+            <div className="glass-card p-3 rounded-2xl border border-slate-800 bg-slate-950/80 relative flex flex-col justify-between group">
+              <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 uppercase font-bold mb-2">
+                <span>2. Bottom Layer</span>
+                <span className="text-emerald-400">Bottoms Reel</span>
+              </div>
+
+              <div className="relative h-44 rounded-xl overflow-hidden mb-3 bg-slate-900 border border-slate-800">
+                <img
+                  src={currentBottom.image}
+                  alt={currentBottom.name}
+                  className={`w-full h-full object-cover transition-all duration-300 ${isAutoShuffling ? 'scale-110 blur-sm' : 'scale-100'}`}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
+                
+                <span className="absolute bottom-2 left-2 right-2 text-[11px] font-extrabold text-white truncate font-sans">
+                  {currentBottom.name}
+                </span>
+              </div>
+
+              {/* Swipe Controls */}
+              <div className="flex items-center justify-between gap-1">
+                <button
+                  onClick={() => setBottomIdx(prev => (prev === 0 ? HERO_BOTTOMS.length - 1 : prev - 1))}
+                  className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 transition-colors border border-slate-800"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="text-[10px] font-mono text-slate-400">Swipe Bottoms</span>
+                <button
+                  onClick={() => setBottomIdx(prev => (prev + 1) % HERO_BOTTOMS.length)}
+                  className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 transition-colors border border-slate-800"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Reel 3: Shoes */}
+            <div className="glass-card p-3 rounded-2xl border border-slate-800 bg-slate-950/80 relative flex flex-col justify-between group">
+              <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 uppercase font-bold mb-2">
+                <span>3. Footwear</span>
+                <span className="text-emerald-400">Shoes Reel</span>
+              </div>
+
+              <div className="relative h-44 rounded-xl overflow-hidden mb-3 bg-slate-900 border border-slate-800">
+                <img
+                  src={currentShoe.image}
+                  alt={currentShoe.name}
+                  className={`w-full h-full object-cover transition-all duration-300 ${isAutoShuffling ? 'scale-110 blur-sm' : 'scale-100'}`}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
+                
+                <span className="absolute bottom-2 left-2 right-2 text-[11px] font-extrabold text-white truncate font-sans">
+                  {currentShoe.name}
+                </span>
+              </div>
+
+              {/* Swipe Controls */}
+              <div className="flex items-center justify-between gap-1">
+                <button
+                  onClick={() => setShoeIdx(prev => (prev === 0 ? HERO_SHOES.length - 1 : prev - 1))}
+                  className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 transition-colors border border-slate-800"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="text-[10px] font-mono text-slate-400">Swipe Shoes</span>
+                <button
+                  onClick={() => setShoeIdx(prev => (prev + 1) % HERO_SHOES.length)}
+                  className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 transition-colors border border-slate-800"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-300">
+            <span className="flex items-center gap-1.5 font-mono text-[11px]">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Active Look: {currentTop.name} + {currentBottom.name}
+            </span>
+
+            <button
+              onClick={() => onNavigate('styling')}
+              className="text-emerald-400 font-extrabold hover:underline flex items-center gap-1 font-mono text-[11px]"
+            >
+              Open Full Canvas Mixer →
+            </button>
+          </div>
+        </div>
+
+        {/* Primary Action CTAs */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-lg mb-10 px-2">
           
           {/* Action A: Launch Outfit Mixer */}
@@ -226,7 +281,7 @@ export default function Hero({ user, onNavigate, onOpenLogin, onOpenRegister, on
                 <Sparkles className="w-5 h-5 text-emerald-200 group-hover:rotate-12 transition-transform" />
               </div>
               <div>
-                <span className="text-sm font-extrabold block tracking-wide uppercase text-white">Launch Outfit Mixer</span>
+                <span className="text-sm font-extrabold block tracking-wide uppercase text-white">Launch Outfit Canvas</span>
                 <span className="text-[10px] text-emerald-100 font-mono font-medium">Anti-Gravity AI Canvas Engine</span>
               </div>
             </div>
@@ -251,7 +306,7 @@ export default function Hero({ user, onNavigate, onOpenLogin, onOpenRegister, on
           </button>
         </div>
 
-        {/* Feature Overview Quick Cards - High Contrast Dark Cards */}
+        {/* Feature Quick Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 w-full max-w-3xl text-left mb-8">
           <div 
             onClick={() => onNavigate('styling')}
@@ -291,7 +346,7 @@ export default function Hero({ user, onNavigate, onOpenLogin, onOpenRegister, on
               <User className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-sm font-extrabold text-white block">Body & Creators</span>
+              <span className="text-sm font-extrabold text-white block">Creators</span>
               <p className="text-[11px] text-slate-300 leading-normal font-medium">
                 Match cuts to your height & waist.
               </p>
