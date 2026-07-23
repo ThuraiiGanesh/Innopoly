@@ -1,47 +1,6 @@
 // Mock data for StyleSync Fashion Tech Web App
 
-export const INITIAL_WARDROBE = [
-  {
-    id: 'w1',
-    name: 'Black Oversized Crew Tee',
-    category: 'Tops',
-    color: '#18181b',
-    colorName: 'Midnight Black',
-    style: 'Streetwear',
-    image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&auto=format&fit=crop&q=80',
-    owned: true
-  },
-  {
-    id: 'w2',
-    name: 'Tailored Straight Chinos',
-    category: 'Bottoms',
-    color: '#27272a',
-    colorName: 'Charcoal',
-    style: 'Smart Casual',
-    image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&auto=format&fit=crop&q=80',
-    owned: true
-  },
-  {
-    id: 'w3',
-    name: 'Classic White Leather Sneakers',
-    category: 'Shoes',
-    color: '#ffffff',
-    colorName: 'Pure White',
-    style: 'Casual',
-    image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&auto=format&fit=crop&q=80',
-    owned: true
-  },
-  {
-    id: 'w4',
-    name: 'Beige Double-Breasted Trench Coat',
-    category: 'Outerwear',
-    color: '#d4b996',
-    colorName: 'Sand Beige',
-    style: 'Formal',
-    image: 'https://images.unsplash.com/photo-1544441893-675973e31985?w=600&auto=format&fit=crop&q=80',
-    owned: true
-  }
-];
+export const INITIAL_WARDROBE = [];
 
 export const CREATORS = [
   {

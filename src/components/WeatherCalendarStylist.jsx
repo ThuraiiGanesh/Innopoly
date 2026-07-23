@@ -54,6 +54,12 @@ export default function WeatherCalendarStylist({ wardrobe, onSelectOutfit }) {
         </p>
       </div>
 
+      {/* Weather App Auto-Sync Status Banner */}
+      <div className="flex items-center justify-center gap-2 p-3 mb-8 rounded-2xl bg-gradient-to-r from-sky-50 to-blue-50 border border-sky-200 text-sky-900 text-xs font-mono font-bold shadow-sm">
+        <Sun className="w-4 h-4 text-amber-500 animate-spin-slow shrink-0" />
+        <span>⚡ Weather App Synced: Auto-detecting local weather (Sunny 32°C) & recommending climate-matched fits!</span>
+      </div>
+
       {/* Preset Controls Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {/* Weather Selector */}

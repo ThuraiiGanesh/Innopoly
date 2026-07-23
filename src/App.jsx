@@ -31,7 +31,7 @@ import { syncWardrobeToCloud } from './utils/supabase';
 export default function App() {
   const [activeTab, setActiveTab] = useState('home'); // 'home' | 'weather' | 'color' | 'closet' | 'styling' | 'creators' | 'templates' | 'compliance'
   const [user, setUser] = useState(null);
-  const [wardrobe, setWardrobe] = useState(INITIAL_WARDROBE);
+  const [wardrobe, setWardrobe] = useState([]);
   const [currentBudget, setCurrentBudget] = useState(50);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [selectedCreator, setSelectedCreator] = useState(null);
@@ -50,10 +50,10 @@ export default function App() {
     const currentUser = getCurrentUser();
     if (currentUser) {
       setUser(currentUser);
-      const savedWardrobe = getUserWardrobeFromDB(currentUser.id, INITIAL_WARDROBE);
+      const savedWardrobe = getUserWardrobeFromDB(currentUser.id, []);
       setWardrobe(savedWardrobe);
     } else {
-      const savedWardrobe = getUserWardrobeFromDB(null, INITIAL_WARDROBE);
+      const savedWardrobe = getUserWardrobeFromDB(null, []);
       setWardrobe(savedWardrobe);
       // Explicitly start logged out on site launch
       setUser(null);

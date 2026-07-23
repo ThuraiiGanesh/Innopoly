@@ -76,16 +76,15 @@ const DEFAULT_USER = {
 
 export const initDatabase = () => {
   if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
-    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify([DEFAULT_USER]));
+    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify([]));
   }
-  // Start logged out initially unless a user has actively signed in
 };
 
 export const getUsersFromDB = () => {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
   } catch (e) {
-    return [DEFAULT_USER];
+    return [];
   }
 };
 
@@ -158,7 +157,7 @@ export const saveUserWardrobeInDB = (userId, wardrobe) => {
   localStorage.setItem(key, JSON.stringify(wardrobe));
 };
 
-export const getUserWardrobeFromDB = (userId, fallback) => {
+export const getUserWardrobeFromDB = (userId, fallback = []) => {
   try {
     const key = userId ? `${STORAGE_KEYS.WARDROBE_PREFIX}${userId}` : 'stylesync_db_wardrobe_guest';
     const data = localStorage.getItem(key);
@@ -208,3 +207,26 @@ export const getUserStyleThemeFromDB = (userId, fallback = 'old_money') => {
     return fallback;
   }
 };
+
+export const DEFAULT_INTEGRATIONS = {
+  weatherSync: true,
+  contactsSync: true,
+  locationPermission: true,
+  friendOutfitsSharing: false
+};
+
+export const saveUserIntegrationsInDB = (userId, integrations) => {
+  const key = userId ? `stylesync_db_integrations_${userId}` : 'stylesync_db_integrations_guest';
+  localStorage.setItem(key, JSON.stringify(integrations));
+};
+
+export const getUserIntegrationsFromDB = (userId, fallback = DEFAULT_INTEGRATIONS) => {
+  try {
+    const key = userId ? `stylesync_db_integrations_${userId}` : 'stylesync_db_integrations_guest';
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : fallback;
+  } catch (e) {
+    return fallback;
+  }
+};
+
