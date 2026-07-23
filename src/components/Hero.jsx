@@ -15,7 +15,9 @@ import {
   Shuffle,
   Play,
   CheckCircle2,
-  Sliders
+  Sliders,
+  ArrowLeft,
+  ArrowRight
 } from 'lucide-react';
 
 // Mix and Match Sample Reel Items for Landing Page Swiping
@@ -45,6 +47,7 @@ export default function Hero({ user, onNavigate, onOpenLogin }) {
   const [bottomIdx, setBottomIdx] = useState(0);
   const [shoeIdx, setShoeIdx] = useState(0);
   const [isAutoShuffling, setIsAutoShuffling] = useState(false);
+  const [animatingRow, setAnimatingRow] = useState(null); // 'top' | 'bottom' | 'shoes'
 
   // Auto-swipe/mix loop interval
   useEffect(() => {
@@ -55,6 +58,36 @@ export default function Hero({ user, onNavigate, onOpenLogin }) {
     }, 4500);
     return () => clearInterval(interval);
   }, []);
+
+  const handleTopSlide = (direction) => {
+    setAnimatingRow('top');
+    if (direction === 'left') {
+      setTopIdx(prev => (prev === 0 ? HERO_TOPS.length - 1 : prev - 1));
+    } else {
+      setTopIdx(prev => (prev + 1) % HERO_TOPS.length);
+    }
+    setTimeout(() => setAnimatingRow(null), 300);
+  };
+
+  const handleBottomSlide = (direction) => {
+    setAnimatingRow('bottom');
+    if (direction === 'left') {
+      setBottomIdx(prev => (prev === 0 ? HERO_BOTTOMS.length - 1 : prev - 1));
+    } else {
+      setBottomIdx(prev => (prev + 1) % HERO_BOTTOMS.length);
+    }
+    setTimeout(() => setAnimatingRow(null), 300);
+  };
+
+  const handleShoeSlide = (direction) => {
+    setAnimatingRow('shoes');
+    if (direction === 'left') {
+      setShoeIdx(prev => (prev === 0 ? HERO_SHOES.length - 1 : prev - 1));
+    } else {
+      setShoeIdx(prev => (prev + 1) % HERO_SHOES.length);
+    }
+    setTimeout(() => setAnimatingRow(null), 300);
+  };
 
   const handleShuffle = () => {
     setIsAutoShuffling(true);
@@ -94,176 +127,179 @@ export default function Hero({ user, onNavigate, onOpenLogin }) {
         <source src="https://assets.mixkit.co/videos/preview/mixkit-model-walking-on-a-catwalk-41489-large.mp4" type="video/mp4" />
       </video>
 
-      {/* Dark Overlay Gradient for 100% Crisp Legibility */}
+      {/* Dark Overlay Gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-slate-950/85 via-slate-950/75 to-slate-950/95 pointer-events-none z-0" />
 
       {/* Glow ambient background element */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] sm:w-[700px] h-[500px] sm:h-[700px] bg-emerald-600/10 rounded-full blur-[140px] pointer-events-none z-0" />
 
       {/* Main Foreground Container */}
-      <div className="relative z-10 max-w-5xl mx-auto flex flex-col items-center w-full animate-fade-in">
+      <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center w-full animate-fade-in">
         
         {/* Brand Tagline Badge */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border bg-slate-900/90 text-emerald-400 border-emerald-500/40 backdrop-blur-md text-xs font-mono font-bold shadow-xl mb-6">
           <Sparkles className="w-4 h-4 text-emerald-400 animate-spin-slow shrink-0" />
-          <span>Interactive Mix & Match Wardrobe Engine</span>
+          <span>3-Tier Mix & Match Mannequin Column</span>
         </div>
 
         {/* High Contrast Header */}
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-4 max-w-4xl leading-[1.12] drop-shadow-md font-sans">
-          {timeGreeting} <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-sky-400">{userName}</span>, Swipe Tops, Bottoms & Shoes in Real-Time
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-4 max-w-3xl leading-[1.12] drop-shadow-md font-sans">
+          {timeGreeting} <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-sky-400">{userName}</span>, Swipe Tops, Bottoms & Shoes
         </h1>
 
-        <p className="text-xs sm:text-sm text-slate-300 max-w-2xl font-normal leading-relaxed mb-8 text-balance px-2 font-mono drop-shadow">
-          Mix & match owned closet pieces, auto-tag new uploads, and generate instant top-to-bottom assembled outfit looks.
+        <p className="text-xs sm:text-sm text-slate-300 max-w-xl font-normal leading-relaxed mb-8 text-balance px-2 font-mono drop-shadow">
+          Swipe the left and right arrows on each clothing slot to mix & match your top, bottom, and footwear!
         </p>
 
-        {/* ================= INTERACTIVE LANDING PAGE SWIPEABLE MIX & MATCH REEL ================= */}
-        <div className="w-full max-w-3xl glass-panel p-5 sm:p-7 rounded-3xl border border-slate-800 bg-slate-900/90 backdrop-blur-2xl shadow-2xl mb-10 text-left">
+        {/* ================= VERTICAL 3-TIER MANNEQUIN COLUMN WITH HORIZONTAL SWIPE ARROWS (MATCHING USER SKETCH) ================= */}
+        <div className="w-full max-w-md glass-panel p-4 sm:p-6 rounded-3xl border border-slate-800 bg-slate-900/95 backdrop-blur-2xl shadow-2xl mb-10 text-center relative overflow-hidden">
           
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3.5 mb-5">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
             <div className="flex items-center gap-2 font-mono text-xs text-slate-300 font-bold">
               <Zap className="w-4 h-4 text-amber-400" />
-              <span>Interactive Outfit Reel: <strong className="text-emerald-400 uppercase">{currentTop.style} Look</strong></span>
+              <span>Active Look: <strong className="text-emerald-400 uppercase">{currentTop.style}</strong></span>
             </div>
 
             <button
               onClick={handleShuffle}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-1.5 rounded-xl text-xs font-mono font-extrabold flex items-center gap-1.5 transition-all shadow-md active:scale-95"
+              className="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded-xl text-xs font-mono font-extrabold flex items-center gap-1 transition-all shadow-md active:scale-95"
             >
-              <Shuffle className={`w-3.5 h-3.5 ${isAutoShuffling ? 'animate-spin' : ''}`} /> ⚡ Shuffle Mix
+              <Shuffle className={`w-3.5 h-3.5 ${isAutoShuffling ? 'animate-spin' : ''}`} /> Shuffle
             </button>
           </div>
 
-          {/* 3 Garment Swipe Reels Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
+          {/* Vertical Stacked 3-Slot Mannequin Tower */}
+          <div className="space-y-4">
             
-            {/* Reel 1: Tops */}
-            <div className="glass-card p-3 rounded-2xl border border-slate-800 bg-slate-950/80 relative flex flex-col justify-between group">
-              <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 uppercase font-bold mb-2">
-                <span>1. Top Layer</span>
-                <span className="text-emerald-400">Tops Reel</span>
-              </div>
+            {/* ROW 1: TOP / SHIRT SLOT WITH LEFT (<--) AND RIGHT (-->) ARROWS */}
+            <div className="glass-card p-3 rounded-2xl border border-slate-800 bg-slate-950/90 relative flex items-center justify-between gap-2 shadow-inner group">
+              {/* Left Arrow <-- */}
+              <button
+                onClick={() => handleTopSlide('left')}
+                className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 hover:bg-emerald-600 text-slate-300 hover:text-white flex items-center justify-center transition-all border border-slate-800 shadow-md shrink-0 active:scale-90"
+                title="Swipe Top Left"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
 
-              <div className="relative h-44 rounded-xl overflow-hidden mb-3 bg-slate-900 border border-slate-800">
+              {/* Center Garment Card: Shirt */}
+              <div className="flex-1 h-36 rounded-xl overflow-hidden relative bg-slate-900 border border-slate-800 flex items-center justify-center">
                 <img
                   src={currentTop.image}
                   alt={currentTop.name}
-                  className={`w-full h-full object-cover transition-all duration-300 ${isAutoShuffling ? 'scale-110 blur-sm' : 'scale-100'}`}
+                  className={`w-full h-full object-cover transition-all duration-300 ${
+                    animatingRow === 'top' || isAutoShuffling ? 'scale-110 opacity-70 blur-xs' : 'scale-100 opacity-100'
+                  }`}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
-                
-                <span className="absolute bottom-2 left-2 right-2 text-[11px] font-extrabold text-white truncate font-sans">
+                <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 backdrop-blur-md text-[10px] font-mono text-emerald-400 font-bold border border-emerald-500/30">
+                  👕 TOP GARMENT
+                </div>
+                <span className="absolute bottom-2 left-2 right-2 text-xs font-extrabold text-white truncate font-sans text-left">
                   {currentTop.name}
                 </span>
               </div>
 
-              {/* Swipe Controls */}
-              <div className="flex items-center justify-between gap-1">
-                <button
-                  onClick={() => setTopIdx(prev => (prev === 0 ? HERO_TOPS.length - 1 : prev - 1))}
-                  className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 transition-colors border border-slate-800"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <span className="text-[10px] font-mono text-slate-400">Swipe Tops</span>
-                <button
-                  onClick={() => setTopIdx(prev => (prev + 1) % HERO_TOPS.length)}
-                  className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 transition-colors border border-slate-800"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
+              {/* Right Arrow --> */}
+              <button
+                onClick={() => handleTopSlide('right')}
+                className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 hover:bg-emerald-600 text-slate-300 hover:text-white flex items-center justify-center transition-all border border-slate-800 shadow-md shrink-0 active:scale-90"
+                title="Swipe Top Right"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
             </div>
 
-            {/* Reel 2: Bottoms */}
-            <div className="glass-card p-3 rounded-2xl border border-slate-800 bg-slate-950/80 relative flex flex-col justify-between group">
-              <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 uppercase font-bold mb-2">
-                <span>2. Bottom Layer</span>
-                <span className="text-emerald-400">Bottoms Reel</span>
-              </div>
+            {/* ROW 2: PANTS / BOTTOM SLOT WITH LEFT (<--) AND RIGHT (-->) ARROWS */}
+            <div className="glass-card p-3 rounded-2xl border border-slate-800 bg-slate-950/90 relative flex items-center justify-between gap-2 shadow-inner group">
+              {/* Left Arrow <-- */}
+              <button
+                onClick={() => handleBottomSlide('left')}
+                className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 hover:bg-emerald-600 text-slate-300 hover:text-white flex items-center justify-center transition-all border border-slate-800 shadow-md shrink-0 active:scale-90"
+                title="Swipe Pants Left"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
 
-              <div className="relative h-44 rounded-xl overflow-hidden mb-3 bg-slate-900 border border-slate-800">
+              {/* Center Garment Card: Pants */}
+              <div className="flex-1 h-36 rounded-xl overflow-hidden relative bg-slate-900 border border-slate-800 flex items-center justify-center">
                 <img
                   src={currentBottom.image}
                   alt={currentBottom.name}
-                  className={`w-full h-full object-cover transition-all duration-300 ${isAutoShuffling ? 'scale-110 blur-sm' : 'scale-100'}`}
+                  className={`w-full h-full object-cover transition-all duration-300 ${
+                    animatingRow === 'bottom' || isAutoShuffling ? 'scale-110 opacity-70 blur-xs' : 'scale-100 opacity-100'
+                  }`}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
-                
-                <span className="absolute bottom-2 left-2 right-2 text-[11px] font-extrabold text-white truncate font-sans">
+                <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 backdrop-blur-md text-[10px] font-mono text-emerald-400 font-bold border border-emerald-500/30">
+                  👖 BOTTOM GARMENT
+                </div>
+                <span className="absolute bottom-2 left-2 right-2 text-xs font-extrabold text-white truncate font-sans text-left">
                   {currentBottom.name}
                 </span>
               </div>
 
-              {/* Swipe Controls */}
-              <div className="flex items-center justify-between gap-1">
-                <button
-                  onClick={() => setBottomIdx(prev => (prev === 0 ? HERO_BOTTOMS.length - 1 : prev - 1))}
-                  className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 transition-colors border border-slate-800"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <span className="text-[10px] font-mono text-slate-400">Swipe Bottoms</span>
-                <button
-                  onClick={() => setBottomIdx(prev => (prev + 1) % HERO_BOTTOMS.length)}
-                  className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 transition-colors border border-slate-800"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
+              {/* Right Arrow --> */}
+              <button
+                onClick={() => handleBottomSlide('right')}
+                className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 hover:bg-emerald-600 text-slate-300 hover:text-white flex items-center justify-center transition-all border border-slate-800 shadow-md shrink-0 active:scale-90"
+                title="Swipe Pants Right"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
             </div>
 
-            {/* Reel 3: Shoes */}
-            <div className="glass-card p-3 rounded-2xl border border-slate-800 bg-slate-950/80 relative flex flex-col justify-between group">
-              <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 uppercase font-bold mb-2">
-                <span>3. Footwear</span>
-                <span className="text-emerald-400">Shoes Reel</span>
-              </div>
+            {/* ROW 3: SHOES / FOOTWEAR SLOT WITH LEFT (<--) AND RIGHT (-->) ARROWS */}
+            <div className="glass-card p-3 rounded-2xl border border-slate-800 bg-slate-950/90 relative flex items-center justify-between gap-2 shadow-inner group">
+              {/* Left Arrow <-- */}
+              <button
+                onClick={() => handleShoeSlide('left')}
+                className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 hover:bg-emerald-600 text-slate-300 hover:text-white flex items-center justify-center transition-all border border-slate-800 shadow-md shrink-0 active:scale-90"
+                title="Swipe Shoes Left"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
 
-              <div className="relative h-44 rounded-xl overflow-hidden mb-3 bg-slate-900 border border-slate-800">
+              {/* Center Garment Card: Shoes */}
+              <div className="flex-1 h-36 rounded-xl overflow-hidden relative bg-slate-900 border border-slate-800 flex items-center justify-center">
                 <img
                   src={currentShoe.image}
                   alt={currentShoe.name}
-                  className={`w-full h-full object-cover transition-all duration-300 ${isAutoShuffling ? 'scale-110 blur-sm' : 'scale-100'}`}
+                  className={`w-full h-full object-cover transition-all duration-300 ${
+                    animatingRow === 'shoes' || isAutoShuffling ? 'scale-110 opacity-70 blur-xs' : 'scale-100 opacity-100'
+                  }`}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
-                
-                <span className="absolute bottom-2 left-2 right-2 text-[11px] font-extrabold text-white truncate font-sans">
+                <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 backdrop-blur-md text-[10px] font-mono text-emerald-400 font-bold border border-emerald-500/30">
+                  👟 FOOTWEAR
+                </div>
+                <span className="absolute bottom-2 left-2 right-2 text-xs font-extrabold text-white truncate font-sans text-left">
                   {currentShoe.name}
                 </span>
               </div>
 
-              {/* Swipe Controls */}
-              <div className="flex items-center justify-between gap-1">
-                <button
-                  onClick={() => setShoeIdx(prev => (prev === 0 ? HERO_SHOES.length - 1 : prev - 1))}
-                  className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 transition-colors border border-slate-800"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <span className="text-[10px] font-mono text-slate-400">Swipe Shoes</span>
-                <button
-                  onClick={() => setShoeIdx(prev => (prev + 1) % HERO_SHOES.length)}
-                  className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 transition-colors border border-slate-800"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
+              {/* Right Arrow --> */}
+              <button
+                onClick={() => handleShoeSlide('right')}
+                className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 hover:bg-emerald-600 text-slate-300 hover:text-white flex items-center justify-center transition-all border border-slate-800 shadow-md shrink-0 active:scale-90"
+                title="Swipe Shoes Right"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
             </div>
 
           </div>
 
           <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-300">
-            <span className="flex items-center gap-1.5 font-mono text-[11px]">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Active Look: {currentTop.name} + {currentBottom.name}
+            <span className="flex items-center gap-1.5 font-mono text-[11px] truncate">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> {currentTop.name.split(' ')[0]} + {currentBottom.name.split(' ')[0]}
             </span>
 
             <button
               onClick={() => onNavigate('styling')}
-              className="text-emerald-400 font-extrabold hover:underline flex items-center gap-1 font-mono text-[11px]"
+              className="text-emerald-400 font-extrabold hover:underline flex items-center gap-1 font-mono text-[11px] shrink-0"
             >
-              Open Full Canvas Mixer →
+              Open Outfit Canvas →
             </button>
           </div>
         </div>
