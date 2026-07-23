@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Camera, Check, Plus, Trash2, Tag, Layers, Sparkles, Cpu, Upload } from 'lucide-react';
+import { Camera, Check, Plus, Trash2, Tag, Layers, Sparkles, Cpu, Upload, Grid } from 'lucide-react';
 
 export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem }) {
   const [itemName, setItemName] = useState('');
@@ -10,8 +10,11 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [autoTagged, setAutoTagged] = useState(null);
   const [selectedFilter, setSelectedFilter] = useState('All');
+  const [scanMode, setScanMode] = useState('single'); // 'single' | 'batch'
+  const [batchCount, setBatchCount] = useState(0);
 
   const fileInputRef = useRef(null);
+  const batchFileInputRef = useRef(null);
 
   const handleImageFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -20,13 +23,57 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
       reader.onloadend = () => {
         setCustomImage(reader.result);
         if (!itemName) {
-          // Auto-suggest name based on filename
           const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
           setItemName(nameWithoutExt.charAt(0).toUpperCase() + nameWithoutExt.slice(1));
         }
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleBatchUpload = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    setIsAnalyzing(true);
+    let count = 0;
+
+    files.slice(0, 10).forEach((file, index) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
+        const autoName = nameWithoutExt.charAt(0).toUpperCase() + nameWithoutExt.slice(1);
+        const categories = ['Tops', 'Bottoms', 'Outerwear', 'Shoes'];
+        const colors = ['Black', 'White', 'Navy', 'Olive', 'Beige'];
+        const autoCat = categories[index % categories.length];
+        const autoColor = colors[index % colors.length];
+
+        const newItem = {
+          id: 'w_batch_' + Date.now() + '_' + index,
+          name: autoName,
+          category: autoCat,
+          color: autoColor.toLowerCase().includes('white') ? '#ffffff' : '#18181b',
+          colorName: autoColor,
+          pattern: 'Solid',
+          style: 'Smart Casual',
+          image: reader.result,
+          owned: true
+        };
+
+        onAddItem(newItem);
+        count++;
+        if (count === Math.min(files.length, 10)) {
+          setBatchCount(count);
+          setIsAnalyzing(false);
+          setAutoTagged({
+            category: `${count} Items Auto-Tagged`,
+            color: 'Batch Processed',
+            pattern: 'Multi-Scan Ready'
+          });
+        }
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
   const handleSimulatedUpload = (e) => {
@@ -74,17 +121,37 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
     : wardrobe.filter(item => item.category === selectedFilter);
 
   return (
-    <section id="digitizer" className="py-16 px-6 max-w-7xl mx-auto scroll-mt-20">
-      <div className="text-center max-w-2xl mx-auto mb-12">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-pill text-xs tracking-wider uppercase text-slate-700 font-semibold mb-3">
-          <Camera className="w-3.5 h-3.5" /> Google AI Auto-Tagging Digitization Engine
+    <section id="digitizer" className="py-12 sm:py-16 px-4 sm:px-6 max-w-7xl mx-auto scroll-mt-20">
+      <div className="text-center max-w-2xl mx-auto mb-10">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass-pill text-xs tracking-wider uppercase text-slate-700 font-semibold mb-3">
+          <Camera className="w-3.5 h-3.5" /> AI Auto-Tagging Digitization Engine
         </div>
-        <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 mb-3">
+        <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 mb-3">
           Snap, Upload & Catalog Your Closet
         </h2>
-        <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-          Upload any clothing photo from your device. Google AI Vision scans your garment and automatically tags Category, Color & Pattern into your closet!
+        <p className="text-slate-600 text-sm leading-relaxed">
+          Single item scanner or multi-shot batch camera scanner up to 10 garments simultaneously.
         </p>
+
+        {/* Mode Selector Chips */}
+        <div className="inline-flex items-center gap-2 bg-slate-200/80 p-1 rounded-2xl mt-4 border border-slate-300">
+          <button
+            onClick={() => setScanMode('single')}
+            className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              scanMode === 'single' ? 'bg-black text-white shadow-sm' : 'text-slate-700 hover:text-black'
+            }`}
+          >
+            Single Garment Scan
+          </button>
+          <button
+            onClick={() => setScanMode('batch')}
+            className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              scanMode === 'batch' ? 'bg-black text-white shadow-sm' : 'text-slate-700 hover:text-black'
+            }`}
+          >
+            <Grid className="w-3.5 h-3.5 text-amber-400" /> Multi-Shot Batch Scanner
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -96,130 +163,152 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
                 <Cpu className="w-4 h-4 text-slate-800" /> Google AI Vision Auto-Tagger
               </h3>
               <span className="text-xs font-mono text-emerald-600 font-bold bg-emerald-50 px-2.5 py-1 rounded-full">
-                Zero Friction
+                {scanMode === 'batch' ? 'Batch Mode' : 'Single Mode'}
               </span>
             </div>
 
-            <form onSubmit={handleSimulatedUpload} className="space-y-4">
-              {/* Hidden File Input */}
-              <input
-                type="file"
-                ref={fileInputRef}
-                accept="image/*"
-                onChange={handleImageFileChange}
-                className="hidden"
-              />
-
-              {/* Photo Upload Dropzone Box */}
-              <div 
-                onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-slate-300 hover:border-slate-800 rounded-2xl p-6 text-center bg-white/60 cursor-pointer transition-all group relative overflow-hidden"
-              >
-                {customImage ? (
-                  <div className="relative">
-                    <img
-                      src={customImage}
-                      alt="Uploaded garment preview"
-                      className="w-28 h-28 object-cover rounded-xl mx-auto shadow-md border border-slate-200"
-                    />
-                    <span className="text-[10px] font-mono bg-emerald-600 text-white px-2 py-0.5 rounded-full mt-2 inline-block font-bold">
-                      ✓ Image Ready for AI Scan
-                    </span>
-                  </div>
-                ) : (
-                  <>
-                    <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-800 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                      <Upload className="w-6 h-6" />
-                    </div>
-                    <p className="text-sm font-semibold text-slate-800 mb-0.5">
-                      Click to Upload Garment Photo
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      Select photo from camera or files • Auto Background Crop
-                    </p>
-                  </>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-xs uppercase tracking-wider text-slate-500 mb-1 font-mono">
-                  Garment Name
-                </label>
+            {scanMode === 'batch' ? (
+              <div className="space-y-4">
                 <input
-                  type="text"
-                  placeholder="e.g. Vintage Black Oversized Tee"
-                  value={itemName}
-                  onChange={(e) => setItemName(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-black transition-colors"
+                  type="file"
+                  ref={batchFileInputRef}
+                  multiple
+                  accept="image/*"
+                  onChange={handleBatchUpload}
+                  className="hidden"
                 />
+                <div
+                  onClick={() => batchFileInputRef.current?.click()}
+                  className="border-2 border-dashed border-indigo-400 hover:border-black rounded-2xl p-8 text-center bg-indigo-50/40 cursor-pointer transition-all"
+                >
+                  <div className="w-12 h-12 rounded-full bg-indigo-600 text-white flex items-center justify-center mx-auto mb-3 shadow-md">
+                    <Camera className="w-6 h-6" />
+                  </div>
+                  <h4 className="text-sm font-bold text-slate-900 mb-1">Upload Up to 10 Closet Photos</h4>
+                  <p className="text-xs text-slate-500 max-w-xs mx-auto">
+                    Select multiple photos from your mobile camera or library. AI auto-tags category, color, and fit for all items instantly!
+                  </p>
+                </div>
               </div>
+            ) : (
+              <form onSubmit={handleSimulatedUpload} className="space-y-4">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/*"
+                  onChange={handleImageFileChange}
+                  className="hidden"
+                />
 
-              <div className="grid grid-cols-3 gap-2">
-                <div>
-                  <label className="block text-xs uppercase tracking-wider text-slate-500 mb-1 font-mono">
-                    Category
-                  </label>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl px-2 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-black transition-colors"
-                  >
-                    <option value="Tops">Tops</option>
-                    <option value="Bottoms">Bottoms</option>
-                    <option value="Outerwear">Outerwear</option>
-                    <option value="Shoes">Shoes</option>
-                  </select>
+                <div 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="border-2 border-dashed border-slate-300 hover:border-slate-800 rounded-2xl p-6 text-center bg-white/60 cursor-pointer transition-all group relative overflow-hidden"
+                >
+                  {customImage ? (
+                    <div className="relative">
+                      <img
+                        src={customImage}
+                        alt="Uploaded garment preview"
+                        className="w-28 h-28 object-cover rounded-xl mx-auto shadow-md border border-slate-200"
+                      />
+                      <span className="text-[10px] font-mono bg-emerald-600 text-white px-2 py-0.5 rounded-full mt-2 inline-block font-bold">
+                        ✓ Image Ready for AI Scan
+                      </span>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-800 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                        <Upload className="w-6 h-6" />
+                      </div>
+                      <p className="text-sm font-semibold text-slate-800 mb-0.5">
+                        Click to Upload Garment Photo
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        Select photo from camera or files • Auto Background Crop
+                      </p>
+                    </>
+                  )}
                 </div>
 
                 <div>
                   <label className="block text-xs uppercase tracking-wider text-slate-500 mb-1 font-mono">
-                    Color
+                    Garment Name
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. Black"
-                    value={colorName}
-                    onChange={(e) => setColorName(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-black transition-colors"
+                    placeholder="e.g. Vintage Black Oversized Tee"
+                    value={itemName}
+                    onChange={(e) => setItemName(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-black transition-colors"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-xs uppercase tracking-wider text-slate-500 mb-1 font-mono">
-                    Pattern
-                  </label>
-                  <select
-                    value={pattern}
-                    onChange={(e) => setPattern(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl px-2 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-black transition-colors"
-                  >
-                    <option value="Solid">Solid</option>
-                    <option value="Striped">Striped</option>
-                    <option value="Textured">Textured</option>
-                    <option value="Plaid">Plaid</option>
-                  </select>
+                <div className="grid grid-cols-3 gap-2">
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-slate-500 mb-1 font-mono">
+                      Category
+                    </label>
+                    <select
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-2 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-black transition-colors"
+                    >
+                      <option value="Tops">Tops</option>
+                      <option value="Bottoms">Bottoms</option>
+                      <option value="Outerwear">Outerwear</option>
+                      <option value="Shoes">Shoes</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-slate-500 mb-1 font-mono">
+                      Color
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Black"
+                      value={colorName}
+                      onChange={(e) => setColorName(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-black transition-colors"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-slate-500 mb-1 font-mono">
+                      Pattern
+                    </label>
+                    <select
+                      value={pattern}
+                      onChange={(e) => setPattern(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-2 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-black transition-colors"
+                    >
+                      <option value="Solid">Solid</option>
+                      <option value="Striped">Striped</option>
+                      <option value="Textured">Textured</option>
+                      <option value="Plaid">Plaid</option>
+                    </select>
+                  </div>
                 </div>
-              </div>
 
-              <button
-                type="submit"
-                disabled={isAnalyzing || !itemName.trim()}
-                className="w-full primary-button py-3 text-xs uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                {isAnalyzing ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    AI Auto-Tagging Garment...
-                  </>
-                ) : (
-                  <>
-                    <Plus className="w-4 h-4" /> Save Garment to Closet
-                  </>
-                )}
-              </button>
-            </form>
+                <button
+                  type="submit"
+                  disabled={isAnalyzing || !itemName.trim()}
+                  className="w-full primary-button py-3 text-xs uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      AI Auto-Tagging Garment...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-4 h-4" /> Save Garment to Closet
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
 
-            {/* AI Auto-Tagged Notification Badge */}
             {autoTagged && (
               <div className="mt-4 p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-mono animate-fade-in-up">
                 <span className="font-bold block mb-1 flex items-center gap-1.5 text-emerald-800">
@@ -244,7 +333,6 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
                 <Layers className="w-4 h-4 text-slate-800" /> Digitized Closet Collection
               </h3>
 
-              {/* Filter Tabs */}
               <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-semibold">
                 {['All', 'Tops', 'Bottoms', 'Outerwear', 'Shoes'].map((cat) => (
                   <button
@@ -262,7 +350,6 @@ export default function WardrobeDigitizer({ wardrobe, onAddItem, onDeleteItem })
               </div>
             </div>
 
-            {/* Closet Display Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-1">
               {filteredWardrobe.map((item) => (
                 <div

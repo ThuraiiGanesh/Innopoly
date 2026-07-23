@@ -288,6 +288,7 @@ Provide a helpful 2-3 sentence style recommendation. Focus on their owned items 
             type="file"
             ref={fileInputRef}
             accept="image/*"
+            capture="environment"
             onChange={handleChatImageUpload}
             className="hidden"
           />
