@@ -151,39 +151,40 @@ export default function Hero({ user, onNavigate, onOpenLogin }) {
           Swipe the left and right arrows on each clothing slot to mix & match your top, bottom, and footwear!
         </p>
 
-        {/* ================= VERTICAL 3-TIER MANNEQUIN COLUMN WITH HORIZONTAL SWIPE ARROWS (MATCHING USER SKETCH) ================= */}
-        <div className="w-full max-w-md glass-panel p-4 sm:p-6 rounded-3xl border border-slate-800 bg-slate-900/95 backdrop-blur-2xl shadow-2xl mb-10 text-center relative overflow-hidden">
+        {/* ================= VERTICAL 3-TIER MANNEQUIN COLUMN WITH SWIPE ARROWS (MATCHING EXACT DESIGN IN SCREENSHOT) ================= */}
+        <div className="w-full max-w-md bg-slate-200/90 backdrop-blur-2xl p-5 sm:p-6 rounded-[32px] border border-slate-300 shadow-2xl mb-10 text-center relative overflow-hidden">
           
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
-            <div className="flex items-center gap-2 font-mono text-xs text-slate-300 font-bold">
-              <Zap className="w-4 h-4 text-amber-400" />
-              <span>Active Look: <strong className="text-emerald-400 uppercase">{currentTop.style}</strong></span>
+          {/* Top Bar: Active Look & Shuffle Button */}
+          <div className="flex items-center justify-between border-b border-slate-300/80 pb-3 mb-4">
+            <div className="flex items-center gap-1.5 font-mono text-xs font-bold text-slate-500">
+              <Zap className="w-4 h-4 text-amber-500 fill-amber-400" />
+              <span>Active Look: <strong className="text-emerald-600 uppercase font-extrabold">{currentTop.style}</strong></span>
             </div>
 
             <button
               onClick={handleShuffle}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded-xl text-xs font-mono font-extrabold flex items-center gap-1 transition-all shadow-md active:scale-95"
+              className="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-1.5 rounded-full text-xs font-mono font-extrabold flex items-center gap-1.5 transition-all shadow-md active:scale-95"
             >
               <Shuffle className={`w-3.5 h-3.5 ${isAutoShuffling ? 'animate-spin' : ''}`} /> Shuffle
             </button>
           </div>
 
           {/* Vertical Stacked 3-Slot Mannequin Tower */}
-          <div className="space-y-4">
+          <div className="space-y-3.5">
             
             {/* ROW 1: TOP / SHIRT SLOT WITH LEFT (<--) AND RIGHT (-->) ARROWS */}
-            <div className="glass-card p-3 rounded-2xl border border-slate-800 bg-slate-950/90 relative flex items-center justify-between gap-2 shadow-inner group">
+            <div className="bg-white p-3 rounded-[20px] border border-slate-200/90 relative flex items-center justify-between gap-3 shadow-sm group">
               {/* Left Arrow <-- */}
               <button
                 onClick={() => handleTopSlide('left')}
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 hover:bg-emerald-600 text-slate-300 hover:text-white flex items-center justify-center transition-all border border-slate-800 shadow-md shrink-0 active:scale-90"
+                className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#0f172a] hover:bg-slate-800 text-white flex items-center justify-center transition-all shadow-md shrink-0 active:scale-90"
                 title="Swipe Top Left"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-5 h-5 text-white" />
               </button>
 
               {/* Center Garment Card: Shirt */}
-              <div className="flex-1 h-36 rounded-xl overflow-hidden relative bg-slate-900 border border-slate-800 flex items-center justify-center">
+              <div className="flex-1 h-36 rounded-xl overflow-hidden relative bg-slate-900 border border-slate-200 flex items-center justify-center">
                 <img
                   src={currentTop.image}
                   alt={currentTop.name}
@@ -191,11 +192,11 @@ export default function Hero({ user, onNavigate, onOpenLogin }) {
                     animatingRow === 'top' || isAutoShuffling ? 'scale-110 opacity-70 blur-xs' : 'scale-100 opacity-100'
                   }`}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
-                <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 backdrop-blur-md text-[10px] font-mono text-emerald-400 font-bold border border-emerald-500/30">
-                  👕 TOP GARMENT
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+                <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-md bg-[#0f172a]/80 backdrop-blur-md text-[10px] font-mono text-emerald-400 font-bold flex items-center gap-1.5 border border-emerald-500/20">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" /> TOP GARMENT
                 </div>
-                <span className="absolute bottom-2 left-2 right-2 text-xs font-extrabold text-white truncate font-sans text-left">
+                <span className="absolute bottom-2.5 left-2.5 right-2.5 text-xs sm:text-sm font-extrabold text-white truncate font-sans text-left drop-shadow-md">
                   {currentTop.name}
                 </span>
               </div>
@@ -203,26 +204,26 @@ export default function Hero({ user, onNavigate, onOpenLogin }) {
               {/* Right Arrow --> */}
               <button
                 onClick={() => handleTopSlide('right')}
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 hover:bg-emerald-600 text-slate-300 hover:text-white flex items-center justify-center transition-all border border-slate-800 shadow-md shrink-0 active:scale-90"
+                className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#0f172a] hover:bg-slate-800 text-white flex items-center justify-center transition-all shadow-md shrink-0 active:scale-90"
                 title="Swipe Top Right"
               >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight className="w-5 h-5 text-white" />
               </button>
             </div>
 
             {/* ROW 2: PANTS / BOTTOM SLOT WITH LEFT (<--) AND RIGHT (-->) ARROWS */}
-            <div className="glass-card p-3 rounded-2xl border border-slate-800 bg-slate-950/90 relative flex items-center justify-between gap-2 shadow-inner group">
+            <div className="bg-white p-3 rounded-[20px] border border-slate-200/90 relative flex items-center justify-between gap-3 shadow-sm group">
               {/* Left Arrow <-- */}
               <button
                 onClick={() => handleBottomSlide('left')}
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 hover:bg-emerald-600 text-slate-300 hover:text-white flex items-center justify-center transition-all border border-slate-800 shadow-md shrink-0 active:scale-90"
+                className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#0f172a] hover:bg-slate-800 text-white flex items-center justify-center transition-all shadow-md shrink-0 active:scale-90"
                 title="Swipe Pants Left"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-5 h-5 text-white" />
               </button>
 
               {/* Center Garment Card: Pants */}
-              <div className="flex-1 h-36 rounded-xl overflow-hidden relative bg-slate-900 border border-slate-800 flex items-center justify-center">
+              <div className="flex-1 h-36 rounded-xl overflow-hidden relative bg-slate-900 border border-slate-200 flex items-center justify-center">
                 <img
                   src={currentBottom.image}
                   alt={currentBottom.name}
@@ -230,11 +231,11 @@ export default function Hero({ user, onNavigate, onOpenLogin }) {
                     animatingRow === 'bottom' || isAutoShuffling ? 'scale-110 opacity-70 blur-xs' : 'scale-100 opacity-100'
                   }`}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
-                <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 backdrop-blur-md text-[10px] font-mono text-emerald-400 font-bold border border-emerald-500/30">
-                  👖 BOTTOM GARMENT
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+                <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-md bg-[#0f172a]/80 backdrop-blur-md text-[10px] font-mono text-emerald-400 font-bold flex items-center gap-1.5 border border-emerald-500/20">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" /> BOTTOM GARMENT
                 </div>
-                <span className="absolute bottom-2 left-2 right-2 text-xs font-extrabold text-white truncate font-sans text-left">
+                <span className="absolute bottom-2.5 left-2.5 right-2.5 text-xs sm:text-sm font-extrabold text-white truncate font-sans text-left drop-shadow-md">
                   {currentBottom.name}
                 </span>
               </div>
@@ -242,26 +243,26 @@ export default function Hero({ user, onNavigate, onOpenLogin }) {
               {/* Right Arrow --> */}
               <button
                 onClick={() => handleBottomSlide('right')}
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 hover:bg-emerald-600 text-slate-300 hover:text-white flex items-center justify-center transition-all border border-slate-800 shadow-md shrink-0 active:scale-90"
+                className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#0f172a] hover:bg-slate-800 text-white flex items-center justify-center transition-all shadow-md shrink-0 active:scale-90"
                 title="Swipe Pants Right"
               >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight className="w-5 h-5 text-white" />
               </button>
             </div>
 
             {/* ROW 3: SHOES / FOOTWEAR SLOT WITH LEFT (<--) AND RIGHT (-->) ARROWS */}
-            <div className="glass-card p-3 rounded-2xl border border-slate-800 bg-slate-950/90 relative flex items-center justify-between gap-2 shadow-inner group">
+            <div className="bg-white p-3 rounded-[20px] border border-slate-200/90 relative flex items-center justify-between gap-3 shadow-sm group">
               {/* Left Arrow <-- */}
               <button
                 onClick={() => handleShoeSlide('left')}
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 hover:bg-emerald-600 text-slate-300 hover:text-white flex items-center justify-center transition-all border border-slate-800 shadow-md shrink-0 active:scale-90"
+                className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#0f172a] hover:bg-slate-800 text-white flex items-center justify-center transition-all shadow-md shrink-0 active:scale-90"
                 title="Swipe Shoes Left"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-5 h-5 text-white" />
               </button>
 
               {/* Center Garment Card: Shoes */}
-              <div className="flex-1 h-36 rounded-xl overflow-hidden relative bg-slate-900 border border-slate-800 flex items-center justify-center">
+              <div className="flex-1 h-36 rounded-xl overflow-hidden relative bg-slate-900 border border-slate-200 flex items-center justify-center">
                 <img
                   src={currentShoe.image}
                   alt={currentShoe.name}
@@ -269,11 +270,11 @@ export default function Hero({ user, onNavigate, onOpenLogin }) {
                     animatingRow === 'shoes' || isAutoShuffling ? 'scale-110 opacity-70 blur-xs' : 'scale-100 opacity-100'
                   }`}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
-                <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 backdrop-blur-md text-[10px] font-mono text-emerald-400 font-bold border border-emerald-500/30">
-                  👟 FOOTWEAR
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+                <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-md bg-[#0f172a]/80 backdrop-blur-md text-[10px] font-mono text-emerald-400 font-bold flex items-center gap-1.5 border border-emerald-500/20">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" /> FOOTWEAR
                 </div>
-                <span className="absolute bottom-2 left-2 right-2 text-xs font-extrabold text-white truncate font-sans text-left">
+                <span className="absolute bottom-2.5 left-2.5 right-2.5 text-xs sm:text-sm font-extrabold text-white truncate font-sans text-left drop-shadow-md">
                   {currentShoe.name}
                 </span>
               </div>
@@ -281,23 +282,24 @@ export default function Hero({ user, onNavigate, onOpenLogin }) {
               {/* Right Arrow --> */}
               <button
                 onClick={() => handleShoeSlide('right')}
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-900 hover:bg-emerald-600 text-slate-300 hover:text-white flex items-center justify-center transition-all border border-slate-800 shadow-md shrink-0 active:scale-90"
+                className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#0f172a] hover:bg-slate-800 text-white flex items-center justify-center transition-all shadow-md shrink-0 active:scale-90"
                 title="Swipe Shoes Right"
               >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight className="w-5 h-5 text-white" />
               </button>
             </div>
 
           </div>
 
-          <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-300">
-            <span className="flex items-center gap-1.5 font-mono text-[11px] truncate">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> {currentTop.name.split(' ')[0]} + {currentBottom.name.split(' ')[0]}
+          {/* Bottom Bar: Active Combination Status & Link */}
+          <div className="mt-4 pt-3.5 border-t border-slate-300/80 flex items-center justify-between text-xs">
+            <span className="flex items-center gap-1.5 font-mono text-slate-500 text-[11px] font-bold truncate">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" /> {currentTop.name.split(' ')[0]} + {currentBottom.name.split(' ')[0]}
             </span>
 
             <button
               onClick={() => onNavigate('styling')}
-              className="text-emerald-400 font-extrabold hover:underline flex items-center gap-1 font-mono text-[11px] shrink-0"
+              className="text-emerald-600 font-extrabold hover:underline flex items-center gap-1 font-mono text-[11px] shrink-0"
             >
               Open Outfit Canvas →
             </button>
