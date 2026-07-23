@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Lock, Mail, User, Shirt, ArrowRight, CheckCircle2, UserPlus, LogIn } from 'lucide-react';
+import { X, Lock, Mail, User, Shirt, ArrowRight, CheckCircle2, UserPlus, LogIn, Sparkles } from 'lucide-react';
 import { loginUser, registerUser } from '../utils/database';
 
 export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
@@ -62,20 +62,21 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-fade-in-up">
-      <div className="glass-panel w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden bg-white">
-        {/* Header */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-lg animate-fade-in-up">
+      <div className="glass-panel w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden bg-white border border-black/10">
+        
+        {/* Brand Header */}
         <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-black text-white flex items-center justify-center">
-              <Shirt className="w-4.5 h-4.5" />
+            <div className="w-9 h-9 rounded-2xl bg-black text-white flex items-center justify-center shadow-md">
+              <Shirt className="w-5 h-5 text-emerald-400" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900">
-                {isRegister ? 'Create Account' : 'Sign In to Account'}
+              <h3 className="text-lg font-extrabold text-slate-900 leading-tight">
+                {isRegister ? 'Create Your Account' : 'Sign In to StyleSync'}
               </h3>
-              <span className="text-xs text-slate-500 font-mono">
-                Stores your wardrobe & preferences
+              <span className="text-[11px] text-slate-500 font-mono">
+                Fashion-Tech Digital Wardrobe Engine
               </span>
             </div>
           </div>
@@ -83,18 +84,19 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
           <button
             onClick={() => { onClose(); resetForm(); }}
             className="p-2 text-slate-400 hover:text-black rounded-full bg-slate-100 hover:bg-slate-200 transition-colors"
+            title="Close"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Tab Switcher */}
-        <div className="grid grid-cols-2 gap-1 bg-slate-100 p-1 rounded-2xl mb-5 text-xs font-bold font-sans">
+        <div className="grid grid-cols-2 gap-1 bg-slate-100 p-1 rounded-2xl mb-5 text-xs font-extrabold font-sans">
           <button
             type="button"
             onClick={() => { setIsRegister(false); setError(''); }}
-            className={`py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
-              !isRegister ? 'bg-black text-white shadow-sm' : 'text-slate-600 hover:text-black'
+            className={`py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+              !isRegister ? 'bg-black text-white shadow-md' : 'text-slate-600 hover:text-black'
             }`}
           >
             <LogIn className="w-3.5 h-3.5" /> Sign In
@@ -102,24 +104,27 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
           <button
             type="button"
             onClick={() => { setIsRegister(true); setError(''); }}
-            className={`py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
-              isRegister ? 'bg-black text-white shadow-sm' : 'text-slate-600 hover:text-black'
+            className={`py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+              isRegister ? 'bg-black text-white shadow-md' : 'text-slate-600 hover:text-black'
             }`}
           >
             <UserPlus className="w-3.5 h-3.5" /> Register Account
           </button>
         </div>
 
-        {/* Quick Demo Login Banner */}
-        <div className="glass-card p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200 mb-5 flex items-center justify-between">
+        {/* 1-Click Demo Login Card */}
+        <div className="glass-card p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 mb-5 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            <span className="text-xs font-semibold text-emerald-900">1-Click Demo Login</span>
+            <Sparkles className="w-4 h-4 text-emerald-600" />
+            <div>
+              <span className="text-xs font-extrabold text-emerald-950 block">1-Click Demo Login</span>
+              <span className="text-[10px] text-emerald-700 font-mono">Instant testing with preset closet</span>
+            </div>
           </div>
           <button
             type="button"
             onClick={handleQuickDemo}
-            className="px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
+            className="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-extrabold transition-all shadow-sm shrink-0"
           >
             Sign In Demo
           </button>
@@ -139,7 +144,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
                 Full Name
               </label>
               <div className="relative">
-                <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                <User className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
                 <input
                   type="text"
                   placeholder="e.g. Alex Vance"
@@ -156,7 +161,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
               Email Address
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
               <input
                 type="email"
                 placeholder="alex@stylesync.ai"
@@ -172,7 +177,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
               Password
             </label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
               <input
                 type="password"
                 placeholder="••••••••"
@@ -185,21 +190,21 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
 
           <button
             type="submit"
-            className="w-full primary-button py-3 text-xs uppercase tracking-wider flex items-center justify-center gap-2 font-bold mt-2"
+            className="w-full primary-button py-3 text-xs uppercase tracking-wider flex items-center justify-center gap-2 font-extrabold mt-2 shadow-md shimmer-hover"
           >
-            {isRegister ? 'Create & Save Account' : 'Sign In to Account'} <ArrowRight className="w-4 h-4" />
+            {isRegister ? 'Create & Launch Setup' : 'Sign In & Launch Setup'} <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
-        <div className="mt-6 pt-4 border-t border-slate-100 text-center text-xs text-slate-500">
-          {isRegister ? 'Already have an account?' : "Don't have an account yet?"}{' '}
+        <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+          <span>{isRegister ? 'Have an account?' : "New to StyleSync?"}</span>
           <button
             type="button"
             onClick={() => {
               setIsRegister(!isRegister);
               setError('');
             }}
-            className="text-black font-bold underline hover:opacity-80"
+            className="text-black font-extrabold underline hover:opacity-80"
           >
             {isRegister ? 'Sign In' : 'Register Account'}
           </button>

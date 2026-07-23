@@ -54,6 +54,8 @@ export default function App() {
     } else {
       const savedWardrobe = getUserWardrobeFromDB(null, INITIAL_WARDROBE);
       setWardrobe(savedWardrobe);
+      // Auto-open Login / Register screen on app start if no active session
+      setLoginModalOpen(true);
     }
   }, []);
 
@@ -105,7 +107,7 @@ export default function App() {
     const userWardrobe = getUserWardrobeFromDB(loggedInUser.id, INITIAL_WARDROBE);
     setWardrobe(userWardrobe);
     showToast(`Welcome, ${loggedInUser.name}!`);
-    // Automatically open Profile Dashboard Modal for user onboarding
+    // Immediately bring user to Profile Dashboard (Style Aesthetic & Body Metrics Setup)
     setProfileModalOpen(true);
   };
 
@@ -114,6 +116,7 @@ export default function App() {
     setUser(null);
     setWardrobe(INITIAL_WARDROBE);
     showToast("Signed out successfully", "info");
+    setLoginModalOpen(true);
   };
 
   const handleNavigate = (tab) => {
@@ -240,20 +243,23 @@ export default function App() {
         onOpenCompliance={() => setComplianceOpen(true)}
       />
 
-      {/* Login & Registration Modal */}
+      {/* Login & Registration Modal (App Launch Screen) */}
       <LoginModal
         isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
         onLoginSuccess={handleLoginSuccess}
       />
 
-      {/* Profile & Body Metrics Dashboard Modal */}
+      {/* Profile Dashboard Modal (Style Aesthetic Themes & Full Body Metrics Setup) */}
       <ProfileDashboardModal
         isOpen={profileModalOpen}
         onClose={() => setProfileModalOpen(false)}
         user={user}
         onSaveMetrics={(metrics) => {
-          showToast("Saved body metrics profile!", "success");
+          showToast("Saved body metrics & style preferences!", "success");
+        }}
+        onCompleteOnboarding={() => {
+          showToast("✨ Profile setup complete! Welcome to StyleSync.");
         }}
         onLogout={handleLogout}
       />
